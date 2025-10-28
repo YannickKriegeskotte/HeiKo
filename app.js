@@ -1,0 +1,90 @@
+const express = require("express");
+const sqlite3 = require("sqlite3");
+const { open } = require("sqlite");
+const { exec } = require("child_process");
+const path = require("path");
+
+// Pfad zur exe oder zum Script
+const dbPath = path.join(process.pkg ? path.dirname(process.execPath) : __dirname, "data.db");
+
+async function main() {
+  const app = express();
+
+  // ----SQLite öffnen (oder erstellen) ----
+  const db = await open({
+    filename: dbPath,
+    driver: sqlite3.Database,
+  });
+
+  // ---- Tabelle anlegen (nur beim ersten Start) ----
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS data (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    );
+  `);
+
+// ---- Middleware ----
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+
+// ---- Get Value ----
+app.get("/get", async (req, res) =>{
+    const key = req.query.key;
+    const row = await db.get("SELECT value FROM data WHERE key = ?", [key]);
+    res.json({value: row ? row.value : null});
+});
+
+// ---- Get all Values from keys containing a pattern ----
+app.get("/getAllContaining", async (req, res) => {
+    const pattern = req.query.pattern;
+    const rows = await db.all("SELECT key, value FROM data WHERE key LIKE ?", [`%${pattern}%`]);
+    res.json(rows || []);
+});
+
+// ---- Save Value ----
+app.post("/save", async (req, res) =>{
+    const {key, value} = req.body;
+    await db.run("INSERT OR REPLACE INTO data (key,value) VALUES (?, ?)", [key,value]);
+    res.json({success: true});
+});
+
+// ---- Update Value ----
+app.post("/update", async (req, res) => {
+  const { key, value } = req.body;
+  if (!key) return res.status(400).json({ error: "key fehlt" });
+
+  try {
+    await db.run("UPDATE data SET value = ? WHERE key = ?", [value, key]);
+    res.json({success: true});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "DB-Fehler" });
+  }
+});
+
+// ---- Delete all entries containing Value ----
+app.delete("/removeApartmentEntries", async (req, res) =>{
+    const id= req.query.apartmentID;
+    await db.run("DELETE FROM data WHERE key LIKE ?", [`%${id}%`]);
+    res.json({succes: true});
+});
+
+
+
+// ---- Server starten und Browser öffnen ----
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server läuft auf http://localhost:${PORT}`);
+    exec(`start http://localhost:${PORT}/index.html`);
+});
+}
+
+// Fehlerbehandlung: Fenster bleibt offen bei Problemen
+main().catch(err => {
+  console.error(err);
+  console.log("\nFehler beim Starten. Drücke eine Taste zum Beenden.");
+  process.stdin.resume();
+});

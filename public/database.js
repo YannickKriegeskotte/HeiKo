@@ -4,52 +4,16 @@
  * @param {String} value
  */
 export async function saveValueToDB(key, value) {
-    await fetch("/save", {
+    console.log("saveValueToDB:", key, value);
+    const response = await fetch("/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: key, value: value }),
+        body: JSON.stringify({ key, value }),
     });
-}
-
-/**
- * 
- * @param {String} key 
- * @returns {String}
- */
-export async function getNewestKey(key) {
-    let response;
-    let data;
-
-    // Suche nach allen keys, die "key" enthalten und nimm den neusten
-    response = await fetch(`/getAllContaining?pattern=${key}`);
-    data = await response.json();
-
-    // Suche im array den neusten Eintrag anhand der Daten in den keys
-    const sorted = data
-        .filter(item => extractDate(item.key))
-        .sort((a, b) => extractDate(b.key) - extractDate(a.key));
-    return sorted[0].key; 
+    if (!response.ok) console.error("saveValueToDB failed", response.status);
 }
 
 
-/**
- * 
- * @param {String} key 
- * @returns {Date}
- */
-export async function getTimestampOfNewestKey(key) {
-
-    const match = (getNewestKey(key)).match(/([0-9]{1,2})-([0-9]{1,2})-([0-9]{4})$/);
-    return [_, day, month, year] = match; 
-}
-
-export async function updateValueInDB(key, value){
-     await fetch("/update", {
-        method: "POST",
-        headers: { "Conten-Type": "application/json" },
-        body: JSON.stringify({ key: key, value: value }),
-    });
-}
 
 
 /**
@@ -57,53 +21,71 @@ export async function updateValueInDB(key, value){
  * @returns {} String or null
  */
 export async function getValueFromDB(key) {
+    console.log("getValueFromDB key", key);
+
     let response;
     let data;
 
-    const keyHasTimestamp = /[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}$/.test(key);
+    response = await fetch(`/get?key=${key}`);
+    console.log("response", response);
+    data = await response.json();
+    console.log("data", data);
+    return data.value;
 
-    // Wenn input key ein Datum hat, suche nach genau diesem Eintrag.
-    if (keyHasTimestamp) {
-        response = await fetch(`/get?key=${key}`);
-        data = await response.json();
+}
 
-        // Wenn kein Eintrag mit genau diesem Datum gefunden, trimme das Datum, suche erneut in der DB und nimm den neusten eintrag.
-        if (!data.value) {
-            const trimmedKey = key.replace(/[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}$/, "");
-            response = await fetch(`/getAllContaining?pattern=${key}`);
-            data = await response.json();
 
-            // Wenn wieder kein Eintrag gefunden, dann gibt es keinen Eintag in DB
-            if (data.length == 0) {
-                return null;
-            }
 
-            // Wenn Einträge gefunden, suche im array den neusten Eintrag anhand der Daten in den keys
-            const sorted = data
-                .filter(item => extractDate(item.key))
-                .sort((a, b) => extractDate(b.key) - extractDate(a.key));
-            return sorted[0].value;
-        }
-        else {
-            // Ein Eintrag mit genau dem Datum wurde gefunden, gib die value zurück
-            return data.value;
-        }
+/**
+ * @param {String} key 
+ * @param {String} value 
+ */
+export async function updateValueInDB(key, value) {
+    const response = await fetch("/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value }),
+    });
+    if (!response.ok) console.error("updateValueInDB failed", response.status);
+}
+
+
+
+
+/**
+ * @param {String} key 
+ * @returns {String} String oder Null
+ */
+export async function getNewestValueFromDB(key) {
+    // Finde alle Einträge, die key enthalten
+    let matches = await getAllKeysContaining(key);
+    if (matches.length == 0) {
+        console.log("no matches");
+        return null;
     }
-    // Wenn input key kein Datum hat, suche nach allen keys und nimm den neusten
-    else {
-        response = await fetch(`/getAllContaining?pattern=${key}`);
-        data = await response.json();
-        // Wenn kein Eintrag gefunden, dann gibt es keinen Eintag in DB
-        if (data.length == 0) {
-            return null;
-        }
-
-        // Suche im array den neusten Eintrag anhand der Daten in den keys
-        const sorted = data
-            .filter(item => extractDate(item.key))
-            .sort((a, b) => extractDate(b.key) - extractDate(a.key));
-        return sorted[0].value;
+    // Wenn Array nur länge 1, dann nimm die value
+    if (matches.length == 1) {
+        console.log("one match:",matches[0]);
+        return matches[0].value;
     }
+    // Sonst sortiere array, sodass neustes Datum vorne und nimm die value des ersten Eintrags
+    console.log("matches:",matches);
+    const sorted = data
+        .filter(item => extractDate(item.key))
+        .sort((a, b) => extractDate(b.key) - extractDate(a.key));
+    console.log("sorted[0]", sorted[0]);
+    return sorted[0].value;
+}
+
+
+/**
+ * @param {String} pattern 
+ * @returns {Array}
+ */
+export async function getAllKeysContaining(pattern) {
+    const response = await fetch(`/getAllContaining?pattern=${pattern}`);
+    if (!response.ok) return [];
+    return await response.json();
 }
 
 /**
@@ -116,6 +98,50 @@ export async function deleteAllValuesFromApartmentInDB(apartmendID) {
         console.log("Gelöscht!");
     }
 }
+
+
+
+
+
+/**
+ * 
+ * @param {String} key 
+ * @returns {String}
+ */
+export async function getNewestKey(key) {
+    const response = await fetch(`/getAllContaining?pattern=${key}`);
+    const data = await response.json();
+
+    if (!Array.isArray(data) || data.length === 0) return null;
+
+    const sorted = data
+        .filter(item => extractDate(item.key))
+        .sort((a, b) => extractDate(b.key) - extractDate(a.key));
+
+    return sorted[0]?.key || null;
+}
+
+
+/**
+ * 
+ * @param {String} key 
+ * @returns {Date}
+ */
+export async function getTimestampOfNewestKey(key) {
+    const newestKey = await getNewestKey(key);
+    if (!newestKey) return null;
+
+    const match = newestKey.match(/(\d{1,2})-(\d{1,2})-(\d{4})$/);
+    if (!match) return null;
+
+    const [_, day, month, year] = match;
+    return `${day}-${month}-${year}`;
+}
+
+
+
+
+
 
 /**
  * @param {String} key 

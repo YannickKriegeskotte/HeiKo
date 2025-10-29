@@ -1,42 +1,53 @@
 import * as DB from "./database.js";
 export function registerListeners() {
-    $(document).on('focusout', 'input:not([type="checkbox"])', async function () {
-        const id = $(this).attr('id');
-        const value = $(this).val();
-        console.log("input", id);
+$(document).on('focusout', 'input:not([type="checkbox"])', async function () {
+    const id = $(this).attr('id');   // z. B. "strom"
+    const value = $(this).val();     // neuer Wert
 
-        // Prüfe ob key(id) bereits in DB, wenn ja, speichere neuste value in "data"
-        const data = await DB.getValueFromDB(id);
-        if(data === null){
-            // Wenn value noch nicht in DB, in DB speichern
-            await DB.saveValueToDB(id,value);
+    console.log("Input:", id, "=", value);
+
+    // Prüfe, ob es in der DB mehrere Versionen (mit Datum) gibt
+    const allMatches = await DB.getAllKeysContaining(id);
+
+    if (!allMatches || allMatches.length === 0) {
+        // 🔹 Noch kein Eintrag -> neu speichern
+        console.log("Kein Eintrag gefunden, speichere neu");
+        await DB.saveValueToDB(id, value);
+        return;
+    }
+
+    // Prüfen, ob die Keys timestamps enthalten
+    const hasTimestamps = allMatches.some(k => /\d{1,2}-\d{1,2}-\d{4}$/.test(k.key));
+
+    if (!hasTimestamps) {
+        // 🔹 Kein Datum => ganz normaler Key, einfach ersetzen
+        const currentValue = await DB.getValueFromDB(id);
+        if (currentValue !== value) {
+            console.log("Update (permanenter Key)", id);
+            await DB.updateValueInDB(id, value);
+        } else {
+            console.log("Wert gleich, ignoriere");
         }
-        else{
-            // Wenn data und value gleich, ignorieren.
-            if(data == value){
-                // ignorieren
-            }
-            // Wenn value von data abweichent, Datum von data key(id) prüfen
-            else{
-                // Wenn Eintragsdatum = heutigem Datum
-                const keyTimestamp = DB.getTimestampOfNewestKey(id);
-                const currentDate = new Date(`${year}-${month}-${day}`);
+        return;
+    }
 
-                if(keyTimestamp = currentDate){
-                   // Dann nur value aktuallisieren.
-                const newestKey = DB.getNewestKey(id);
-                DB.updateValueInDB(newestKey, value);
+    // 🔹 Ab hier: zeitabhängige Keys
+    const newestKey = await DB.getNewestKey(id);
+    const newestTimestamp = await DB.getTimestampOfNewestKey(id);
 
-                }
-                else{
-                    // Wenn Eintragsdatum älter, dann neuen Eintrag erstellen
-                    await DB.saveValueToDB(id,value);
-                }
-                
-            }
-        }
+    const today = new Date();
+    const todayString = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
 
-    });
+    if (newestTimestamp === todayString) {
+        console.log("Heutiger Eintrag vorhanden -> update", newestKey);
+        await DB.updateValueInDB(newestKey, value);
+    } else {
+        const newKey = `${id}-${todayString}`;
+        console.log("Neuer Tag, erstelle neuen Key:", newKey);
+        await DB.saveValueToDB(newKey, value);
+    }
+});
+
 
     $(document).on('change', 'input[type="checkbox"]', function () {
         const id = $(this).attr('id');

@@ -11,6 +11,15 @@ export async function saveValueToDB(key, value) {
         body: JSON.stringify({ key, value }),
     });
     if (!response.ok) console.error("saveValueToDB failed", response.status);
+    $('tbody').append(`
+         <tr>
+            <td>${key}</td>
+            <td>${value}</td>
+            <td><input type="text" class="newKeyInput"></td>
+            <td><input type="text" class=newValueInput"></td>
+            <td><button class=deleteButton id="${key}_button">Löschen</button></td>
+        </tr>
+    `);
 }
 
 
@@ -31,8 +40,24 @@ export async function getValueFromDB(key) {
     data = await response.json();
     console.log("data", data);
     return data.value;
-
 }
+
+
+
+
+/** 
+ * @returns {Array} 
+ */
+export async function getAllValuesFromDB() {
+    let response;
+    let data;
+
+    response = await fetch(`/getAll`);
+    data = await response.json();
+    if (!response.ok) return [];
+    return data;
+}
+
 
 
 
@@ -47,6 +72,12 @@ export async function updateValueInDB(key, value) {
         body: JSON.stringify({ key, value }),
     });
     if (!response.ok) console.error("updateValueInDB failed", response.status);
+    if (response.ok) console.log("Updated:", key, "=>", value);
+
+     const row = $(`tbody tr`).filter(function() {
+        return $(this).find("td:first").text() === key;
+    });
+     row.find("td:nth-child(2)").text(value);
 }
 
 
@@ -65,11 +96,11 @@ export async function getNewestValueFromDB(key) {
     }
     // Wenn Array nur länge 1, dann nimm die value
     if (matches.length == 1) {
-        console.log("one match:",matches[0]);
+        console.log("one match:", matches[0]);
         return matches[0].value;
     }
     // Sonst sortiere array, sodass neustes Datum vorne und nimm die value des ersten Eintrags
-    console.log("matches:",matches);
+    console.log("matches:", matches);
     const sorted = data
         .filter(item => extractDate(item.key))
         .sort((a, b) => extractDate(b.key) - extractDate(a.key));
@@ -96,9 +127,30 @@ export async function deleteAllValuesFromApartmentInDB(apartmendID) {
     const result = await response.json();
     if (result.success) {
         console.log("Gelöscht!");
+
+        // Finde alle html datenbank zeilen, die apartmendID enthalten und lösche sie
+        //...
     }
 }
 
+
+export async function deleteKeyInDB(key) {
+    const response = await fetch("/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key })
+    });
+    const result = await response.json();
+    if (result.success) {
+        console.log("Gelöscht!");
+
+        // Finde html datenbank zeile und lösche
+         const row = $(`tbody tr`).filter(function() {
+        return $(this).find("td:first").text() === key;
+         });
+         row.parent().remove();
+    }
+}
 
 
 

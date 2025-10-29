@@ -1,5 +1,6 @@
 import * as DB from "./database.js";
 import { registerListeners } from "./indexListeners.js";
+import * as Helper from "./helpers.js";
 
 $(document).ready(async function () {
 
@@ -7,15 +8,16 @@ $(document).ready(async function () {
 
 
     // ==Allgemein==
-    // 1. Apartmentcount input auslesen
-    const apartmentcount = $('#apartmentcount').val();
+    // 1. Apartmentcount laden und in input schreiben
+    const apartmentcount = (await DB.getValueFromDB(`apartmentcount`)) || 1;
+    $(`#apartmentcount`).val(apartmentcount);
 
     // 2. Ensprechend viele Namen-Inputs erzeugen
     // 3. Server anfragen, ob in DB ein eintrag mit jeweiligem Namen-Input ist.  Wenn ja, einfügen, wenn ignorieren
     for (let i = 1; i <= apartmentcount; i++) {
         const apartmentName = (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
         $(`#general`).append(`
-        <label for="apartment${i}name">Name der ${i}. Wohnung</label> <input type="text" id="apartment${i}name" name="apartment${i}name" value="${apartmentName}">
+        <label for="apartment${i}name">Name der ${i}. Wohnung</label> <input type="text" id="apartment${i}name" name="apartment${i}name" value="${apartmentName}"><br>
         `);
     }
 
@@ -51,7 +53,8 @@ $(document).ready(async function () {
 
     // ==Wasser==
     // 1. Allgemeine versiegelungs Inputs erzeugen, Server anfragen, ob in DB checkobx state gespeichert. Wenn ja, setzen, wenn nein standardmäßig aktivieren
-    const generalPrecipitation = await DB.getValueFromDB('generalPrecipitation') || 'true'; // Standardwert
+    let generalPrecipitation = await DB.getValueFromDB('generalPrecipitation');
+    generalPrecipitation = (generalPrecipitation == 1) ? true : false;
     const precipitationFee = await DB.getValueFromDB('precipitationFee') || '';
     const precipitationArea = await DB.getValueFromDB('precipitationArea') || '';
     $('#water').append(`
@@ -60,13 +63,17 @@ $(document).ready(async function () {
         <br>
         <label for="precipitationFee">Allgemeine Versiegeltungsgebühr</label>
         <input type="number" id="precipitationFee" name="precipitationFee" min="0" value="${precipitationFee}">
-        <label for="precipitationFee">€</label>
+        <label for="precipitationFee">€/m²</label>
         <br>
         <label for="precipitationArea">Allgemeine Versiegelte Fläche</label>
         <input type="number" id="precipitationArea" name="precipitationArea" min="0" value="${precipitationArea}">
         <label for="precipitationArea">m²</label>
     `);
     $('#generalPrecipitation').prop('checked', generalPrecipitation === true || generalPrecipitation === 'true');
+    const generalWaterChecked = $('#generalPrecipitation').is(':checked');
+    console.log("pre water check section update");
+    Helper.waterSectionUpdate(generalWaterChecked);
+
 
 
     // 2. Entsprechende viele Wohnungssektionen erzeugen
@@ -106,16 +113,13 @@ $(document).ready(async function () {
                 <input type="number" id="apartment${i}precipitationFee" name="apartment${i}precipitationFee" min="0" value="${precipitationFee}">
                 <label for="apartment${i}precipitationFee">€</label>
              </div>
-        `);
-
-        // style="color: #8c8c8c;"
-        // disabled
+        `);  
     }
 
     // ==Heizung==
     // 1. Allgemeine Einstellungs Checkbox erzeugen, Server anfragen, ob in DB checkbox state gespeichert. Wenn ja, setzen, wenn nein standardmäßig aktivieren
-    const generalHeating = (await DB.getValueFromDB(`generalHeating`));
-    const isGeneralHeating = (generalHeating === null || generalHeating === '' || generalHeating === 'true' || generalHeating === true);
+    let generalHeating = (await DB.getValueFromDB(`generalHeating`));
+    generalHeating = (generalHeating == 1) ? true : false;
     const oilPerCm = (await DB.getNewestValueFromDB(`oilPerCm`)) || '';
     const numberOfOilTanks = (await DB.getNewestValueFromDB(`numberOfOilTanks`)) || '';
     $('#heating').append(`
@@ -129,7 +133,7 @@ $(document).ready(async function () {
         <label for="numberOfOilTanks">Anzahl der Öltanks</label>
         <input type="text" id="numberOfOilTanks" name="numberOfOilTanks" min="0" value=${numberOfOilTanks}>
     `);
-    $('#generalHeating').prop('checked', isGeneralHeating);
+    $('#generalHeating').prop('checked', generalHeating);
 
 
 
@@ -155,6 +159,7 @@ $(document).ready(async function () {
                     <h3 id="apartment${i}name_heating">${apartmentName}</h3>
                     <label for="apartment${i}oilPerCm">1cm Tankfüllung entsprechen</label>
                     <input type="text" id="apartment${i}oilPerCm" min="0" value="${oilPerCm}">
+                    <br>
                     <label for="apartment${i}numberOfOilTanks">Anzahl der Öltanks</label>
                     <input type="text" id="apartment${i}numberOfOilTanks" min="0" value="${numberOfTanks}">
                 </div>
@@ -163,5 +168,61 @@ $(document).ready(async function () {
     }
 
 
+    const dbdata = await DB.getAllValuesFromDB();
+
+    // Sortiere dbdata zuerst alphabetisch und dann nochmal nach datum
+    const sorted = dbdata.sort((a, b) => {
+        const baseA = extractBaseKey(a.key);
+        const baseB = extractBaseKey(b.key);
+
+        // 1️⃣ Alphabetisch nach Präfix
+        const alphaCompare = baseA.localeCompare(baseB);
+        if (alphaCompare !== 0) return alphaCompare;
+
+        // 2️⃣ Wenn gleich, nach Datum (neu → alt)
+        const dateA = extractDate(a.key);
+        const dateB = extractDate(b.key);
+
+        if (!dateA && !dateB) return 0;     // beide ohne Datum
+        if (!dateA) return 1;              // ohne Datum → älter
+        if (!dateB) return -1;
+
+        return dateB - dateA; // neueste zuerst
+    });
+
+    for (let i = 0; i < sorted.length; i++) {
+        const key = sorted[i].key;
+        const value = sorted[i].value
+        console.log(key, value);
+
+        $('tbody').append(`
+         <tr>
+            <td>${key}</td>
+            <td>${value}</td>
+            <td><input type="text" class="newKeyInput"></td>
+            <td><input type="text" class=newValueInput"></td>
+            <td><button class=deleteButton id="${key}_button">Löschen</button></td>
+        </tr>
+    `);
+    }
+
+
+
     registerListeners();
-}); 
+});
+
+
+
+
+
+
+function extractBaseKey(key) {
+    return key.replace(/[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}$/, "").trim();
+}
+
+function extractDate(key) {
+    const match = key.match(/([0-9]{1,2})-([0-9]{1,2})-([0-9]{4})$/);
+    if (!match) return null;
+    const [_, day, month, year] = match.map(Number);
+    return new Date(year, month - 1, day);
+}

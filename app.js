@@ -37,6 +37,19 @@ app.get("/get", async (req, res) =>{
     res.json({value: row ? row.value : null});
 });
 
+// ---- Get All Values ----
+app.get("/getAll", async (req, res) =>{
+    try{
+      const rows = await db.all("SELECT key, value FROM data");
+      res.json(rows);
+    }
+    catch(err){
+      console.error(err);
+      res.status(500).json({ error: "DB-Fehler" });
+    }
+});
+
+
 // ---- Get all Values from keys containing a pattern ----
 app.get("/getAllContaining", async (req, res) => {
     const pattern = req.query.pattern;
@@ -69,7 +82,14 @@ app.post("/update", async (req, res) => {
 app.delete("/removeApartmentEntries", async (req, res) =>{
     const id= req.query.apartmentID;
     await db.run("DELETE FROM data WHERE key LIKE ?", [`%${id}%`]);
-    res.json({succes: true});
+    res.json({success: true});
+});
+
+// ---- Delete a single entry ----
+app.delete("/delete",async(req,res) =>{
+  const { key } = req.body;
+  await db.run("DELETE FROM data WHERE key = ?",[key]);
+  res.json({ success: true});
 });
 
 

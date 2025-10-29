@@ -1,75 +1,142 @@
 import * as DB from "./database.js";
+import * as Helper from "./helpers.js";
 export function registerListeners() {
-$(document).on('focusout', 'input:not([type="checkbox"])', async function () {
-    const id = $(this).attr('id');   // z. B. "strom"
-    const value = $(this).val();     // neuer Wert
-
-    console.log("Input:", id, "=", value);
-
-    // Prüfe, ob es in der DB mehrere Versionen (mit Datum) gibt
-    const allMatches = await DB.getAllKeysContaining(id);
-
-    if (!allMatches || allMatches.length === 0) {
-        // 🔹 Noch kein Eintrag -> neu speichern
-        console.log("Kein Eintrag gefunden, speichere neu");
-        await DB.saveValueToDB(id, value);
-        return;
-    }
-
-    // Prüfen, ob die Keys timestamps enthalten
-    const hasTimestamps = allMatches.some(k => /\d{1,2}-\d{1,2}-\d{4}$/.test(k.key));
-
-    if (!hasTimestamps) {
-        // 🔹 Kein Datum => ganz normaler Key, einfach ersetzen
-        const currentValue = await DB.getValueFromDB(id);
-        if (currentValue !== value) {
-            console.log("Update (permanenter Key)", id);
-            await DB.updateValueInDB(id, value);
-        } else {
-            console.log("Wert gleich, ignoriere");
+    // Inputs
+    $(document).on('focusout', 'input:not([type="checkbox"])', async function () {
+        const id = $(this).attr('id');   // z. B. "strom"
+        const value = $(this).val();     // neuer Wert
+        if (value == "") {
+            return;
         }
-        return;
-    }
 
-    // 🔹 Ab hier: zeitabhängige Keys
-    const newestKey = await DB.getNewestKey(id);
-    const newestTimestamp = await DB.getTimestampOfNewestKey(id);
-
-    const today = new Date();
-    const todayString = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-
-    if (newestTimestamp === todayString) {
-        console.log("Heutiger Eintrag vorhanden -> update", newestKey);
-        await DB.updateValueInDB(newestKey, value);
-    } else {
-        const newKey = `${id}-${todayString}`;
-        console.log("Neuer Tag, erstelle neuen Key:", newKey);
-        await DB.saveValueToDB(newKey, value);
-    }
-});
+        console.log("Input:", id, "=", value);
 
 
-    $(document).on('change', 'input[type="checkbox"]', function () {
+        // Wenn id = apartmentcount, vergleiche value mit db, wenn value kleiner, lösche alle höheren db einträge
+        if (id == "apartmentcount") {
+            console.log("apartmentcount trigger");
+            let data = await DB.getValueFromDB('apartmentcount');
+            console.log("apartmentcount in db", data);
+            while (data > value) {
+                console.log("deleting apartment", data);
+                await DB.deleteAllValuesFromApartmentInDB(`apartment${data}`);
+                data--;
+            }
+            // Speichere neuen apartmentcount value in DB
+            await DB.updateValueInDB('apartmentcount',value);
+            
+            // Seite neu laden für GUI update
+            window.location.reload();
+        }
+
+
+
+
+        // Prüfe, ob es in der DB mehrere Versionen (mit Datum) gibt
+        const allMatches = await DB.getAllKeysContaining(id);
+
+        if (!allMatches || allMatches.length === 0) {
+            // Noch kein Eintrag -> neu speichern
+            console.log("Kein Eintrag gefunden, speichere neu");
+            await DB.saveValueToDB(id, value);
+            return;
+        }
+
+        // Prüfen, ob die Keys timestamps enthalten
+        const hasTimestamps = allMatches.some(k => /\d{1,2}-\d{1,2}-\d{4}$/.test(k.key));
+
+        if (!hasTimestamps) {
+            // Kein Datum => ganz normaler Key, einfach ersetzen
+            const currentValue = await DB.getValueFromDB(id);
+            if (currentValue !== value) {
+                console.log("Update (permanenter Key)", id);
+                await DB.updateValueInDB(id, value);
+            } else {
+                console.log("Wert gleich, ignoriere");
+            }
+
+            // Wenn Input id beginnt mit "apartment" und endet mit "name", dann fenster neu laden, um Namen überall richtig anzuzeigen
+            if (id.startsWith("apartment") && id.endsWith("name")) {
+                window.location.reload();
+            }
+            return;
+        }
+
+        // Ab hier: zeitabhängige Keys
+        const newestKey = await DB.getNewestKey(id);
+        const newestTimestamp = await DB.getTimestampOfNewestKey(id);
+
+        const today = new Date();
+        const todayString = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+
+        if (newestTimestamp === todayString) {
+            console.log("Heutiger Eintrag vorhanden -> update", newestKey);
+            await DB.updateValueInDB(newestKey, value);
+        } else {
+            const newKey = `${id}-${todayString}`;
+            console.log("Neuer Tag, erstelle neuen Key:", newKey);
+            await DB.saveValueToDB(newKey, value);
+        }
+    });
+
+    // Checkboxes
+    $(document).on('change', 'input[type="checkbox"]', async function () {
         const id = $(this).attr('id');
-        const value = $(this).val();
         const checked = $(this).is(':checked');
         console.log("checkbox", id);
+        console.log("checked", checked);
         /*
         Prüfe ob state in DB
         Wenn ja, Wert auslesen und Checkbox setzen
         Wenn nein, aktuellen Wert in DB speichern
         */
 
+        let data = (await DB.getValueFromDB(id));
+        console.log("checkbox data", data);
+        if (data === null) {
+            console.log("id", id, "checked", checked);
+            await DB.saveValueToDB(id, checked);
+            data = checked;
+            console.log("post save data", data);
+        }
+        else {
+            console.log("update checkbox state");
+            await DB.updateValueInDB(id, checked);
+        }
+
         // Water Checkbox
         if (id == "generalPrecipitation") {
-            // WaterSectionUpdate() ausführen um inputs zu toggeln
+            // Watersection GUI toggle
+            Helper.waterSectionUpdate(checked);
 
         }
 
         // Heating Checkbox
         if (id == "generalHeating") {
             // HeatingSectionUpdate() ausführen um inputs zu toggeln
+            if(checked){
 
+            }
+            else{
+                
+            }
         }
     });
+
+    // Delete Buttons
+    $(document).on('click', 'button.deleteButton', async function () {
+        const key = $(this).attr('id');
+        const trimmedKey = key.replace("_button", "");
+        console.log("key", key, "trimmedKey", trimmedKey);
+        const confirmed = confirm(`Möchten Sie ${trimmedKey} und den dazugehörigen Wert wirklich löschen?`);
+        if (confirmed) {
+            await DB.deleteKeyInDB(trimmedKey);
+            // Finde input anhand von trimmedKey, setze value auf "", finde Parent von this und lösche
+            $(`#${trimmedKey}`).val("");
+            $(`#${key}`).parent().parent().remove();
+        }
+    });
+
+    // Datenbank Inputs
+    //$(document).on('focusout', 'input:not([type="checkbox"])', async function () {});
 }

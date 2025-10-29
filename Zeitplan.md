@@ -13,4 +13,4 @@ Settings backend fertig (51 Stunden)
 
 ========Projekt mit sqlite neu Aufgesetzt========
 28.10.25:   12-16 Uhr 17-23 Uhr
-29.10.25:   10-13 Uhr 15-
+29.10.25:   10-13 Uhr 15-00 Uhr

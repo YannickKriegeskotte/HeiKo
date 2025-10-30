@@ -9,26 +9,24 @@ export function registerListeners() {
             return;
         }
 
-        console.log("Input:", id, "=", value);
+
 
 
         // Wenn id = apartmentcount, vergleiche value mit db, wenn value kleiner, lösche alle höheren db einträge
         if (id == "apartmentcount") {
-            console.log("apartmentcount trigger");
             let data = await DB.getValueFromDB('apartmentcount');
-            console.log("apartmentcount in db", data);
             while (data > value) {
-                console.log("deleting apartment", data);
                 await DB.deleteAllValuesFromApartmentInDB(`apartment${data}`);
                 data--;
             }
             // Speichere neuen apartmentcount value in DB
-            await DB.updateValueInDB('apartmentcount',value);
-            
+            await DB.updateValueInDB('apartmentcount', value);
+
             // Seite neu laden für GUI update
             window.location.reload();
-        }
 
+
+        }
 
 
 
@@ -37,7 +35,6 @@ export function registerListeners() {
 
         if (!allMatches || allMatches.length === 0) {
             // Noch kein Eintrag -> neu speichern
-            console.log("Kein Eintrag gefunden, speichere neu");
             await DB.saveValueToDB(id, value);
             return;
         }
@@ -49,10 +46,8 @@ export function registerListeners() {
             // Kein Datum => ganz normaler Key, einfach ersetzen
             const currentValue = await DB.getValueFromDB(id);
             if (currentValue !== value) {
-                console.log("Update (permanenter Key)", id);
                 await DB.updateValueInDB(id, value);
             } else {
-                console.log("Wert gleich, ignoriere");
             }
 
             // Wenn Input id beginnt mit "apartment" und endet mit "name", dann fenster neu laden, um Namen überall richtig anzuzeigen
@@ -70,11 +65,9 @@ export function registerListeners() {
         const todayString = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
 
         if (newestTimestamp === todayString) {
-            console.log("Heutiger Eintrag vorhanden -> update", newestKey);
             await DB.updateValueInDB(newestKey, value);
         } else {
             const newKey = `${id}-${todayString}`;
-            console.log("Neuer Tag, erstelle neuen Key:", newKey);
             await DB.saveValueToDB(newKey, value);
         }
     });
@@ -83,8 +76,6 @@ export function registerListeners() {
     $(document).on('change', 'input[type="checkbox"]', async function () {
         const id = $(this).attr('id');
         const checked = $(this).is(':checked');
-        console.log("checkbox", id);
-        console.log("checked", checked);
         /*
         Prüfe ob state in DB
         Wenn ja, Wert auslesen und Checkbox setzen
@@ -92,51 +83,47 @@ export function registerListeners() {
         */
 
         let data = (await DB.getValueFromDB(id));
-        console.log("checkbox data", data);
         if (data === null) {
-            console.log("id", id, "checked", checked);
             await DB.saveValueToDB(id, checked);
             data = checked;
-            console.log("post save data", data);
         }
         else {
-            console.log("update checkbox state");
             await DB.updateValueInDB(id, checked);
         }
 
         // Water Checkbox
         if (id == "generalPrecipitation") {
             // Watersection GUI toggle
-            Helper.waterSectionUpdate(checked);
+            Helper.sectionUpdate('water', checked);
 
         }
 
         // Heating Checkbox
         if (id == "generalHeating") {
             // HeatingSectionUpdate() ausführen um inputs zu toggeln
-            if(checked){
-
-            }
-            else{
-                
-            }
+            Helper.sectionUpdate('heating', checked);
         }
     });
 
     // Delete Buttons
     $(document).on('click', 'button.deleteButton', async function () {
         const key = $(this).attr('id');
+        console.log("key", key);
         const trimmedKey = key.replace("_button", "");
-        console.log("key", key, "trimmedKey", trimmedKey);
+        console.log("trimmedKey", trimmedKey);
         const confirmed = confirm(`Möchten Sie ${trimmedKey} und den dazugehörigen Wert wirklich löschen?`);
         if (confirmed) {
             await DB.deleteKeyInDB(trimmedKey);
             // Finde input anhand von trimmedKey, setze value auf "", finde Parent von this und lösche
             $(`#${trimmedKey}`).val("");
-            $(`#${key}`).parent().parent().remove();
+            $(`#${trimmedKey}_row`).remove();
         }
     });
 
     // Datenbank Inputs
-    //$(document).on('focusout', 'input:not([type="checkbox"])', async function () {});
+    $(document).on('focusout', 'input.newKeyInput, input.newValueInput', async function () {
+        if (value == "") {
+            return;
+        }
+    });
 }

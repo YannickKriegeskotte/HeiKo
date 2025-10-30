@@ -1,28 +1,23 @@
 import * as DB from "./database.js";
-export async function waterSectionUpdate(checked){
-    console.log("water check section update",checked);
-    if(checked){
-                // precipitationFee und precipitationArea enablen, farbe auf schwarz setzen, alle apartment precipitationFee und precipitationArea inputs disablen und farbe auf grau setzen
-                $('#precipitationFee, #precipitationArea').prop('disabled', false);
-                $('#precipitationFee, #precipitationArea').css('color', 'black');
-                $('label[for="precipitationFee"], label[for="precipitationArea"]').css('color', 'black');
-                 const apartmentcount = await DB.getValueFromDB('apartmentcount');
-                 for(let i=1;i<=apartmentcount;i++){
-                    $(`#apartment${i}precipitationFee, #apartment${i}precipitationArea`).prop('disabled', true);
-                    $(`#apartment${i}precipitationFee, #apartment${i}precipitationArea`).css('color', '#8c8c8c');
-                    $(`label[for="apartment${i}precipitationFee"], label[for="apartment${i}precipitationArea"]`).css('color', '#8c8c8c');
-                 }
-            }
-            else{
-                // obige Logik umkehren
-                $('#precipitationFee, #precipitationArea').prop('disabled', true);
-                $('#precipitationFee, #precipitationArea').css('color', '#8c8c8c');
-                $('label[for="precipitationFee"], label[for="precipitationArea"]').css('color', '#8c8c8c');
-                 const apartmentcount = await DB.getValueFromDB('apartmentcount');
-                 for(let i=1;i<=apartmentcount;i++){
-                    $(`#apartment${i}precipitationFee, #apartment${i}precipitationArea`).prop('disabled', false);
-                    $(`#apartment${i}precipitationFee, #apartment${i}precipitationArea`).css('color', 'black');
-                    $(`label[for="apartment${i}precipitationFee"], label[for="apartment${i}precipitationArea"]`).css('color', 'black');
-                 }
-            }
+
+export async function sectionUpdate(sectionString, checked) {
+   const precFeeID = `precipitationFee`;
+   const precAreaID = `precipitationArea`;
+   const oilID = 'oilPerCm';
+   const tanksID = 'numberOfOilTanks';
+
+   let input1 = (sectionString == 'water') ? precFeeID : oilID;
+   let input2 = (sectionString == 'water') ? precAreaID : tanksID;
+   let color1 = (checked) ? 'black' : '#8c8c8c';
+   let color2 = (checked) ? '#8c8c8c' : 'black';
+
+   $(`#${input1}, #${input2}`).prop(`disabled`, !checked);
+   $(`#${input1}, #${input2}`).css(`color`, color1);
+   $(`label[for="${input1}"], label[for="${input2}"]`).css(`color`, color1);
+   const apartmentcount = await DB.getValueFromDB(`apartmentcount`);
+   for (let i = 1; i <= apartmentcount; i++) {
+      $(`#apartment${i}${input1}, #apartment${i}${input2}`).prop(`disabled`, checked);
+      $(`#apartment${i}${input1}, #apartment${i}${input2}`).css(`color`, color2);
+      $(`label[for="apartment${i}${input1}"], label[for="apartment${i}${input2}"]`).css(`color`, color2);
+   }
 }

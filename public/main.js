@@ -4,12 +4,19 @@ import * as Helper from "./helpers.js";
 
 $(document).ready(async function () {
 
-
+    // DB availability check einbauen, um potentielle dauer reloading durch 1. zu vermeiden
+    //...
 
 
     // ==Allgemein==
     // 1. Apartmentcount laden und in input schreiben
-    const apartmentcount = (await DB.getValueFromDB(`apartmentcount`)) || 1;
+    let apartmentcount = await DB.getValueFromDB(`apartmentcount`);
+    if(apartmentcount === null){
+        console.log("init apartmentcount");
+        apartmentcount = 1;
+        await DB.saveValueToDB('apartmentcount',apartmentcount);
+        window.location.reload();
+    }
     $(`#apartmentcount`).val(apartmentcount);
 
     // 2. Ensprechend viele Namen-Inputs erzeugen
@@ -17,7 +24,9 @@ $(document).ready(async function () {
     for (let i = 1; i <= apartmentcount; i++) {
         const apartmentName = (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
         $(`#general`).append(`
-        <label for="apartment${i}name">Name der ${i}. Wohnung</label> <input type="text" id="apartment${i}name" name="apartment${i}name" value="${apartmentName}"><br>
+            <label for="apartment${i}name">Name der ${i}. Wohnung</label>
+            <input type="text" id="apartment${i}name" name="apartment${i}name" value="${apartmentName}">
+            <br>
         `);
     }
 
@@ -35,16 +44,16 @@ $(document).ready(async function () {
         $('#energy').append(`
             <div class="apartment${i}container">
                 <h3 id="apartment${i}name_electricity">${apartmentName}</h3>
-                <label for="apartment${i}electricityMeterNumber">Zählernummer</label>
+                <label class="preInputLabel" for="apartment${i}electricityMeterNumber">Zählernummer</label>
                 <input type="text" id="apartment${i}electricityMeterNumber" name="apartment${i}electricityMeterNumber" value="${meterNumber}">
                 <br>
-                <label for="apartment${i}electricityMeterFee">Zählergebühren</label>
+                <label class="preInputLabel" for="apartment${i}electricityMeterFee">Zählergebühren</label>
                 <input type="number" id="apartment${i}electricityMeterFee" name="apartment${i}electricityMeterFee" min="0" value="${meterFee}">
-                <label for="apartment${i}electricityMeterFee">€</label>
+                <label class="postInputLabel" for="apartment${i}electricityMeterFee">€</label>
                 <br>
-                <label for="apartment${i}electricityFee">Preis pro KWh</label>
+                <label class="preInputLabel" for="apartment${i}electricityFee">Preis pro KWh</label>
                 <input type="number" id="apartment${i}electricityFee" name="apartment${i}electricityFee" min="0" value="${electricityFee}">
-                <label for="apartment${i}electricityFee">€</label>
+                <label class="postInputLabel" for="apartment${i}electricityFee">€</label>
             </div>
         `);
     }
@@ -58,21 +67,20 @@ $(document).ready(async function () {
     const precipitationFee = await DB.getValueFromDB('precipitationFee') || '';
     const precipitationArea = await DB.getValueFromDB('precipitationArea') || '';
     $('#water').append(`
-        <label for="generalPrecipitation">Allgemeine Einstellungen für Versiegelte Fläche verwenden</label>
+        <label class="preInputLabel" for="generalPrecipitation">Allgemeine Einstellungen für Versiegelte Fläche verwenden</label>
         <input type="checkbox" id="generalPrecipitation" name="generalPrecipitation" checked>
         <br>
-        <label for="precipitationFee">Allgemeine Versiegeltungsgebühr</label>
+        <label class="preInputLabel" for="precipitationFee">Allgemeine Versiegeltungsgebühr</label>
         <input type="number" id="precipitationFee" name="precipitationFee" min="0" value="${precipitationFee}">
-        <label for="precipitationFee">€/m²</label>
+        <label class="postInputLabel" for="precipitationFee">€/m²</label>
         <br>
-        <label for="precipitationArea">Allgemeine Versiegelte Fläche</label>
+        <label class="preInputLabel" for="precipitationArea">Allgemeine Versiegelte Fläche</label>
         <input type="number" id="precipitationArea" name="precipitationArea" min="0" value="${precipitationArea}">
-        <label for="precipitationArea">m²</label>
+        <label class="postInputLabel" for="precipitationArea">m²</label>
     `);
     $('#generalPrecipitation').prop('checked', generalPrecipitation === true || generalPrecipitation === 'true');
     const generalWaterChecked = $('#generalPrecipitation').is(':checked');
-    console.log("pre water check section update");
-    Helper.waterSectionUpdate(generalWaterChecked);
+    Helper.sectionUpdate('water',generalWaterChecked);
 
 
 
@@ -90,28 +98,28 @@ $(document).ready(async function () {
         $('#water').append(`
              <div class="apartment${i}container">
                 <h3 id="apartment${i}name_water">${apartmentName}</h3>
-                <label for="apartment${i}waterMeterNumber">Zählernummer</label>
+                <label class="preInputLabel" for="apartment${i}waterMeterNumber">Zählernummer</label>
                 <input type="number" id="apartment${i}waterMeterNumber" name="apartment${i}waterMeterNumber" value="${meterNumber}">
                 <br>
-                <label for="apartment${i}waterMeterFee">Zählergebühren</label>
+                <label class="preInputLabel" for="apartment${i}waterMeterFee">Zählergebühren</label>
                 <input type="number" id="apartment${i}waterMeterFee" name="apartment${i}waterMeterFee" min="0" value="${meterFee}">
-                <label for="apartment${i}meterFee">€</label>
+                <label class="postInputLabel" for="apartment${i}meterFee">€</label>
                 <br>
-                <label for="apartment${i}waterFee">Preis pro m³ Wasser</label>
+                <label class="preInputLabel" for="apartment${i}waterFee">Preis pro m³ Wasser</label>
                 <input type="number" id="apartment${i}waterFee" name="apartment${i}waterFee" min="0" value="${waterFee}">
-                <label for="apartment${i}waterFee">€</label>
+                <label class="postInputLabel" for="apartment${i}waterFee">€</label>
                 <br>
-                <label for="apartment${i}sewageFee">Preis pro m³ Abwasser</label>
+                <label class="preInputLabel" for="apartment${i}sewageFee">Preis pro m³ Abwasser</label>
                 <input type="number" id="apartment${i}sewageFee" name="apartment${i}sewageFee" min="0" value="${sewageFee}">
-                <label for="apartment${i}sewageFee">€</label>
+                <label class="postInputLabel" for="apartment${i}sewageFee">€</label>
                 <br>
-                <label for="apartment${i}precipitationArea">Versiegelte Fläche</label>
+                <label class="preInputLabel" for="apartment${i}precipitationArea">Versiegelte Fläche</label>
                 <input type="number" id="apartment${i}precipitationArea" name="apartment${i}precipitationArea" min="0" value="${precipitationArea}">
-                <label for="apartment${i}precipitationArea">m²</label>
+                <label class="postInputLabel" for="apartment${i}precipitationArea">m²</label>
                 <br>
-                <label for="apartment${i}precipitationFee">Niederschlagsgebühr</label>
+                <label class="preInputLabel" for="apartment${i}precipitationFee">Niederschlagsgebühr</label>
                 <input type="number" id="apartment${i}precipitationFee" name="apartment${i}precipitationFee" min="0" value="${precipitationFee}">
-                <label for="apartment${i}precipitationFee">€</label>
+                <label class="postInputLabel" for="apartment${i}precipitationFee">€</label>
              </div>
         `);  
     }
@@ -123,17 +131,18 @@ $(document).ready(async function () {
     const oilPerCm = (await DB.getNewestValueFromDB(`oilPerCm`)) || '';
     const numberOfOilTanks = (await DB.getNewestValueFromDB(`numberOfOilTanks`)) || '';
     $('#heating').append(`
-        <label for="generalHeating">Allgemeine Einstellungen für alle Wohnungen verwenden</label>
+        <label class="preInputLabel" for="generalHeating">Allgemeine Einstellungen für alle Wohnungen verwenden</label>
         <input type="checkbox" id="generalHeating" name="generalHeating">
         <br>
-        <label for="oilPerCm">1cm Tankfüllung entsprechen</label>
-        <input type="text" id="oilPerCm" name="oilPerCm" min="0" value=${oilPerCm}>
-        <label for="oilPerCm">Liter Öl</label>
+        <label class="preInputLabel" for="oilPerCm">1cm Tankfüllung entsprechen</label>
+        <input type="text" id="oilPerCm" name="oilPerCm" min="0" value="${oilPerCm}">
+        <label class="postInputLabel" for="oilPerCm">Liter Öl</label>
         <br>
-        <label for="numberOfOilTanks">Anzahl der Öltanks</label>
-        <input type="text" id="numberOfOilTanks" name="numberOfOilTanks" min="0" value=${numberOfOilTanks}>
+        <label class="preInputLabel" for="numberOfOilTanks">Anzahl der Öltanks</label>
+        <input type="text" id="numberOfOilTanks" name="numberOfOilTanks" min="0" value="${numberOfOilTanks}">
     `);
     $('#generalHeating').prop('checked', generalHeating);
+    Helper.sectionUpdate('heating',generalHeating);
 
 
 
@@ -157,10 +166,10 @@ $(document).ready(async function () {
             $('#heating').append(`
                 <div class="apartment${i}container">
                     <h3 id="apartment${i}name_heating">${apartmentName}</h3>
-                    <label for="apartment${i}oilPerCm">1cm Tankfüllung entsprechen</label>
+                    <label class="preInputLabel" for="apartment${i}oilPerCm">1cm Tankfüllung entsprechen</label>
                     <input type="text" id="apartment${i}oilPerCm" min="0" value="${oilPerCm}">
                     <br>
-                    <label for="apartment${i}numberOfOilTanks">Anzahl der Öltanks</label>
+                    <label class="preInputLabel" for="apartment${i}numberOfOilTanks">Anzahl der Öltanks</label>
                     <input type="text" id="apartment${i}numberOfOilTanks" min="0" value="${numberOfTanks}">
                 </div>
             `);
@@ -175,11 +184,11 @@ $(document).ready(async function () {
         const baseA = extractBaseKey(a.key);
         const baseB = extractBaseKey(b.key);
 
-        // 1️⃣ Alphabetisch nach Präfix
+        // Alphabetisch nach Präfix
         const alphaCompare = baseA.localeCompare(baseB);
         if (alphaCompare !== 0) return alphaCompare;
 
-        // 2️⃣ Wenn gleich, nach Datum (neu → alt)
+        // Wenn gleich, nach Datum (neu → alt)
         const dateA = extractDate(a.key);
         const dateB = extractDate(b.key);
 
@@ -193,15 +202,16 @@ $(document).ready(async function () {
     for (let i = 0; i < sorted.length; i++) {
         const key = sorted[i].key;
         const value = sorted[i].value
-        console.log(key, value);
+
+        console.log("key in main",key);
 
         $('tbody').append(`
-         <tr>
+         <tr id="${key}_row">
             <td>${key}</td>
             <td>${value}</td>
-            <td><input type="text" class="newKeyInput"></td>
-            <td><input type="text" class=newValueInput"></td>
-            <td><button class=deleteButton id="${key}_button">Löschen</button></td>
+            <td><input type="text" class="newKeyInput" id="new${key}Input" placeholder="Noch nicht funktional!" disabled></td>
+            <td><input type="text" class="newValueInput" id="new${value}Input" placeholder="Noch nicht funktional!" disabled></td>
+            <td><button class="deleteButton" id="${key}_button">Löschen</button></td>
         </tr>
     `);
     }

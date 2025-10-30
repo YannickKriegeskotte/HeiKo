@@ -1,0 +1,101 @@
+/* 1. Alles zentrieren */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* horizontal zentrieren */
+  justify-content: flex-start; /* vertikale Ausrichtung */
+  font-family: Trebuchet MS, sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+#sectionSelection {
+  display: flex;
+  flex-direction: row;
+}
+
+#sectionSelection a {
+  border: 1px solid black;
+  padding: 20px;
+  margin: 5px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.energySelection, .waterSelection, .heatingSelection {
+    display: inline-block;      
+    padding: 15px 25px;         
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.3s ease;  
+}
+
+
+.energySelection { color: #ddb500; }
+.waterSelection { color: #00b1dd; }
+.heatingSelection { color: #dd3f00; }
+
+
+.energySelection:hover { background-color: #ddb500; color: black; }
+.waterSelection:hover { background-color: #00b1dd; color: black; }
+.heatingSelection:hover { background-color: #dd3f00; color: black; }
+
+h1 {
+  text-align: center;
+}
+
+
+
+/* 4. Tabellen zentrieren */
+table {
+  border-collapse: collapse;
+  margin: 20px auto; /* zentriert */
+}
+
+table,
+th,
+td {
+  border: 1px solid #333;
+  padding: 8px 12px;
+  text-align: center; /* zentriert Text in Zellen */
+}
+
+/* Optional: Überschriften zentrieren */
+h2,
+h3 {
+  text-align: center;
+}
+
+
+
+
+
+
+#general,#energy,#water,#heating, #database{
+    width: 60vw;
+    border: 1px solid green;
+}
+
+label,input{
+    border: 1px solid red;
+    justify-content: right;
+}
+
+
+.preInputLabel{
+    text-align: left;
+}
+
+input:not([type="checkbox"]) {
+    display: inline-block;
+    text-align: left;
+}
+
+.postInputLabel{
+    text-align: right;
+}
+
+
+
+
+

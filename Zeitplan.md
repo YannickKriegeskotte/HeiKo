@@ -15,3 +15,5 @@ Settings backend fertig (51 Stunden)
 28.10.25:   12-16 Uhr 17-23 Uhr
 29.10.25:   10-13 Uhr 15-00 Uhr
 30.10.25:   14-18 Uhr
+01.11.25:   17-00 Uhr
+02.11.25:   00-02 Uhr

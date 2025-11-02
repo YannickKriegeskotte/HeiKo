@@ -1,1 +1,2 @@
 - Datenbank: Inputs für neuen Namen und neuen Wert noch nicht funktional
+- Apartments werden nicht gelöscht, wenn die Checkbox in der Heizungs-Sektion Deaktiviert wird.

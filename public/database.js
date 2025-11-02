@@ -1,3 +1,4 @@
+import * as Helper from "./helpers.js";
 /**
  * 
  * @param {String} url 
@@ -99,6 +100,25 @@ export async function updateValueInDB(key, value) {
     // Klasse kurz hinzufügen, dann wieder entfernen
     row.addClass("highlightFade");
     setTimeout(() => row.removeClass("highlightFade"), 1300);
+}
+
+
+
+
+export async function renameKeyInDB(oldKey, newKey) {
+  const response = await fetch("/rename", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ oldKey, newKey }),
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    await Helper.updateDatabaseTable();
+  } else {
+    console.error("Fehler beim Rename:", data.error);
+  }
 }
 
 

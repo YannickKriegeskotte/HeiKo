@@ -80,6 +80,33 @@ app.post("/update", async (req, res) => {
   }
 });
 
+// ---- Rename Key ----
+app.post("/rename", async (req, res) => {
+  const { oldKey, newKey } = req.body;
+  if (!oldKey || !newKey) return res.status(400).json({ error: "oldKey oder newKey fehlt" });
+
+  try {
+    // Prüfen, ob der neue Key schon existiert (weil PRIMARY KEY)
+    const existing = await db.get("SELECT key FROM data WHERE key = ?", [newKey]);
+    if (existing) {
+      return res.status(400).json({ error: "newKey existiert bereits" });
+    }
+
+    // Key umbenennen
+    const result = await db.run("UPDATE data SET key = ? WHERE key = ?", [newKey, oldKey]);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: "oldKey nicht gefunden" });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "DB-Fehler" });
+  }
+});
+
+
 // ---- Delete all entries containing Value ----
 app.delete("/removeApartmentEntries", async (req, res) =>{
     const id= req.query.apartmentID;

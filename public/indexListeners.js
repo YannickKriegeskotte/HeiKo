@@ -132,9 +132,29 @@ export function registerListeners() {
 
 // === Datenbank Inputs === 
     $(document).on('focusout', 'input.newKeyInput, input.newValueInput', async function () {
+        console.log("Dtatabasetable Input focus update");
+        const value = $(this).val();
+        const inputClass = $(this).attr('class');
+
+        // Kein Wert eingegeben => ignorieren
         if (value == "") {
             return;
         }
+        // Neuer Key Name => renameKey
+        if(inputClass == "newKeyInput"){
+            console.log("newKeyInput");
+            const oldKey =$(this).closest("tr").children("td:first").text();
+            const newKey =value;
+            await DB.renameKeyInDB(oldKey,newKey);
+            Helper.updateDatabaseTable();
+        }
+        // Neue Value => updateValue
+        else{
+            console.log("newVlueInput");
+            const key=$(this).closest("tr").children("td:first").text();
+            await DB.updateValueInDB(key,value);
+            Helper.updateDatabaseTable();
+        }        
     });
 
 

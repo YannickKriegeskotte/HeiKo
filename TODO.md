@@ -1,5 +1,5 @@
-- Datenbank: Inputs für neuen Namen und neuen Wert noch nicht funktional
-- Apartments werden nicht gelöscht, wenn die Checkbox in der Heizungs-Sektion Deaktiviert wird.
+
+(- Apartments werden nicht gelöscht, wenn die Checkbox in der Heizungs-Sektion Deaktiviert wird.)
 
 - Wenn Heizung Checkbox aktiviert, laden keine Apartments in Strom,Wasser und Heizungssektion
 - Wenn Heizung Checkbox switched, Inputs toggeln aber Apartments verschwinden/erscheinen nicht

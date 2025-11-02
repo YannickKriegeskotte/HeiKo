@@ -225,6 +225,13 @@ table tr:nth-child(odd) {
   text-align: left;
 }
 
+#addToDatabaseTable{
+  width: 90%;
+}
+#addToDatabaseTable input{
+  width: 100%;
+}
+
 /* --- Buttons --- */
 .deleteButton {
   background-color: var(--deleteButtonBackgroundColor);

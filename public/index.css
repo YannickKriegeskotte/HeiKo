@@ -1,101 +1,302 @@
-/* 1. Alles zentrieren */
+:root {
+  /* --- Farben --- */
+  
+  /* Mint Schema */
+
+  --primaryBackgroundColor: #ceffe8;
+  --primaryTextColor: #2f4f4f;
+  --disabledTextColor: #89a195;
+  --disabledInputBackgroundColor: #d0eede;
+
+  --inputTextColor: #2b7a4b;
+  --inputPlaceholderTextColor: var(--disabledTextColor);
+  --inputBackgroundColor: #f0fcf5;
+  --inputBorderColor: #b6d8c9;
+
+  --sectionBackground: #d9f0e0;
+  --apartmentBackground: #c2e5cc;
+
+  --deleteButtonBackgroundColor: #27ae60;
+  --deleteButtonHoverBackgroundColor: #45b26f;
+  --deleteButtonTextColor: #ffffff;
+
+  --sectionLinkBorderColor: #000000;
+  --sectionLinkHoverBackground: #27ae60;
+
+  --tableBorderColor: #b6d8c9;
+
+  --tableEvenBackgroundColor: #eaf8f0;   
+  --tableUnevenBackgroundColor: #d4eddf; 
+  --tableHeaderColor: var(--apartmentBackground);
+  
+  --highlightColor: #c9f7c2;
+
+/* Blau-Grau Schema */
+  /*
+  --primaryBackgroundColor: #def4ff;
+  --primaryTextColor: #333333;
+  --disabledTextColor: #7a7a7a;
+
+  --inputTextColor: #2a6f9e;
+  --inputPlaceholderTextColor: #7fb6d8;
+  --inputBackgroundColor: #ffffff;
+  --inputBorderColor: #cccccc;
+
+  --sectionBackground: #d9e6ef;
+  --apartmentBackground: #cce0e8;
+
+  --deleteButtonBackgroundColor: #3A8DDE;
+  --deleteButtonHoverBackgroundColor: #5aa0ff;
+  --deleteButtonTextColor: #ffffff;
+
+  --sectionLinkBorderColor: #2a6f9e;
+  --sectionLinkHoverBackground: #2a6f9e;
+
+  --tableBorderColor: #cccccc;
+  */
+
+/* Lila Schema */
+/*
+  --primaryBackgroundColor: #ebdbff;
+  --primaryTextColor: #3c2f41;
+  --disabledTextColor: #b9a8bf;
+
+  --inputTextColor: #9b59b6;
+  --inputPlaceholderTextColor: #d1b3e0;
+  --inputBackgroundColor: #f8e6ff;
+  --inputBorderColor: #d8baf0;
+
+  --sectionBackground: #f0e0ff;
+  --apartmentBackground: #e6ccff;
+
+  --deleteButtonBackgroundColor: #e91e63;
+  --deleteButtonHoverBackgroundColor: #ff3f7f;
+  --deleteButtonTextColor: #ffffff;
+
+  --sectionLinkBorderColor: #9b59b6;
+  --sectionLinkHoverBackground: #9b59b6;
+
+  --tableBorderColor: #d8baf0;
+*/
+
+
+
+  /* --- Typografie --- */
+  --fontSize: 1.2rem;
+
+  /* --- Spacing / Layout --- */
+  --sectionPadding: 20px;
+  --containerWidth: 40vw;
+  --apartmentGapRow: 8px;
+  --apartmentGapColumn: 12px;
+  --apartmentPadding: 10px;
+  --apartmentPaddingLeft: 5%;
+  --apartmentMarginTop: 20px;
+  --apartmentMarginBottom: 10px;
+}
+
+/* --- Body --- */
 body {
   display: flex;
   flex-direction: column;
-  align-items: center; /* horizontal zentrieren */
-  justify-content: flex-start; /* vertikale Ausrichtung */
+  align-items: center;
+  justify-content: flex-start;
   font-family: Trebuchet MS, sans-serif;
   margin: 0;
-  padding: 20px;
+  padding: var(--sectionPadding);
+  background-color: var(--primaryBackgroundColor);
+  color: var(--primaryTextColor);
+  font-size: var(--fontSize);
 }
 
+/* --- Inputs --- */
+input {
+  font-size: var(--fontSize);
+  background-color: var(--inputBackgroundColor);
+  color: var(--inputTextColor);
+  border: 1px solid var(--inputBorderColor);
+  grid-column: 2;
+}
+
+input::placeholder {
+  font-size: var(--fontSize);
+  color: var(--inputPlaceholderTextColor);
+}
+
+input[type=checkbox] {
+  cursor: pointer;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+input:disabled{
+  background-color: var(--disabledInputBackgroundColor);
+}
+
+/* --- Labels --- */
+
+label:hover{
+  cursor: pointer;
+}
+
+/* --- Section Selection / Links --- */
 #sectionSelection {
   display: flex;
   flex-direction: row;
 }
 
 #sectionSelection a {
-  border: 1px solid black;
+  border-radius: 8px;
+  border: 1px solid var(--sectionLinkBorderColor);
   padding: 20px;
   margin: 5px;
-  border-radius: 8px;
   text-decoration: none;
 }
 
 .energySelection, .waterSelection, .heatingSelection {
-    display: inline-block;      
-    padding: 15px 25px;         
-    text-align: center;
-    border-radius: 8px;
-    transition: all 0.3s ease;  
+  display: inline-block;
+  padding: 15px 25px;
+  text-align: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: var(--sectionBackground);
 }
 
+.energySelection { color: #F5C542; }
+.waterSelection { color: #3A8DDE; }
+.heatingSelection { color: #E55C3C; }
 
-.energySelection { color: #ddb500; }
-.waterSelection { color: #00b1dd; }
-.heatingSelection { color: #dd3f00; }
+.energySelection:hover { background-color: #F5C542; color: var(--primaryBackgroundColor); }
+.waterSelection:hover { background-color: #3A8DDE; color: var(--primaryBackgroundColor); }
+.heatingSelection:hover { background-color: #E55C3C; color: var(--primaryBackgroundColor); }
 
-
-.energySelection:hover { background-color: #ddb500; color: black; }
-.waterSelection:hover { background-color: #00b1dd; color: black; }
-.heatingSelection:hover { background-color: #dd3f00; color: black; }
-
-h1 {
+/* --- Headers --- */
+.sectionHeader {
+  display: block;
   text-align: center;
 }
 
+.apartmentHeader {
+  grid-column: 1 / -1;
+  justify-self: center;
+  text-align: center;
+  margin: 0 auto;
+}
 
-
-/* 4. Tabellen zentrieren */
+/* --- Tables --- */
 table {
   border-collapse: collapse;
-  margin: 20px auto; /* zentriert */
+  margin: 20px auto;
 }
 
-table,
-th,
-td {
-  border: 1px solid #333;
+table, th, td {
+  border: 1px solid var(--tableBorderColor);
   padding: 8px 12px;
-  text-align: center; /* zentriert Text in Zellen */
-}
-
-/* Optional: Überschriften zentrieren */
-h2,
-h3 {
   text-align: center;
 }
 
-
-
-
-
-
-#general,#energy,#water,#heating, #database{
-    width: 60vw;
-    border: 1px solid green;
+th{
+  background-color: var(--tableHeaderColor);
 }
 
-label,input{
-    border: 1px solid red;
-    justify-content: right;
+table tr:nth-child(even) {
+  background-color: var(--tableEvenBackgroundColor);
+}
+
+table tr:nth-child(odd) {
+  background-color: var(--tableUnevenBackgroundColor);
+}
+
+/* --- Delete Button --- */
+.deleteButton {
+  background-color: var(--deleteButtonBackgroundColor);
+  color: var(--deleteButtonTextColor);
+  border: none;
+  border-radius: 5px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: var(--fontSize);
+}
+
+.deleteButton:hover {
+  background-color: var(--deleteButtonHoverBackgroundColor);
+}
+
+/* --- Section / Container --- */
+#general, #energy, #water, #heating {
+  display: block;
+  width: var(--containerWidth);
+  margin: 5px auto;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: var(--sectionBackground);
+}
+
+#database {
+  display: block;
+  width: auto;
+  margin: 5px auto;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: var(--sectionBackground);
+}
+
+/* --- Apartment Container --- */
+#general.apartmentContainer,
+#energy.apartmentContainer,
+#water.apartmentContainer,
+#heating.apartmentContainer,
+#database.apartmentContainer {
+  display: grid;
+}
+
+.apartmentContainer {
+  display: grid;
+  grid-template-columns: 65% 25% auto;
+  gap: var(--apartmentGapRow) var(--apartmentGapColumn);
+  padding: var(--apartmentPadding);
+  padding-left: var(--apartmentPaddingLeft);
+  border-top: 1px solid var(--tableBorderColor);
+  border-bottom: 1px solid var(--tableBorderColor);
+  background-color: var(--apartmentBackground);
+  margin-top: var(--apartmentMarginTop);
+  margin-bottom: var(--apartmentMarginBottom);
+}
+
+/* --- Apartment Grid Items --- */
+.preInputLabel {
+  grid-column: 1;
+}
+
+.postInputLabel {
+  grid-column: 3;
 }
 
 
-.preInputLabel{
-    text-align: left;
+
+/* --- Updated table element highlighting --- */
+@keyframes fadeHighlight {
+  from { background-color: var(--highlightColor); }  /* Startfarbe */
+  to { background-color: transparent; } /* oder deine normale Tabellenfarbe */
 }
 
-input:not([type="checkbox"]) {
-    display: inline-block;
-    text-align: left;
-}
-
-.postInputLabel{
-    text-align: right;
+.highlightFade {
+  animation: fadeHighlight 1.2s ease-out;
 }
 
 
-
-
-
+/* --- Server Error --- */
+.serverConnectionErrorImg{
+  display: block;
+  width: 25%;
+  height: auto;
+  margin: 0 auto;
+}

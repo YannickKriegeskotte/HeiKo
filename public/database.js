@@ -1,5 +1,21 @@
 /**
  * 
+ * @param {String} url 
+ * @returns {Boolean}
+ */
+export async function checkServerAvailability(url) {
+    try {
+        const response = await fetch(url, { method: "GET" });
+        return response.ok; // true, wenn HTTP-Status 200–299
+    } catch (error) {
+        return false; // Netzwerkfehler oder Server offline
+    }
+}
+
+
+
+/**
+ * 
  * @param {String} key
  * @param {String} value
  */
@@ -72,9 +88,13 @@ export async function updateValueInDB(key, value) {
     if (response.ok) console.log("updatedValueInDB:", key, "=>", value);
 
     const row = $(`tbody tr`).filter(function () {
-        return $(this).find("td:first").text() === key;
-    });
-    row.find("td:nth-child(2)").text(value);
+    return $(this).find("td:first").text() === key;
+});
+row.find("td:nth-child(2)").text(value);
+
+// Klasse kurz hinzufügen, dann wieder entfernen
+row.addClass("highlightFade");
+setTimeout(() => row.removeClass("highlightFade"), 1300);
 }
 
 

@@ -29,6 +29,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// ---- Server availability ----
+app.get("/ping", (req, res) => res.sendStatus(200));
 
 // ---- Get Value ----
 app.get("/get", async (req, res) =>{

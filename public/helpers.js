@@ -6,10 +6,14 @@ export async function sectionUpdate(sectionString, checked) {
    const oilID = 'oilPerCm';
    const tanksID = 'numberOfOilTanks';
 
+   const root = document.documentElement;
+   const textColor = getComputedStyle(root).getPropertyValue('--primaryTextColor').trim();
+   const disabledTextColor = getComputedStyle(root).getPropertyValue('--disabledTextColor').trim();
+
    let input1 = (sectionString == 'water') ? precFeeID : oilID;
    let input2 = (sectionString == 'water') ? precAreaID : tanksID;
-   let color1 = (checked) ? 'black' : '#8c8c8c';
-   let color2 = (checked) ? '#8c8c8c' : 'black';
+   let color1 = (checked) ? textColor : disabledTextColor;
+   let color2 = (checked) ? disabledTextColor : textColor;
 
    $(`#${input1}, #${input2}`).prop(`disabled`, !checked);
    $(`#${input1}, #${input2}`).css(`color`, color1);

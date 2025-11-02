@@ -3,6 +3,7 @@ import { registerListeners } from "./indexListeners.js";
 import * as Helper from "./helpers.js";
 
 $(document).ready(async function () {
+    const date = Helper.getDate();
 
     // HTTP Server availability check, um potentielles dauer reloading durch 1. zu vermeiden
     const serverAvailable = await DB.checkServerAvailability("/ping");
@@ -34,14 +35,19 @@ $(document).ready(async function () {
     // 2. Ensprechend viele Namen-Inputs erzeugen
     // 3. Server anfragen, ob in DB ein eintrag mit jeweiligem Namen-Input ist.  Wenn ja, einfügen, wenn ignorieren
     for (let i = 1; i <= apartmentcount; i++) {
-        const apartmentName = (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
+        let apartmentName = await DB.getValueFromDB(`apartment${i}name`);
+        if(apartmentName === null){
+             apartmentName = `Wohnung ${i}`;
+             await DB.saveValueToDB(`apartment${i}name`,apartmentName);
+             window.location.reload();
+        }
         $(`.apartmentContainer`).append(`
             <label class="preInputLabel" for="apartment${i}name">Name der ${i}. Wohnung</label>
             <input type="text" id="apartment${i}name" name="apartment${i}name" value="${apartmentName}">
         `);
     }
 
-
+//=== Ab hier fast alles mit Zeitstempel ===
 
     // ==Strom==
     // 1. Entsprechende viele Wohnungssektionen erzeugen
@@ -153,13 +159,20 @@ $(document).ready(async function () {
     // 2. Wenn Checkbox aktiv: Allgmeine Inputs erzeugen, Server anfragen, ob in DB eintrag vorhanden, wenn ja, eingügen, wenn nein, leer lassen.
     // 3. Wenn Checkbox nicht aktiv: Entsprechend viele Wohnungen mit Inputs erzeugen, bei jedem input Server anfragen, ob in DB wert vorhanden. Wenn ja, einfügen, wenn nein, leer lassen.
     if ($('#generalHeating').prop('checked')) {
-        /*
-         // Allgemeine Inputs – hier Werte aus DB laden ?
-         const oilPerCm = await DB.getValueFromDB('oilPerCm') || '';
-         const numberOfTanks = await DB.getValueFromDB('numberOfOilTanks') || '';
-         $('#oilPerCm_' + day + '-' + month + '-' + year).val(oilPerCm);
-         $('#numberOfOilTanks_' + day + '-' + month + '-' + year).val(numberOfTanks);
-         */
+
+        // Allgemeine Inputs – Werte aus DB laden 
+        const oilPerCm = await DB.getValueFromDB('oilPerCm') || '';
+        const numberOfTanks = await DB.getValueFromDB('numberOfOilTanks') || '';
+        $(`#oilPerCm`).val(oilPerCm);
+        $(`#numberOfOilTanks`).val(numberOfTanks);
+
+        // Wohnungen löschen
+        for (let i = 1; i <= apartmentcount; i++) {
+            $(`.apartment${i}container`).remove();
+            await DB.deleteKeyInDB(`apartment${i}oilPerCm`);
+            await DB.deleteKeyInDB(`apartment${i}numberOfOilTanks`);
+        }
+
     } else {
         // Pro-Wohnung Inputs erzeugen
         for (let i = 1; i <= apartmentcount; i++) {
@@ -206,11 +219,11 @@ $(document).ready(async function () {
         const key = sorted[i].key;
         const value = sorted[i].value
 
-        console.log("key in main", key);
+        // console.log("key in main", key);
 
         $('tbody').append(`
          <tr id="${key}_row">
-            <td>${key}</td>
+            <td class="keyTd">${key}</td>
             <td>${value}</td>
             <td><input type="text" class="newKeyInput" id="new${key}Input" placeholder="Noch nicht funktional!" disabled></td>
             <td><input type="text" class="newValueInput" id="new${value}Input" placeholder="Noch nicht funktional!" disabled></td>

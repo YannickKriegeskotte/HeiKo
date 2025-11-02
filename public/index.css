@@ -16,9 +16,14 @@
   --sectionBackground: #d9f0e0;
   --apartmentBackground: #c2e5cc;
 
-  --deleteButtonBackgroundColor: #27ae60;
-  --deleteButtonHoverBackgroundColor: #45b26f;
+  --deleteButtonBackgroundColor: #e74c3c;
+  --deleteButtonHoverBackgroundColor: #ff6b61;
   --deleteButtonTextColor: #ffffff;
+
+  --addButtonBackgroundColor: #27ae60;
+  --addButtonHoverBackgroundColor: #58af7a;
+  --addButtonTextColor: #ffffff;
+  
 
   --sectionLinkBorderColor: #000000;
   --sectionLinkHoverBackground: #27ae60;
@@ -215,7 +220,12 @@ table tr:nth-child(odd) {
   background-color: var(--tableUnevenBackgroundColor);
 }
 
-/* --- Delete Button --- */
+
+.keyTd{
+  text-align: left;
+}
+
+/* --- Buttons --- */
 .deleteButton {
   background-color: var(--deleteButtonBackgroundColor);
   color: var(--deleteButtonTextColor);
@@ -229,6 +239,26 @@ table tr:nth-child(odd) {
 .deleteButton:hover {
   background-color: var(--deleteButtonHoverBackgroundColor);
 }
+
+
+.addButton{
+  display: block;
+  margin: 0 auto 10px;
+  background-color: var(--addButtonBackgroundColor);
+  color: var(--addButtonTextColor);
+  border: none;
+  border-radius: 5px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: var(--fontSize);
+}
+
+.addButton:hover{
+background-color: var(--addButtonHoverBackgroundColor);
+}
+
+
+
 
 /* --- Section / Container --- */
 #general, #energy, #water, #heating {
@@ -300,3 +330,25 @@ table tr:nth-child(odd) {
   height: auto;
   margin: 0 auto;
 }
+
+
+/* --- Icons --- */
+.addIcon{
+  display: block;
+  width: 5%;
+  height: auto;
+  margin: 0 auto 10px;
+  border: 1px solid #2f4f4f;
+  border-radius: 50%;
+  padding:5px;
+  fill: white;
+  transition: fill 0.2s;
+  transition: transform 0.2s;
+}
+
+.addIcon:hover{
+  cursor: pointer;
+   fill: #00ffcc; 
+   transform: scale(1.1);
+}
+

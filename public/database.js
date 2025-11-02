@@ -26,16 +26,20 @@ export async function saveValueToDB(key, value) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value }),
     });
-    if (!response.ok) console.error("saveValueToDB failed", response.status);
-    $('tbody').append(`
+    if (!response.ok){
+        console.error("saveValueToDB failed", response.status);
+    }
+    else{
+    $('#databaseTable tbody').append(`
          <tr>
-            <td>${key}</td>
+            <td class="keyTd">${key}</td>
             <td>${value}</td>
             <td><input type="text" class="newKeyInput"></td>
             <td><input type="text" class=newValueInput"></td>
             <td><button class=deleteButton id="${key}_button">Löschen</button></td>
         </tr>
     `);
+    }
 }
 
 
@@ -88,13 +92,13 @@ export async function updateValueInDB(key, value) {
     if (response.ok) console.log("updatedValueInDB:", key, "=>", value);
 
     const row = $(`tbody tr`).filter(function () {
-    return $(this).find("td:first").text() === key;
-});
-row.find("td:nth-child(2)").text(value);
+        return $(this).find("td:first").text() === key;
+    });
+    row.find("td:nth-child(2)").text(value);
 
-// Klasse kurz hinzufügen, dann wieder entfernen
-row.addClass("highlightFade");
-setTimeout(() => row.removeClass("highlightFade"), 1300);
+    // Klasse kurz hinzufügen, dann wieder entfernen
+    row.addClass("highlightFade");
+    setTimeout(() => row.removeClass("highlightFade"), 1300);
 }
 
 
@@ -118,9 +122,10 @@ export async function getNewestValueFromDB(key) {
     }
     // Sonst sortiere array, sodass neustes Datum vorne und nimm die value des ersten Eintrags
     console.log("getNewestValueFromDB", key, ": matches:", matches);
-    const sorted = data
+    const sorted = matches
         .filter(item => extractDate(item.key))
         .sort((a, b) => extractDate(b.key) - extractDate(a.key));
+    console.log("sorted[0]", sorted[0]);
     return sorted[0].value;
 }
 
@@ -145,9 +150,6 @@ export async function deleteAllValuesFromApartmentInDB(apartmendID) {
     const result = await response.json();
     if (result.success) {
         console.log("Gelöscht!");
-
-        // Finde alle html datenbank zeilen, die apartmendID enthalten und lösche sie
-        //...
     }
 }
 
@@ -162,13 +164,9 @@ export async function deleteKeyInDB(key) {
     const result = await response.json();
     if (result.success) {
         console.log("Gelöscht!");
-        /* Unnötig?
-                // Finde html datenbank zeile und lösche
-                 const row = $(`tbody tr`).filter(function() {
-                return $(this).find("td:first").text() === key;
-                 });
-                 row.parent().remove();
-        */
+
+        // Finde html datenbank zeile und lösche
+        $(`${key}_row`).remove();
     }
 }
 

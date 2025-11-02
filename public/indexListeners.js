@@ -1,8 +1,14 @@
 import * as DB from "./database.js";
 import * as Helper from "./helpers.js";
 export function registerListeners() {
-    // Inputs
-    $(document).on('focusout', 'input:not([type="checkbox"])', async function () {
+    const date = Helper.getDate();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+
+
+// === Inputs (außer Checkboxen und Datenbank Sektion Inputs) === 
+    $(document).on('focusout', 'input:not([type="checkbox"]):not(#database input)', async function () {
         const id = $(this).attr('id');   // z. B. "strom"
         const value = $(this).val();     // neuer Wert
         if (value == "") {
@@ -24,8 +30,6 @@ export function registerListeners() {
 
             // Seite neu laden für GUI update
             window.location.reload();
-
-
         }
 
 
@@ -35,7 +39,13 @@ export function registerListeners() {
 
         if (!allMatches || allMatches.length === 0) {
             // Noch kein Eintrag -> neu speichern
-            await DB.saveValueToDB(id, value);
+            if(id.startsWith("apartment") && id.endsWith("name")){
+                await DB.saveValueToDB(id, value);
+            }
+            else{
+                await DB.saveValueToDB(`${id}_${day}-${month}-${year}`, value);
+            }
+            
             return;
         }
 
@@ -61,18 +71,18 @@ export function registerListeners() {
         const newestKey = await DB.getNewestKey(id);
         const newestTimestamp = await DB.getTimestampOfNewestKey(id);
 
-        const today = new Date();
-        const todayString = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+        const today = date;
+        const todayString = `${day}-${month}-${year}`;
 
         if (newestTimestamp === todayString) {
             await DB.updateValueInDB(newestKey, value);
         } else {
-            const newKey = `${id}-${todayString}`;
+            const newKey = `${id}_${todayString}`;
             await DB.saveValueToDB(newKey, value);
         }
     });
 
-    // Checkboxes
+// === Checkboxes === 
     $(document).on('change', 'input[type="checkbox"]', async function () {
         const id = $(this).attr('id');
         const checked = $(this).is(':checked');
@@ -105,7 +115,7 @@ export function registerListeners() {
         }
     });
 
-    // Delete Buttons
+// === Delete Buttons === 
     $(document).on('click', 'button.deleteButton', async function () {
         const key = $(this).attr('id');
         console.log("key", key);
@@ -120,10 +130,93 @@ export function registerListeners() {
         }
     });
 
-    // Datenbank Inputs
+// === Datenbank Inputs === 
     $(document).on('focusout', 'input.newKeyInput, input.newValueInput', async function () {
         if (value == "") {
             return;
+        }
+    });
+
+
+
+// ===  "+" Icon === 
+    $(document).on('click', 'svg.addIcon', async function () {
+        let newElement;
+        if ($('#addToDatabaseTable').length == 0) {
+            newElement = $(`
+            <h2 class="sectionHeader">Rückwirkend in Datenbank eintragen</h2>
+            <table id="addToDatabaseTable">
+                <thead>
+                    <tr>
+                    <th>Name</th>
+                    <th>Wert</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="keyInput"></td>
+                        <td><input type="text" class="valueInput"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="addButton">Hinzufügen</button>
+            `);
+            $('#database .addIcon').before(newElement);
+        }
+        else {
+            newElement = $(`
+                <tr>
+                    <td><input type="text" class="keyInput"></td>
+                    <td><input type="text" class="valueInput"></td>
+                </tr>
+                `);
+            $('#addToDatabaseTable tbody').append(newElement);
+        }
+
+
+
+    });
+
+
+// === Add Button === 
+    $(document).on('click', 'button.addButton', async function () {
+        let errorRows = [];
+
+        const confirmed = confirm(`Möchten Sie obige Werte wirklich in die Datenbank speichern?`);
+        if (confirmed) {
+
+            const rows = $('#addToDatabaseTable tbody tr').toArray();
+
+            for (const row of rows) {
+                const $row = $(row);
+                const key = $row.find('.keyInput').val();
+                const value = $row.find('.valueInput').val();
+                console.log("key,value", key, value);
+
+                if (key === '' || value === '') {
+                    errorRows.push(key);
+                    continue;
+                }
+
+                await DB.saveValueToDB(key, value);
+
+                $row.remove();
+            }
+
+            // Wenn tbody leer, dann tabelle löschen
+            if ($('#addToDatabaseTable tbody tr').length == 0) {
+                $('#addToDatabaseTable').prev('h2').remove();
+                $('#addToDatabaseTable').next('button').remove();
+                $('#addToDatabaseTable').remove();
+            }
+
+
+
+            // Wenn fehlerhafte Zeilen vorhanden waren, dann Nutzer darauf hinweisen
+            if (errorRows.length != 0) {
+                console.log("Fehlerhafte Zeile(n)");
+                //...
+            }
         }
     });
 }

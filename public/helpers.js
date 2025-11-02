@@ -25,3 +25,8 @@ export async function sectionUpdate(sectionString, checked) {
       $(`label[for="apartment${i}${input1}"], label[for="apartment${i}${input2}"]`).css(`color`, color2);
    }
 }
+
+export function getDate() {
+   const date = new Date();
+   return date;
+}

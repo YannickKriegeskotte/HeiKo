@@ -21,6 +21,22 @@ $(document).ready(async function () {
     }
 
 
+    // ==ThemeToggle==
+    let isDarkMode = await DB.getValueFromDB('appearanceToggleInput');
+    if (isDarkMode !== null) {
+        if (isDarkMode) {
+            $('html, body').css('transition', 'none');
+            $('html').attr('data-theme', 'dark');
+            void document.body.offsetHeight;
+            $('html, body').css({transition: 'background-color 1s ease, color 1s ease, border-color 1s ease'});
+        }
+        else {
+            $('html').removeAttr('data-theme');
+        }
+    }
+
+
+
     // ==Allgemein==
     // 1. Apartmentcount laden und in input schreiben
     let apartmentcount = await DB.getValueFromDB(`apartmentcount`);
@@ -36,10 +52,10 @@ $(document).ready(async function () {
     // 3. Server anfragen, ob in DB ein eintrag mit jeweiligem Namen-Input ist.  Wenn ja, einfügen, wenn ignorieren
     for (let i = 1; i <= apartmentcount; i++) {
         let apartmentName = await DB.getValueFromDB(`apartment${i}name`);
-        if(apartmentName === null){
-             apartmentName = `Wohnung ${i}`;
-             await DB.saveValueToDB(`apartment${i}name`,apartmentName);
-             window.location.reload();
+        if (apartmentName === null) {
+            apartmentName = `Wohnung ${i}`;
+            await DB.saveValueToDB(`apartment${i}name`, apartmentName);
+            window.location.reload();
         }
         $(`.apartmentContainer`).append(`
             <label class="preInputLabel" for="apartment${i}name">Name der ${i}. Wohnung</label>
@@ -47,7 +63,7 @@ $(document).ready(async function () {
         `);
     }
 
-//=== Ab hier fast alles mit Zeitstempel ===
+    //=== Ab hier fast alles mit Zeitstempel ===
 
     // ==Strom==
     // 1. Entsprechende viele Wohnungssektionen erzeugen
@@ -58,7 +74,7 @@ $(document).ready(async function () {
         const electricityFee = (await DB.getNewestValueFromDB(`apartment${i}electricityFee`)) || '';
         const apartmentName = (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
 
-        Helper.appendApartmentEnergy(meterFee,meterNumber,electricityFee,apartmentName,i);
+        Helper.appendApartmentEnergy(meterFee, meterNumber, electricityFee, apartmentName, i);
     }
 
 
@@ -69,8 +85,8 @@ $(document).ready(async function () {
     generalPrecipitation = (generalPrecipitation == 1) ? true : false;
     const precipitationFee = await DB.getValueFromDB('precipitationFee') || '';
     const precipitationArea = await DB.getValueFromDB('precipitationArea') || '';
-    Helper.appendGeneralWater(generalPrecipitation,precipitationFee,precipitationArea);
-    
+    Helper.appendGeneralWater(generalPrecipitation, precipitationFee, precipitationArea);
+
     const generalWaterChecked = $('#generalPrecipitation').is(':checked');
     Helper.sectionUpdate('water', generalWaterChecked);
 
@@ -87,7 +103,7 @@ $(document).ready(async function () {
         const precipitationFee = (await DB.getNewestValueFromDB(`apartment${i}precipitationFee`)) || '';
         const apartmentName = (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
 
-        Helper.appendApartmentWater(meterFee, meterNumber, waterFee, sewageFee, precipitationArea, precipitationFee, apartmentName,i);
+        Helper.appendApartmentWater(meterFee, meterNumber, waterFee, sewageFee, precipitationArea, precipitationFee, apartmentName, i);
     }
 
     // ==Heizung==
@@ -97,7 +113,7 @@ $(document).ready(async function () {
     const oilPerCm = (await DB.getNewestValueFromDB(`oilPerCm`)) || '';
     const numberOfOilTanks = (await DB.getNewestValueFromDB(`numberOfOilTanks`)) || '';
 
-    Helper.appendGeneralHeating(generalHeating,oilPerCm,numberOfOilTanks);
+    Helper.appendGeneralHeating(generalHeating, oilPerCm, numberOfOilTanks);
     Helper.sectionUpdate('heating', generalHeating);
 
 
@@ -126,7 +142,7 @@ $(document).ready(async function () {
             const numberOfTanks = (await DB.getNewestValueFromDB(`apartment${i}numberOfOilTanks`)) || '';
             const apartmentName = (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
 
-            Helper.appendApartmentHeating(oilPerCm,numberOfTanks,apartmentName,i);
+            Helper.appendApartmentHeating(oilPerCm, numberOfTanks, apartmentName, i);
         }
     }
 

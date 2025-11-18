@@ -8,13 +8,13 @@
       const localTheme = localStorage.getItem('theme');
       if (localTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        document.documentElement.style.backgroundColor = '#1a1a1a'; // dunkler Fallback-Hintergrund
+        document.documentElement.style.backgroundColor = '#0f1c24'; // dunkler Fallback-Hintergrund
       } else {
-        document.documentElement.style.backgroundColor = '#fffde6'; // heller Fallback-Hintergrund
+        document.documentElement.style.backgroundColor = '#e4f6ff'; // heller Fallback-Hintergrund
       }
     </script>
-
-   <link rel="stylesheet" href="energy.css">
+    
+   <link rel="stylesheet" href="water.css">
   <script src="lib/jquery-3.7.1.min.js"></script>
   <script type="module" src="main.js"></script>
 </head>
@@ -31,14 +31,13 @@
     </div>
   <h1>HEKTAR</h1>
   <h2>Heimkosten Tracker & Auswerter</h2>
-  
 
     <div id="sectionSelection">
-      <a href="index.html" class="indexSelection">
-        <div class="sectionSelectionIcon" id="indexTab"></div>
+      <a href="energy.html" class="energySelection">
+        <div class="sectionSelectionIcon" id="energyTab"></div>
       </a>
-      <a href="water.html" class="waterSelection"> 
-        <div class="sectionSelectionIcon" id="waterTab"></div>
+      <a href="index.html" class="indexSelection"> 
+        <div class="sectionSelectionIcon" id="indexTab"></div>
       </a>
       <a href="heating.html" class="heatingSelection"> 
         <div class="sectionSelectionIcon" id="heatingTab"></div>

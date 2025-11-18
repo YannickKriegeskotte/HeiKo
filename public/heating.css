@@ -1,0 +1,211 @@
+:root {
+  /* --- Farben --- */
+--primaryBackgroundColor: #fff1ee; 
+--primaryTextColor: #4d2a26;
+--disabledTextColor: #a98682;
+--disabledInputBackgroundColor: #f2dcd9;
+
+--inputTextColor: #b33a2e;
+--inputPlaceholderTextColor: var(--disabledTextColor);
+--inputBackgroundColor: #fff8f6;
+--inputBorderColor: #e0b7b2;
+
+--sectionBackground: #f7e0dc;
+--apartmentBackground: #f0c8c2; 
+
+--deleteButtonBackgroundColor: #d35400;
+--deleteButtonHoverBackgroundColor: #e67e22;
+--deleteButtonTextColor: #ffffff;
+
+--addButtonBackgroundColor: #e74c3c;
+--addButtonHoverBackgroundColor: #ff6b61;
+--addButtonTextColor: #ffffff;
+
+--sectionLinkBorderColor: #4d2a26;
+--sectionLinkHoverBackground: #e74c3c;
+
+--tableBorderColor: #e0b7b2;
+
+--tableEvenBackgroundColor: #fff2ef;
+--tableUnevenBackgroundColor: #f9ded7;
+--tableHeaderColor: var(--apartmentBackground);
+  
+--highlightColor: #ffb3a3;
+
+
+
+ 
+
+  /* --- Typografie --- */
+  --fontSize: 1.2rem;
+
+  /* --- Spacing / Layout --- */
+  --sectionPadding: 20px;
+  --containerWidth: 40vw;
+  --apartmentGapRow: 8px;
+  --apartmentGapColumn: 12px;
+  --apartmentPadding: 10px;
+  --apartmentPaddingLeft: 5%;
+  --apartmentMarginTop: 20px;
+  --apartmentMarginBottom: 10px;
+}
+
+:root[data-theme="dark"] {
+--primaryBackgroundColor: #1f0e0b;
+--primaryTextColor: #ffd7c9;
+--disabledTextColor: #805e58;
+--disabledInputBackgroundColor: #2b1916;
+
+--inputTextColor: #ff7058;
+--inputPlaceholderTextColor: #9b7066;
+--inputBackgroundColor: #291511;
+--inputBorderColor: #7a3b2c;
+
+--sectionBackground: #261512;
+--apartmentBackground: #321d18;
+
+--deleteButtonBackgroundColor: #b23a23;
+--deleteButtonHoverBackgroundColor: #d35400;
+--deleteButtonTextColor: #fff8f0;
+
+--addButtonBackgroundColor: #e74c3c;
+--addButtonHoverBackgroundColor: #ff6b61;
+--addButtonTextColor: #ffffff;
+
+--sectionLinkBorderColor: #ff7058;
+--sectionLinkHoverBackground: #e74c3c;
+
+--tableBorderColor: #7a3b2c;
+
+--tableEvenBackgroundColor: #1a0f0d;
+--tableUnevenBackgroundColor: #241411;
+--tableHeaderColor: #3a1c17;
+
+--highlightColor: #ff9f80;
+}
+
+:root,
+body {
+  transition: background-color 1s ease, color 1s ease, border-color 1s ease;
+}
+
+/* --- Body --- */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: Trebuchet MS, sans-serif;
+  margin: 0;
+  padding: var(--sectionPadding);
+  background-color: var(--primaryBackgroundColor);
+  color: var(--primaryTextColor);
+  font-size: var(--fontSize);
+}
+
+/* Section Selection Icons */
+.sectionSelectionIcon {
+  width: 75px;
+  height: 75px;
+  scale: 1.2;
+  margin-bottom: 8px;
+  transition: background-color 0.3s ease;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+#sectionSelection a {
+  border-radius: 8px;
+  border: 1px solid var(--sectionLinkBorderColor);
+  padding: 20px;
+  margin: 5px;
+  text-decoration: none;
+}
+
+
+.energySelection,
+.waterSelection,
+.indexSelection {
+  display: inline-block;
+  padding: 15px 25px;
+  text-align: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: var(--primaryBackgroundColor);
+}
+
+.energySelection .sectionSelectionIcon {
+  background-color: #f5c542;
+}
+.waterSelection .sectionSelectionIcon {
+  background-color: #3a8dde;
+}
+.indexSelection .sectionSelectionIcon {
+  background-color: #27ae60;
+}
+
+.energySelection:hover {
+  background-color: #f5c542;
+}
+.energySelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.waterSelection:hover {
+  background-color: #3a8dde;
+}
+.waterSelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.indexSelection:hover {
+  background-color: #27ae60;
+}
+.indexSelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.sectionSelectionIcon {
+  scale: 1.2;
+  width: 75px;
+}
+
+#energyTab {
+  mask-image: url("./assets/bolt-solid-full.svg");
+  -webkit-mask-image: url("./assets/bolt-solid-full.svg");
+}
+
+#waterTab {
+  mask-image: url("./assets/droplet-solid-full.svg");
+  -webkit-mask-image: url("./assets/droplet-solid-full.svg");
+}
+
+#indexTab {
+  mask-image: url("./assets/gear-solid-full.svg");
+  -webkit-mask-image: url("./assets/gear-solid-full.svg");
+}
+
+/* --- Headers --- */
+.sectionHeader {
+  display: block;
+  text-align: center;
+}
+
+.apartmentHeader {
+  grid-column: 1 / -1;
+  justify-self: center;
+  text-align: center;
+  margin: 0 auto;
+}
+
+/* --- Server Error --- */
+.serverConnectionErrorImg{
+  display: block;
+  width: 25%;
+  height: auto;
+  margin: 0 auto;
+}

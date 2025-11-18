@@ -6,8 +6,38 @@ export function registerListeners() {
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
 
+// === Theme Toggle Listener
+$(document).on('change', '#appearanceToggleInput', async function () {
+    const isDark = $(this).is(':checked');
 
-// === Inputs (außer Checkboxen und Datenbank Sektion Inputs) === 
+    // Transition kurz deaktivieren, damit das Umschalten flüssiger wirkt
+    $('html, body').css('transition', 'none');
+
+    // Theme toggeln
+    if (isDark) {
+        $('html').attr('data-theme', 'dark');
+    } else {
+        $('html').removeAttr('data-theme');
+    }
+
+    // Force reflow, damit die Transition korrekt angewendet wird
+    void document.body.offsetHeight;
+
+    // Transition wieder aktivieren
+    $('html, body').css({
+        transition: 'background-color 1s ease, color 1s ease, border-color 1s ease'
+    });
+
+    // LocalStorage speichern
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+    // Optional: In DB speichern
+    await DB.saveValueToDB('appearanceToggleInput', isDark);
+});
+
+
+
+    // === Inputs (außer Checkboxen und Datenbank Sektion Inputs) === 
     $(document).on('focusout', 'input:not([type="checkbox"]):not(#database input)', async function () {
         const id = $(this).attr('id');   // z. B. "strom"
         const value = $(this).val();     // neuer Wert
@@ -39,13 +69,13 @@ export function registerListeners() {
 
         if (!allMatches || allMatches.length === 0) {
             // Noch kein Eintrag -> neu speichern
-            if(id.startsWith("apartment") && id.endsWith("name")){
+            if (id.startsWith("apartment") && id.endsWith("name")) {
                 await DB.saveValueToDB(id, value);
             }
-            else{
+            else {
                 await DB.saveValueToDB(`${id}_${day}-${month}-${year}`, value);
             }
-            
+
             return;
         }
 
@@ -82,7 +112,7 @@ export function registerListeners() {
         }
     });
 
-// === Checkboxes === 
+    // === Checkboxes === 
     $(document).on('change', 'input[type="checkbox"]', async function () {
         const id = $(this).attr('id');
         const checked = $(this).is(':checked');
@@ -115,7 +145,7 @@ export function registerListeners() {
         }
     });
 
-// === Delete Buttons === 
+    // === Delete Buttons === 
     $(document).on('click', 'button.deleteButton', async function () {
         const key = $(this).attr('id');
         console.log("key", key);
@@ -130,7 +160,7 @@ export function registerListeners() {
         }
     });
 
-// === Datenbank Inputs === 
+    // === Datenbank Inputs === 
     $(document).on('focusout', 'input.newKeyInput, input.newValueInput', async function () {
         console.log("Dtatabasetable Input focus update");
         const value = $(this).val();
@@ -141,25 +171,25 @@ export function registerListeners() {
             return;
         }
         // Neuer Key Name => renameKey
-        if(inputClass == "newKeyInput"){
+        if (inputClass == "newKeyInput") {
             console.log("newKeyInput");
-            const oldKey =$(this).closest("tr").children("td:first").text();
-            const newKey =value;
-            await DB.renameKeyInDB(oldKey,newKey);
+            const oldKey = $(this).closest("tr").children("td:first").text();
+            const newKey = value;
+            await DB.renameKeyInDB(oldKey, newKey);
             Helper.updateDatabaseTable();
         }
         // Neue Value => updateValue
-        else{
+        else {
             console.log("newVlueInput");
-            const key=$(this).closest("tr").children("td:first").text();
-            await DB.updateValueInDB(key,value);
+            const key = $(this).closest("tr").children("td:first").text();
+            await DB.updateValueInDB(key, value);
             Helper.updateDatabaseTable();
-        }        
+        }
     });
 
 
 
-// ===  "+" Icon === 
+    // ===  "+" Icon === 
     $(document).on('click', 'svg.addIcon', async function () {
         let newElement;
         if ($('#addToDatabaseTable').length == 0) {
@@ -198,7 +228,7 @@ export function registerListeners() {
     });
 
 
-// === Add Button === 
+    // === Add Button === 
     $(document).on('click', 'button.addButton', async function () {
         let errorRows = [];
 

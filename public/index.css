@@ -1,8 +1,6 @@
 :root {
   /* --- Farben --- */
-  
-  /* Mint Schema */
-
+  /* Helles Mint Schema */
   --primaryBackgroundColor: #ceffe8;
   --primaryTextColor: #2f4f4f;
   --disabledTextColor: #89a195;
@@ -23,68 +21,17 @@
   --addButtonBackgroundColor: #27ae60;
   --addButtonHoverBackgroundColor: #58af7a;
   --addButtonTextColor: #ffffff;
-  
 
   --sectionLinkBorderColor: #000000;
   --sectionLinkHoverBackground: #27ae60;
 
   --tableBorderColor: #b6d8c9;
 
-  --tableEvenBackgroundColor: #eaf8f0;   
-  --tableUnevenBackgroundColor: #d4eddf; 
+  --tableEvenBackgroundColor: #eaf8f0;
+  --tableUnevenBackgroundColor: #d4eddf;
   --tableHeaderColor: var(--apartmentBackground);
-  
+
   --highlightColor: #c9f7c2;
-
-/* Blau-Grau Schema */
-  /*
-  --primaryBackgroundColor: #def4ff;
-  --primaryTextColor: #333333;
-  --disabledTextColor: #7a7a7a;
-
-  --inputTextColor: #2a6f9e;
-  --inputPlaceholderTextColor: #7fb6d8;
-  --inputBackgroundColor: #ffffff;
-  --inputBorderColor: #cccccc;
-
-  --sectionBackground: #d9e6ef;
-  --apartmentBackground: #cce0e8;
-
-  --deleteButtonBackgroundColor: #3A8DDE;
-  --deleteButtonHoverBackgroundColor: #5aa0ff;
-  --deleteButtonTextColor: #ffffff;
-
-  --sectionLinkBorderColor: #2a6f9e;
-  --sectionLinkHoverBackground: #2a6f9e;
-
-  --tableBorderColor: #cccccc;
-  */
-
-/* Lila Schema */
-/*
-  --primaryBackgroundColor: #ebdbff;
-  --primaryTextColor: #3c2f41;
-  --disabledTextColor: #b9a8bf;
-
-  --inputTextColor: #9b59b6;
-  --inputPlaceholderTextColor: #d1b3e0;
-  --inputBackgroundColor: #f8e6ff;
-  --inputBorderColor: #d8baf0;
-
-  --sectionBackground: #f0e0ff;
-  --apartmentBackground: #e6ccff;
-
-  --deleteButtonBackgroundColor: #e91e63;
-  --deleteButtonHoverBackgroundColor: #ff3f7f;
-  --deleteButtonTextColor: #ffffff;
-
-  --sectionLinkBorderColor: #9b59b6;
-  --sectionLinkHoverBackground: #9b59b6;
-
-  --tableBorderColor: #d8baf0;
-*/
-
-
 
   /* --- Typografie --- */
   --fontSize: 1.2rem;
@@ -98,6 +45,44 @@
   --apartmentPaddingLeft: 5%;
   --apartmentMarginTop: 20px;
   --apartmentMarginBottom: 10px;
+}
+:root[data-theme="dark"] {
+  --primaryBackgroundColor: #1a2420;
+  --primaryTextColor: #cce7da;
+  --disabledTextColor: #5d7368;
+  --disabledInputBackgroundColor: #2b3a34;
+
+  --inputTextColor: #7ed9a0;
+  --inputPlaceholderTextColor: var(--disabledTextColor);
+  --inputBackgroundColor: #23312c;
+  --inputBorderColor: #3b5248;
+
+  --sectionBackground: #1f2c27;
+  --apartmentBackground: #263833;
+
+  --deleteButtonBackgroundColor: #c0392b;
+  --deleteButtonHoverBackgroundColor: #e74c3c;
+  --deleteButtonTextColor: #ffffff;
+
+  --addButtonBackgroundColor: #1f8a48;
+  --addButtonHoverBackgroundColor: #27ae60;
+  --addButtonTextColor: #ffffff;
+
+  --sectionLinkBorderColor: #a3d9b1;
+  --sectionLinkHoverBackground: #27ae60;
+
+  --tableBorderColor: #3b5248;
+
+  --tableEvenBackgroundColor: #1f2d28;
+  --tableUnevenBackgroundColor: #24352f;
+  --tableHeaderColor: var(--apartmentBackground);
+
+  --highlightColor: #335e46;
+}
+
+:root,
+body {
+  transition: background-color 1s ease, color 1s ease, border-color 1s ease;
 }
 
 /* --- Body --- */
@@ -114,6 +99,11 @@ body {
   font-size: var(--fontSize);
 }
 
+/* --- Appearance Checkbox --- */
+.appearanceToggleCheckbox {
+  display: none;
+}
+
 /* --- Inputs --- */
 input {
   font-size: var(--fontSize);
@@ -128,60 +118,28 @@ input::placeholder {
   color: var(--inputPlaceholderTextColor);
 }
 
-input[type=checkbox] {
+input[type="checkbox"] {
   cursor: pointer;
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
-
-input:disabled{
+input:disabled {
   background-color: var(--disabledInputBackgroundColor);
 }
 
 /* --- Labels --- */
 
-label:hover{
+label:hover {
   cursor: pointer;
 }
-
-/* --- Section Selection / Links --- */
-#sectionSelection {
-  display: flex;
-  flex-direction: row;
-}
-
-#sectionSelection a {
-  border-radius: 8px;
-  border: 1px solid var(--sectionLinkBorderColor);
-  padding: 20px;
-  margin: 5px;
-  text-decoration: none;
-}
-
-.energySelection, .waterSelection, .heatingSelection {
-  display: inline-block;
-  padding: 15px 25px;
-  text-align: center;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  background-color: var(--sectionBackground);
-}
-
-.energySelection { color: #F5C542; }
-.waterSelection { color: #3A8DDE; }
-.heatingSelection { color: #E55C3C; }
-
-.energySelection:hover { background-color: #F5C542; color: var(--primaryBackgroundColor); }
-.waterSelection:hover { background-color: #3A8DDE; color: var(--primaryBackgroundColor); }
-.heatingSelection:hover { background-color: #E55C3C; color: var(--primaryBackgroundColor); }
 
 /* --- Headers --- */
 .sectionHeader {
@@ -202,13 +160,15 @@ table {
   margin: 20px auto;
 }
 
-table, th, td {
+table,
+th,
+td {
   border: 1px solid var(--tableBorderColor);
   padding: 8px 12px;
   text-align: center;
 }
 
-th{
+th {
   background-color: var(--tableHeaderColor);
 }
 
@@ -220,15 +180,14 @@ table tr:nth-child(odd) {
   background-color: var(--tableUnevenBackgroundColor);
 }
 
-
-.keyTd{
+.keyTd {
   text-align: left;
 }
 
-#addToDatabaseTable{
+#addToDatabaseTable {
   width: 90%;
 }
-#addToDatabaseTable input{
+#addToDatabaseTable input {
   width: 100%;
 }
 
@@ -247,8 +206,7 @@ table tr:nth-child(odd) {
   background-color: var(--deleteButtonHoverBackgroundColor);
 }
 
-
-.addButton{
+.addButton {
   display: block;
   margin: 0 auto 10px;
   background-color: var(--addButtonBackgroundColor);
@@ -260,15 +218,15 @@ table tr:nth-child(odd) {
   font-size: var(--fontSize);
 }
 
-.addButton:hover{
-background-color: var(--addButtonHoverBackgroundColor);
+.addButton:hover {
+  background-color: var(--addButtonHoverBackgroundColor);
 }
 
-
-
-
 /* --- Section / Container --- */
-#general, #energy, #water, #heating {
+#general,
+#energy,
+#water,
+#heating {
   display: block;
   width: var(--containerWidth);
   margin: 5px auto;
@@ -317,45 +275,151 @@ background-color: var(--addButtonHoverBackgroundColor);
   grid-column: 3;
 }
 
-
-
 /* --- Updated table element highlighting --- */
 @keyframes fadeHighlight {
-  from { background-color: var(--highlightColor); }  /* Startfarbe */
-  to { background-color: transparent; } /* oder deine normale Tabellenfarbe */
+  from {
+    background-color: var(--highlightColor);
+  } /* Startfarbe */
+  to {
+    background-color: transparent;
+  } /* oder deine normale Tabellenfarbe */
 }
 
 .highlightFade {
   animation: fadeHighlight 1.2s ease-out;
 }
 
-
 /* --- Server Error --- */
-.serverConnectionErrorImg{
+.serverConnectionErrorImg {
   display: block;
   width: 25%;
   height: auto;
   margin: 0 auto;
 }
 
-
 /* --- Icons --- */
-.addIcon{
+
+/* Add Icon */
+.addIcon {
   display: block;
   width: 5%;
   height: auto;
   margin: 0 auto 10px;
   border: 1px solid #2f4f4f;
   border-radius: 50%;
-  padding:5px;
+  padding: 5px;
   fill: white;
   transition: fill 0.2s;
   transition: transform 0.2s;
 }
 
-.addIcon:hover{
+.addIcon:hover {
   cursor: pointer;
-   fill: #00ffcc; 
-   transform: scale(1.1);
+  fill: #00ffcc;
+  transform: scale(1.1);
 }
 
+/* Theme Toggle Icon */
+.dark-white-toggle-icon {
+  width: 20%;
+  height: auto;
+  transition: transform 0.5s;
+}
+
+.dark-white-toggle-icon:hover {
+  transform: rotate(180deg);
+  height: auto;
+  cursor: pointer;
+}
+
+
+/* Section Selection Icons */
+.sectionSelectionIcon {
+  width: 75px;
+  height: 75px;
+  scale: 1.2;
+  margin-bottom: 8px;
+  transition: background-color 0.3s ease;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+#sectionSelection a {
+  border-radius: 8px;
+  border: 1px solid var(--sectionLinkBorderColor);
+  padding: 20px;
+  margin: 5px;
+  text-decoration: none;
+}
+
+
+.energySelection,
+.waterSelection,
+.heatingSelection {
+  display: inline-block;
+  padding: 15px 25px;
+  text-align: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: var(--primaryBackgroundColor);
+}
+
+.energySelection .sectionSelectionIcon {
+  background-color: #f5c542;
+}
+.waterSelection .sectionSelectionIcon {
+  background-color: #3a8dde;
+}
+.heatingSelection .sectionSelectionIcon {
+  background-color: #e55c3c;
+}
+
+.energySelection:hover {
+  background-color: #f5c542;
+}
+.energySelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.waterSelection:hover {
+  background-color: #3a8dde;
+}
+.waterSelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.heatingSelection:hover {
+  background-color: #e55c3c;
+}
+.heatingSelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.sectionSelectionIcon {
+  scale: 1.2;
+  width: 75px;
+}
+
+#energyTab {
+  mask-image: url("./assets/bolt-solid-full.svg");
+  -webkit-mask-image: url("./assets/bolt-solid-full.svg");
+}
+
+#waterTab {
+  mask-image: url("./assets/droplet-solid-full.svg");
+  -webkit-mask-image: url("./assets/droplet-solid-full.svg");
+}
+
+#heatingTab {
+  mask-image: url("./assets/fire-solid-full.svg");
+  -webkit-mask-image: url("./assets/fire-solid-full.svg");
+}
+
+#indexTab {
+  mask-image: url("./assets/gear-solid-full.svg");
+  -webkit-mask-image: url("./assets/gear-solid-full.svg");
+}

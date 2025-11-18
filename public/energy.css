@@ -1,0 +1,206 @@
+:root {
+  /* --- Farben --- */
+  --primaryBackgroundColor: #fffde6;
+  --primaryTextColor: #2f2f1f;
+  --disabledTextColor: #a8a28b;
+  --disabledInputBackgroundColor: #f5f3c8;
+
+  --inputTextColor: #4a4a00;
+  --inputPlaceholderTextColor: #b2ad6b;
+  --inputBackgroundColor: #fffce0;
+  --inputBorderColor: #d6cc7a;
+
+  --sectionBackground: #fff9c4;
+  --apartmentBackground: #f2e59c;
+
+  --deleteButtonBackgroundColor: #e67e22;
+  --deleteButtonHoverBackgroundColor: #ff9f43;
+  --deleteButtonTextColor: #ffffff;
+
+  --addButtonBackgroundColor: #f1c40f;
+  --addButtonHoverBackgroundColor: #f7d74b;
+  --addButtonTextColor: #2f2f1f;
+
+  --sectionLinkBorderColor: #d6cc7a;
+  --sectionLinkHoverBackground: #f1c40f;
+
+  --tableBorderColor: #d6cc7a;
+
+  --tableEvenBackgroundColor: #fffde0;
+  --tableUnevenBackgroundColor: #f7f1ba;
+  --tableHeaderColor: #f2e59c;
+
+  --highlightColor: #fff5a3;
+
+  /* --- Typografie --- */
+  --fontSize: 1.2rem;
+
+  /* --- Spacing / Layout --- */
+  --sectionPadding: 20px;
+  --containerWidth: 40vw;
+  --apartmentGapRow: 8px;
+  --apartmentGapColumn: 12px;
+  --apartmentPadding: 10px;
+  --apartmentPaddingLeft: 5%;
+  --apartmentMarginTop: 20px;
+  --apartmentMarginBottom: 10px;
+}
+
+:root[data-theme="dark"] {
+  --primaryBackgroundColor: #1a1a1a;
+  --primaryTextColor: #f5eeb0;
+  --disabledTextColor: #8b865c;
+  --disabledInputBackgroundColor: #2a2a1f;
+
+  --inputTextColor: #e8d85c;
+  --inputPlaceholderTextColor: #9b9554;
+  --inputBackgroundColor: #2d2c1f;
+  --inputBorderColor: #6a6532;
+
+  --sectionBackground: #232319;
+  --apartmentBackground: #2e2b1c;
+
+  --deleteButtonBackgroundColor: #c0392b;
+  --deleteButtonHoverBackgroundColor: #e74c3c;
+  --deleteButtonTextColor: #fff8dc;
+
+  --addButtonBackgroundColor: #d4af37;
+  --addButtonHoverBackgroundColor: #f1c40f;
+  --addButtonTextColor: #1a1a1a;
+
+  --sectionLinkBorderColor: #d4af37;
+  --sectionLinkHoverBackground: #d4af37;
+
+  --tableBorderColor: #4a4725;
+
+  --tableEvenBackgroundColor: #1f1f14;
+  --tableUnevenBackgroundColor: #2b2a18;
+  --tableHeaderColor: #3a341a;
+
+  --highlightColor: #f1c40f;
+}
+
+:root,
+body {
+  transition: background-color 1s ease, color 1s ease, border-color 1s ease;
+}
+
+/* --- Body --- */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: Trebuchet MS, sans-serif;
+  margin: 0;
+  padding: var(--sectionPadding);
+  background-color: var(--primaryBackgroundColor);
+  color: var(--primaryTextColor);
+  font-size: var(--fontSize);
+}
+
+/* Section Selection Icons */
+.sectionSelectionIcon {
+  width: 75px;
+  height: 75px;
+  scale: 1.2;
+  margin-bottom: 8px;
+  transition: background-color 0.3s ease;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+#sectionSelection a {
+  border-radius: 8px;
+  border: 1px solid var(--sectionLinkBorderColor);
+  padding: 20px;
+  margin: 5px;
+  text-decoration: none;
+}
+
+.indexSelection,
+.waterSelection,
+.heatingSelection {
+  display: inline-block;
+  padding: 15px 25px;
+  text-align: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: var(--primaryBackgroundColor);
+}
+
+.indexSelection .sectionSelectionIcon {
+  background-color: #27ae60;
+}
+.waterSelection .sectionSelectionIcon {
+  background-color: #3a8dde;
+}
+.heatingSelection .sectionSelectionIcon {
+  background-color: #e55c3c;
+}
+
+.indexSelection:hover {
+  background-color: #27ae60;
+}
+.indexSelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.waterSelection:hover {
+  background-color: #3a8dde;
+}
+.waterSelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.heatingSelection:hover {
+  background-color: #e55c3c;
+}
+.heatingSelection:hover .sectionSelectionIcon {
+  background-color: var(--primaryBackgroundColor);
+}
+
+.sectionSelectionIcon {
+  scale: 1.2;
+  width: 75px;
+}
+
+#indexTab {
+  mask-image: url("./assets/gear-solid-full.svg");
+  -webkit-mask-image: url("./assets/gear-solid-full.svg");
+}
+
+#waterTab {
+  mask-image: url("./assets/droplet-solid-full.svg");
+  -webkit-mask-image: url("./assets/droplet-solid-full.svg");
+}
+
+#heatingTab {
+  mask-image: url("./assets/fire-solid-full.svg");
+  -webkit-mask-image: url("./assets/fire-solid-full.svg");
+}
+
+/* --- Headers --- */
+.sectionHeader {
+  display: block;
+  text-align: center;
+}
+
+.apartmentHeader {
+  grid-column: 1 / -1;
+  justify-self: center;
+  text-align: center;
+  margin: 0 auto;
+}
+
+/* --- Server Error --- */
+.serverConnectionErrorImg {
+  display: block;
+  width: 25%;
+  height: auto;
+  margin: 0 auto;
+}

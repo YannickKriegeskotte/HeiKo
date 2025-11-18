@@ -1,6 +1,6 @@
-import * as DB from "./database.js";
+import * as DB from "../utils/database.js";
 import { registerListeners } from "./indexListeners.js";
-import * as Helper from "./helpers.js";
+import * as Helper from "../utils/helpers.js";
 
 $(document).ready(async function () {
     const date = Helper.getDate();
@@ -13,7 +13,7 @@ $(document).ready(async function () {
         $('body').append(`
             <div id="general" >
             <h2 class="sectionHeader">Server nicht erreicht!</h2>
-            <img class="serverConnectionErrorImg" src="./assets/ConnectionError.png">
+            <img class="serverConnectionErrorImg" src="../assets/ConnectionError.png">
             </div>
         `);
         // alert("Der Server ist nicht erreichbar.");

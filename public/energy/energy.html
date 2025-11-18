@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>HEKTAR</title>
+  <title>HeiKo</title>
       <script>
       // Beim allerersten Rendern theme speichern
       const localTheme = localStorage.getItem('theme');
@@ -15,10 +15,14 @@
     </script>
 
    <link rel="stylesheet" href="energy.css">
-  <script src="lib/jquery-3.7.1.min.js"></script>
+  <script src="../lib/jquery-3.7.1.min.js"></script>
+  <script src="../lib/chart.js"></script>
+
   <script type="module" src="main.js"></script>
 </head>
 <body>
+
+  <!--
   <div class="appearanceToggle">
       <input
         type="checkbox"
@@ -29,21 +33,39 @@
         <img class="dark-white-toggle-icon" src="./assets/circle-half-stroke-solid-full.svg" alt="Toggle Theme" />
       </label>
     </div>
-  <h1>HEKTAR</h1>
-  <h2>Heimkosten Tracker & Auswerter</h2>
+    -->
+  <h1>HEIKO</h1>
+  <h2>Heimkosten</h2>
   
 
     <div id="sectionSelection">
-      <a href="index.html" class="indexSelection">
+      <a href="../index/index.html" class="indexSelection">
         <div class="sectionSelectionIcon" id="indexTab"></div>
       </a>
-      <a href="water.html" class="waterSelection"> 
+      <a href="../water/water.html" class="waterSelection"> 
         <div class="sectionSelectionIcon" id="waterTab"></div>
       </a>
-      <a href="heating.html" class="heatingSelection"> 
+      <a href="../heating/heating.html" class="heatingSelection"> 
         <div class="sectionSelectionIcon" id="heatingTab"></div>
       </a>
     </div>
 
+
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <script>
+      const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'line', // line, bar, pie, doughnut, radar, ...
+        data: {
+          labels: ['Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun'],
+          datasets: [{
+            label: 'Energieverbrauch',
+            data: [10, 20, 15, 30, 25, 40],
+            borderWidth: 2
+          }]
+        }
+      });
+    </script>
 </body>
 </html>

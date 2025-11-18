@@ -5,7 +5,10 @@
   "main": "app.js",
   "bin": "app.js",
   "pkg": {
-    "assets": ["public/**/*", "data.db"]
+    "assets": [
+      "public/**/*",
+      "data.db"
+    ]
   },
   "scripts": {
     "start": "node app.js"
@@ -19,7 +22,6 @@
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
   },
-  
   "devDependencies": {
     "pkg": "^5.8.1"
   }

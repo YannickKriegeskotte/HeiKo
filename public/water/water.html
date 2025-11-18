@@ -2,23 +2,24 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>HEKTAR</title>
+  <title>HeiKo</title>
       <script>
       // Beim allerersten Rendern theme speichern
       const localTheme = localStorage.getItem('theme');
       if (localTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        document.documentElement.style.backgroundColor = '#1f0e0b'; // dunkler Fallback-Hintergrund
+        document.documentElement.style.backgroundColor = '#0f1c24'; // dunkler Fallback-Hintergrund
       } else {
-        document.documentElement.style.backgroundColor = '#fff1ee'; // heller Fallback-Hintergrund
+        document.documentElement.style.backgroundColor = '#e4f6ff'; // heller Fallback-Hintergrund
       }
     </script>
     
-   <link rel="stylesheet" href="heating.css">
-  <script src="lib/jquery-3.7.1.min.js"></script>
-  <script type="module" src="main.js"></script>
+   <link rel="stylesheet" href="water.css">
+  <script src="../lib/jquery-3.7.1.min.js"></script>
+  <script type="module" src="waterMain.js"></script>
 </head>
 <body>
+  <!--
   <div class="appearanceToggle">
       <input
         type="checkbox"
@@ -29,18 +30,19 @@
         <img class="dark-white-toggle-icon" src="./assets/circle-half-stroke-solid-full.svg" alt="Toggle Theme" />
       </label>
     </div>
-  <h1>HEKTAR</h1>
-  <h2>Heimkosten Tracker & Auswerter</h2>
+    -->
+  <h1>HEIKO</h1>
+  <h2>Heimkosten</h2>
 
     <div id="sectionSelection">
-      <a href="energy.html" class="energySelection">
+      <a href="../energy/energy.html" class="energySelection">
         <div class="sectionSelectionIcon" id="energyTab"></div>
       </a>
-      <a href="water.html" class="waterSelection"> 
-        <div class="sectionSelectionIcon" id="waterTab"></div>
-      </a>
-      <a href="index.html" class="indexSelection"> 
+      <a href="../index/index.html" class="indexSelection"> 
         <div class="sectionSelectionIcon" id="indexTab"></div>
+      </a>
+      <a href="../heating/heating.html" class="heatingSelection"> 
+        <div class="sectionSelectionIcon" id="heatingTab"></div>
       </a>
     </div>
 

@@ -170,18 +170,18 @@ body {
 }
 
 #indexTab {
-  mask-image: url("./assets/gear-solid-full.svg");
-  -webkit-mask-image: url("./assets/gear-solid-full.svg");
+  mask-image: url("../assets/gear-solid-full.svg");
+  -webkit-mask-image: url("../assets/gear-solid-full.svg");
 }
 
 #waterTab {
-  mask-image: url("./assets/droplet-solid-full.svg");
-  -webkit-mask-image: url("./assets/droplet-solid-full.svg");
+  mask-image: url("../assets/droplet-solid-full.svg");
+  -webkit-mask-image: url("../assets/droplet-solid-full.svg");
 }
 
 #heatingTab {
-  mask-image: url("./assets/fire-solid-full.svg");
-  -webkit-mask-image: url("./assets/fire-solid-full.svg");
+  mask-image: url("../assets/fire-solid-full.svg");
+  -webkit-mask-image: url("../assets/fire-solid-full.svg");
 }
 
 /* --- Headers --- */

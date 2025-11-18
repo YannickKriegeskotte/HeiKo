@@ -127,7 +127,7 @@ app.delete("/delete",async(req,res) =>{
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server läuft auf http://localhost:${PORT}`);
-    exec(`start http://localhost:${PORT}/index.html`);
+    exec(`start http://localhost:${PORT}/index/index.html`);
 });
 }
 

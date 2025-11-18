@@ -1,5 +1,5 @@
-import * as DB from "./database.js";
-import * as Helper from "./helpers.js";
+import * as DB from "../utils/database.js";
+import * as Helper from "../utils/helpers.js";
 export function registerListeners() {
     const date = Helper.getDate();
     const day = date.getDate();

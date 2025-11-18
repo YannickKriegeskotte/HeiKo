@@ -2,7 +2,7 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <title>HEKTAR</title>
+    <title>HeiKo</title>
 
     <script>
       // Beim allerersten Rendern theme speichern
@@ -17,11 +17,12 @@
 
 
     <link rel="stylesheet" href="index.css" />
-    <script src="lib/jquery-3.7.1.min.js"></script>
-    <script type="module" src="main.js"></script>
+    <script src="../lib/jquery-3.7.1.min.js"></script>
+    <script type="module" src="indexMain.js"></script>
   </head>
   <body>
-    <div class="appearanceToggle">
+  <!--
+  <div class="appearanceToggle">
       <input
         type="checkbox"
         id="appearanceToggleInput"
@@ -31,18 +32,19 @@
         <img class="dark-white-toggle-icon" src="./assets/circle-half-stroke-solid-full.svg" alt="Toggle Theme" />
       </label>
     </div>
+    -->
 
-    <h1>HEKTAR</h1>
-    <h2>Heimkosten Tracker & Auswerter</h2>
+    <h1>HEIKO</h1>
+    <h2>Heimkosten</h2>
 
     <div id="sectionSelection">
-      <a href="energy.html" class="energySelection">
+      <a href="../energy/energy.html" class="energySelection">
         <div class="sectionSelectionIcon" id="energyTab"></div>
       </a>
-      <a href="water.html" class="waterSelection"> 
+      <a href="../water/water.html" class="waterSelection"> 
         <div class="sectionSelectionIcon" id="waterTab"></div>
       </a>
-      <a href="heating.html" class="heatingSelection"> 
+      <a href="../heating/heating.html" class="heatingSelection"> 
         <div class="sectionSelectionIcon" id="heatingTab"></div>
       </a>
     </div>

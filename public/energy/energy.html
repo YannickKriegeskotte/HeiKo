@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <title>HeiKo</title>
-      <script>
+  <head>
+    <meta charset="UTF-8" />
+    <title>HeiKo</title>
+    <script>
       // Beim allerersten Rendern theme speichern
-      const localTheme = localStorage.getItem('theme');
-      if (localTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.documentElement.style.backgroundColor = '#1a1a1a'; // dunkler Fallback-Hintergrund
+      const localTheme = localStorage.getItem("theme");
+      if (localTheme === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+        document.documentElement.style.backgroundColor = "#1a1a1a"; // dunkler Fallback-Hintergrund
       } else {
-        document.documentElement.style.backgroundColor = '#fffde6'; // heller Fallback-Hintergrund
+        document.documentElement.style.backgroundColor = "#fffde6"; // heller Fallback-Hintergrund
       }
     </script>
 
-   <link rel="stylesheet" href="energy.css">
-  <script src="../lib/jquery-3.7.1.min.js"></script>
-  <script src="../lib/chart.js"></script>
+    <link rel="stylesheet" href="energy.css" />
+    <script src="../lib/jquery-3.7.1.min.js"></script>
+    <script src="../lib/chart.js"></script>
+    <script src="../lib/chartjs-plugin-annotation.min.js"></script>
 
-  <script type="module" src="energyMain.js"></script>
-</head>
-<body>
-
-  <!--
+    <script type="module" src="energyMain.js"></script>
+  </head>
+  <body>
+    <!--
   <div class="appearanceToggle">
       <input
         type="checkbox"
@@ -34,35 +34,34 @@
       </label>
     </div>
     -->
-  <h1>HEIKO</h1>
-  <h2>Heimkosten</h2>
-  
+    <h1>HEIKO</h1>
+    <h2>Heimkosten</h2>
 
     <div id="sectionSelection">
       <a href="../index/index.html" class="indexSelection">
         <div class="sectionSelectionIcon" id="indexTab"></div>
       </a>
-      <a href="../water/water.html" class="waterSelection"> 
+      <a href="../water/water.html" class="waterSelection">
         <div class="sectionSelectionIcon" id="waterTab"></div>
       </a>
-      <a href="../heating/heating.html" class="heatingSelection"> 
+      <a href="../heating/heating.html" class="heatingSelection">
         <div class="sectionSelectionIcon" id="heatingTab"></div>
       </a>
     </div>
 
-
-    <div id="overviewContainer">
-      <h2>Gesamtübersicht</h2>
+    <div class="sectionContainer" id="overviewContainer">
+      <h2 class="sectionHeader">Gesamtübersicht</h2>
+      <!-- <canvas id="overviewChart" width="400" height="200"></canvas> -->
     </div>
-    <!-- <canvas id="overviewChart" width="400" height="200"></canvas> -->
+    
 
-    <div class="generalAnnualTableContainer">
-      <h2>Jahrestabellen</h2>
+    <div class="sectionContainer">
+      <h2 class="sectionHeader">Jahrestabellen</h2>
+      <div class="addIconSection">
+      <img class="addTableIcon" src="../assets/plus-solid-full.svg" />
+      </div>
+
+      <div class="annualTablesWrapper"></div>
     </div>
-
-
-
-    
-    
-</body>
+  </body>
 </html>

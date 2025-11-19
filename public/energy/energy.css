@@ -1,91 +1,20 @@
+/*
 :root {
-  /* --- Farben --- */
-  --primaryBackgroundColor: #fffde6;
-  --primaryTextColor: #2f2f1f;
-  --disabledTextColor: #a8a28b;
-  --disabledInputBackgroundColor: #f5f3c8;
 
-  --inputTextColor: #4a4a00;
-  --inputPlaceholderTextColor: #b2ad6b;
-  --inputBackgroundColor: #fffce0;
-  --inputBorderColor: #d6cc7a;
 
-  --sectionBackground: #fff9c4;
-  --apartmentBackground: #f2e59c;
 
-  --deleteButtonBackgroundColor: #e67e22;
-  --deleteButtonHoverBackgroundColor: #ff9f43;
-  --deleteButtonTextColor: #ffffff;
-
-  --addButtonBackgroundColor: #f1c40f;
-  --addButtonHoverBackgroundColor: #f7d74b;
-  --addButtonTextColor: #2f2f1f;
-
-  --sectionLinkBorderColor: #d6cc7a;
-  --sectionLinkHoverBackground: #f1c40f;
-
-  --tableBorderColor: #d6cc7a;
-
-  --tableEvenBackgroundColor: #fffde0;
-  --tableUnevenBackgroundColor: #f7f1ba;
-  --tableHeaderColor: #f2e59c;
-
-  --highlightColor: #fff5a3;
-
-  /* --- Typografie --- */
-  --fontSize: 1.2rem;
-
-  /* --- Spacing / Layout --- */
-  --sectionPadding: 20px;
-  --containerWidth: 40vw;
-  --apartmentGapRow: 8px;
-  --apartmentGapColumn: 12px;
-  --apartmentPadding: 10px;
-  --apartmentPaddingLeft: 5%;
-  --apartmentMarginTop: 20px;
-  --apartmentMarginBottom: 10px;
 }
 
 :root[data-theme="dark"] {
-  --primaryBackgroundColor: #1a1a1a;
-  --primaryTextColor: #f5eeb0;
-  --disabledTextColor: #8b865c;
-  --disabledInputBackgroundColor: #2a2a1f;
 
-  --inputTextColor: #e8d85c;
-  --inputPlaceholderTextColor: #9b9554;
-  --inputBackgroundColor: #2d2c1f;
-  --inputBorderColor: #6a6532;
-
-  --sectionBackground: #232319;
-  --apartmentBackground: #2e2b1c;
-
-  --deleteButtonBackgroundColor: #c0392b;
-  --deleteButtonHoverBackgroundColor: #e74c3c;
-  --deleteButtonTextColor: #fff8dc;
-
-  --addButtonBackgroundColor: #d4af37;
-  --addButtonHoverBackgroundColor: #f1c40f;
-  --addButtonTextColor: #1a1a1a;
-
-  --sectionLinkBorderColor: #d4af37;
-  --sectionLinkHoverBackground: #d4af37;
-
-  --tableBorderColor: #4a4725;
-
-  --tableEvenBackgroundColor: #1f1f14;
-  --tableUnevenBackgroundColor: #2b2a18;
-  --tableHeaderColor: #3a341a;
-
-  --highlightColor: #f1c40f;
 }
-
+*/
 :root,
 body {
   transition: background-color 1s ease, color 1s ease, border-color 1s ease;
 }
 
-/* --- Body --- */
+/*--- Body --- */
 body {
   display: flex;
   flex-direction: column;
@@ -93,13 +22,97 @@ body {
   justify-content: flex-start;
   font-family: Trebuchet MS, sans-serif;
   margin: 0;
-  padding: var(--sectionPadding);
-  background-color: var(--primaryBackgroundColor);
-  color: var(--primaryTextColor);
-  font-size: var(--fontSize);
+  padding: 20px;
+  background-color: #fdf9c7;
+  color: #2f2f1f;
+  font-size: 1.2rem;
 }
 
-/* Section Selection Icons */
+/*=============================*/
+/*=== Ganz großer Container ===*/
+/*=============================*/
+.sectionContainer {
+  width: 80vw;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  margin: 5px;
+  background-color: #fff9c4;
+}
+
+/*=======================================*/
+/*=== Überschrift in großem Container ===*/
+/*=======================================*/
+.sectionHeader {
+  text-align: center;
+  padding: 10px;
+}
+
+/*=======================================================*/
+/*=== Container um Tabellenkopf Container und Tabelle ===*/
+/*=======================================================*/
+.annualTableContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+/*
+.annualTablesWrapper{}
+*/
+
+
+/*====================*/
+/*=== Tabellenkopf ===*/
+/*====================*/
+.annualTableHeaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f2e59c;
+}
+
+/*=====================*/
+/*=== Table Element ===*/
+/*=====================*/
+table {
+  border-collapse: collapse;
+  margin: 10px auto;
+}
+
+table,th,td {
+  border: 1px solid #838a2669;
+  text-align: center;
+}
+
+th {
+  width: auto;
+  max-width: 200px;
+  background-color: #ffef64;
+}
+
+table tr:nth-child(even) {
+  background-color: #fff6a5;
+}
+
+table tr:nth-child(odd) {
+  background-color: #fffacf;
+}
+
+/*=====================*/
+/*=== Input Element ===*/
+/*=====================*/
+input{
+  width: 99%;
+  height: 99%;
+  background-color: #00000000;
+  border: 1px solid #838a2600;
+}
+
+/*===============================*/
+/*=== Section Selection Icons ===*/
+/*===============================*/
 .sectionSelectionIcon {
   width: 75px;
   height: 75px;
@@ -116,7 +129,7 @@ body {
 
 #sectionSelection a {
   border-radius: 8px;
-  border: 1px solid var(--sectionLinkBorderColor);
+  border: 1px solid #000000;
   padding: 20px;
   margin: 5px;
   text-decoration: none;
@@ -130,7 +143,7 @@ body {
   text-align: center;
   border-radius: 8px;
   transition: all 0.3s ease;
-  background-color: var(--primaryBackgroundColor);
+  background-color: #fdf9c7;
 }
 
 .indexSelection .sectionSelectionIcon {
@@ -147,21 +160,21 @@ body {
   background-color: #27ae60;
 }
 .indexSelection:hover .sectionSelectionIcon {
-  background-color: var(--primaryBackgroundColor);
+  background-color: #fdf9c7;
 }
 
 .waterSelection:hover {
   background-color: #3a8dde;
 }
 .waterSelection:hover .sectionSelectionIcon {
-  background-color: var(--primaryBackgroundColor);
+  background-color: #fdf9c7;
 }
 
 .heatingSelection:hover {
   background-color: #e55c3c;
 }
 .heatingSelection:hover .sectionSelectionIcon {
-  background-color: var(--primaryBackgroundColor);
+  background-color: #fdf9c7;
 }
 
 .sectionSelectionIcon {
@@ -184,38 +197,48 @@ body {
   -webkit-mask-image: url("../assets/fire-solid-full.svg");
 }
 
-/* --- Headers --- */
-.sectionHeader {
+/*=============*/
+/*=== ICONS ===*/
+/*=============*/
+
+.tableCollapseIcon {
+  width: 70px;
+  height: auto;
+}
+
+.tableSettingsIcon {
+  width: 50px;
+  height: auto;
+}
+
+.addTableIcon {
   display: block;
-  text-align: center;
+  width: 50px;
+  height: auto;
+  margin: 0 auto 10px;
+  border: 1px solid #2f4f4f;
+  border-radius: 50%;
+  padding: 5px;
+  fill: white;
+  transition: fill 0.2s;
+  transition: transform 0.2s;
+  background-color: #f2e59c;
 }
 
-.apartmentHeader {
-  grid-column: 1 / -1;
-  justify-self: center;
-  text-align: center;
-  margin: 0 auto;
+.addTableIcon:hover {
+  cursor: pointer;
+  transform: scale(1.1);
 }
 
-/* --- ICONS --- */
-
-.tableCollapseIcon{
-width: 70px;
-height: auto;
+.tableCollapseIcon {
+    transition: transform 0.3s ease;
 }
 
-
-.tableSettingsIcon{
-width: 50px;
-height: auto;
+.tableCollapseIcon:hover{
+    cursor: pointer;
+  transform: scale(1.1);
 }
 
-
-
-.annualTableHeaderContainer{
-  display: flex;
-}
-
-.generalAnnualTableContainer input{
-  max-width: 100px;
+.tableCollapseIcon.rotated {
+    transform: rotate(-90deg);
 }

@@ -217,3 +217,252 @@ export function renderDatabaseTable(sortedDatabaseData) {
     `);
    }
 }
+
+
+
+
+
+
+// ===========================
+// ===== Energy Helper =====
+// ===========================
+
+export async function createEnergyTable(year) {
+   const apartmentCount = await DB.getValueFromDB('apartmentcount');
+
+   $('.annualTablesWrapper').prepend(`
+       <div class="annualTableContainer" id="${year}_energyTableContainer">
+        <div class="annualTableHeaderContainer" id="${year}_energyTableHeaderContainer">
+          <img class="tableCollapseIcon" src="../assets/caret-down-solid-full.svg">
+          <h2 id="${year}_energyTableHeaderH2">${year}</h2>
+          <img class="tableSettingsIcon" src="../assets/sliders-solid-full.svg">
+        </div>
+        <div class="tableWrapper">
+        <table>
+          <thead>
+          <tr>
+          <th>Datum</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        </div>
+      </div>    
+    `);
+
+
+   for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+      // Apartmentname in DB?
+      // Wenn ja, dann den nehmen, ansonsten fallback Wert
+      let displayname;
+      let aptname = await DB.getValueFromDB(`apartment${apartment}name`);
+      if (aptname === null) {
+         displayname = `Wohnung ${apartment}`;
+      }
+      else {
+         displayname = aptname;
+      }
+
+      $(`#${year}_energyTableContainer thead tr`).append(`
+                <th>Zählerstand ${displayname}</th>
+                <th>Verbrauch ${displayname}</th>
+                <th>Kosten ${displayname}</th>
+        `);
+   }
+
+
+   for (let i = 1; i <= 12; i++) {
+      let rowHTML = '<tr>';
+
+      let date = await DB.getValueFromDB(`${year}_energyTableDate${i}`);
+      if (date === null) {
+         date = "";
+      }
+      rowHTML += `<td><input type="text" id="${year}_energyTableDate${i}" value="${date}"></td>`;
+
+      for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+         let aptMeterCount;
+         let aptConsumption;
+         let aptCost;
+
+         aptMeterCount = await DB.getValueFromDB(`${year}_energyTableMeterCount${i}_apartment${apartment}`);
+         aptConsumption = await DB.getValueFromDB(`${year}_energyTableConsumption${i}_apartment${apartment}`);
+         aptCost = await DB.getValueFromDB(`${year}_energyTableCost${i}_apartment${apartment}`);
+
+
+         if (aptMeterCount === null) {
+            // input mit leerem value schreiben
+            aptMeterCount = "";
+         }
+
+         if (aptConsumption === null) {
+            aptConsumption = "";
+         }
+
+         if (aptCost === null) {
+            aptCost = "";
+         }
+         rowHTML += `<td><input type="text" id="${year}_energyTableMeterCount${i}_apartment${apartment}" value="${aptMeterCount}"></td>`;
+         rowHTML += `<td><input type="text" id="${year}_energyTableConsumption${i}_apartment${apartment}" value="${aptConsumption}"></td>`;
+         rowHTML += `<td><input type="text" id="${year}_energyTableCost${i}_apartment${apartment}" value="${aptCost}"></td>`;
+      }
+
+      rowHTML += '</tr>';
+      $(`#${year}_energyTableContainer tbody`).append(rowHTML);
+   }
+}
+
+export async function createEnergyGraph(year) {
+
+   // Canvas einfügen, falls noch nicht vorhanden
+   if (!$(`#${year}_energyGraph`).length) {
+      $(`#${year}_energyTableContainer table`).after(`
+            <div class="canvasWrapper">
+            <canvas id="${year}_energyGraph" width="400" height="200"></canvas>
+            </div>
+        `);
+   }
+
+   const ctx = document.getElementById(`${year}_energyGraph`);
+   const datesArray = [];
+
+   // Datumswerte sammeln
+   $(`#${year}_energyTableContainer tbody tr`).each(function () {
+      const dateValue = $(this).find('td:first-child input').val();
+      datesArray.push(dateValue);
+   });
+
+   // -------------------------------------------
+   // Stabile Farb-Generierung
+   // -------------------------------------------
+   function hashString(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+         hash = (hash << 5) - hash + str.charCodeAt(i);
+         hash |= 0;
+      }
+      return Math.abs(hash);
+   }
+
+   function stableColorFor(label) {
+      const hash = hashString(label) >>> 0;
+      const hueIndex = hash % 12;      // 12 fest definierte Farbtöne
+      const hue = hueIndex * 30;       // 0°, 30°, 60° ... 330°
+      const sat = 70;
+      const light = 50;
+      return `hsl(${hue}, ${sat}%, ${light}%)`;
+   }
+
+   // -------------------------------------------
+
+   const datasets = [];
+   const apartmentCount = await DB.getValueFromDB('apartmentcount');
+
+   for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+
+      const apartmentName =
+         await DB.getValueFromDB(`apartment${apartment}name`) || `Wohnung ${apartment}`;
+
+      const types = ['Zählerstand', 'Verbrauch', 'Kosten'];
+
+      for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
+
+         const type = types[typeIndex];
+         const dataArray = [];
+
+         // Spaltenindex berechnen
+         const columnIndex = 1 + (apartment - 1) * 3 + typeIndex;
+
+         // Werte aller 12 Zeilen sammeln
+         $(`#${year}_energyTableContainer tbody tr`).each(function () {
+            const dataValue = $(this).find(`td:eq(${columnIndex}) input`).val();
+            dataArray.push(Number(dataValue) || 0);
+         });
+
+         // Min/Max bestimmen
+         const meta = getMinMax(dataArray);
+
+         const label = `${type} ${apartmentName}`;
+
+         datasets.push({
+            label: label,
+            data: dataArray,
+            borderWidth: 2,
+            tension: 0, // Linien zackig
+            fill: false,
+            borderColor: stableColorFor(label),
+            pointRadius: dataArray.map((v, i) =>
+               i === meta.minIndex || i === meta.maxIndex ? 6 : 2
+            ),
+            pointBackgroundColor: dataArray.map((v, i) => {
+               if (i === meta.maxIndex) return 'red';
+               if (i === meta.minIndex) return 'blue';
+               return stableColorFor(label);
+            }),
+            _minIndex: meta.minIndex,
+            _maxIndex: meta.maxIndex,
+            _minValue: meta.minValue,
+            _maxValue: meta.maxValue
+         });
+      }
+   }
+
+   // Chart erstellen
+   new Chart(ctx, {
+      type: 'line',
+      data: {
+         labels: datesArray,
+         datasets: datasets
+      },
+      options: {
+         responsive: true,
+         interaction: {
+            mode: 'index',
+            intersect: false
+         },
+         plugins: {
+            title: {
+               display: true,
+               text: `Energieverbrauch ${year}`
+            },
+            tooltip: {
+               mode: 'index',      // Tooltip folgt dem nächsten Punkt
+               intersect: false,      // Tooltip erscheint nur, wenn Cursor über dem Punkt ist
+               position: 'nearest',  // Tooltip direkt am Punkt
+            },
+            legend: {
+               labels: {
+                  font: {
+                     size: 16 // etwas größere Schrift
+                  },
+                  usePointStyle: true,
+                  pointStyle: "line"
+               },
+               onHover(event, item) {
+                  event.native.target.style.cursor = "pointer";
+               },
+               onLeave(event, item) {
+                  event.native.target.style.cursor = "default";
+               }
+            }
+         },
+         scales: {
+            y: {
+               beginAtZero: true
+            }
+         }
+      }
+   });
+}
+
+function getMinMax(data) {
+   const minValue = Math.min(...data);
+   const maxValue = Math.max(...data);
+   return {
+      minValue,
+      maxValue,
+      minIndex: data.indexOf(minValue),
+      maxIndex: data.indexOf(maxValue)
+   };
+}

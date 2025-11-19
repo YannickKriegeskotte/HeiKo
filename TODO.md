@@ -11,3 +11,11 @@
 
 
 - Appearance toggle auf andere seiten als index implementieren (angefangen)
+
+- EnergyTable Name in Settings änderbar
+
+- Suchfeld für  Datenbank Einblick Tabelle implementieren
+
+- Overview Graph für Energy Tab erzeugen
+
+- Jahresgraphen bei tabellen input focusout aktuallisieren

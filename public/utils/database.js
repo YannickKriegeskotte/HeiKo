@@ -125,7 +125,7 @@ export async function renameKeyInDB(oldKey, newKey) {
 
 
 /**
- * @param {String} key 
+ * @param {String} KeyPattern 
  * @returns {String} String oder Null
  */
 export async function getNewestValueFromDB(key) {

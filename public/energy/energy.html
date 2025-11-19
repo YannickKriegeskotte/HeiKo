@@ -18,7 +18,7 @@
   <script src="../lib/jquery-3.7.1.min.js"></script>
   <script src="../lib/chart.js"></script>
 
-  <script type="module" src="main.js"></script>
+  <script type="module" src="energyMain.js"></script>
 </head>
 <body>
 
@@ -51,21 +51,18 @@
     </div>
 
 
-    <canvas id="myChart" width="400" height="200"></canvas>
-    <script>
-      const ctx = document.getElementById('myChart');
+    <div id="overviewContainer">
+      <h2>Gesamtübersicht</h2>
+    </div>
+    <!-- <canvas id="overviewChart" width="400" height="200"></canvas> -->
 
-      new Chart(ctx, {
-        type: 'line', // line, bar, pie, doughnut, radar, ...
-        data: {
-          labels: ['Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun'],
-          datasets: [{
-            label: 'Energieverbrauch',
-            data: [10, 20, 15, 30, 25, 40],
-            borderWidth: 2
-          }]
-        }
-      });
-    </script>
+    <div class="generalAnnualTableContainer">
+      <h2>Jahrestabellen</h2>
+    </div>
+
+
+
+    
+    
 </body>
 </html>

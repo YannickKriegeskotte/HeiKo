@@ -6,34 +6,34 @@ export function registerListeners() {
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
 
-// === Theme Toggle Listener
-$(document).on('change', '#appearanceToggleInput', async function () {
-    const isDark = $(this).is(':checked');
+    // === Theme Toggle Listener
+    $(document).on('change', '#appearanceToggleInput', async function () {
+        const isDark = $(this).is(':checked');
 
-    // Transition kurz deaktivieren, damit das Umschalten flüssiger wirkt
-    $('html, body').css('transition', 'none');
+        // Transition kurz deaktivieren, damit das Umschalten flüssiger wirkt
+        $('html, body').css('transition', 'none');
 
-    // Theme toggeln
-    if (isDark) {
-        $('html').attr('data-theme', 'dark');
-    } else {
-        $('html').removeAttr('data-theme');
-    }
+        // Theme toggeln
+        if (isDark) {
+            $('html').attr('data-theme', 'dark');
+        } else {
+            $('html').removeAttr('data-theme');
+        }
 
-    // Force reflow, damit die Transition korrekt angewendet wird
-    void document.body.offsetHeight;
+        // Force reflow, damit die Transition korrekt angewendet wird
+        void document.body.offsetHeight;
 
-    // Transition wieder aktivieren
-    $('html, body').css({
-        transition: 'background-color 1s ease, color 1s ease, border-color 1s ease'
+        // Transition wieder aktivieren
+        $('html, body').css({
+            transition: 'background-color 1s ease, color 1s ease, border-color 1s ease'
+        });
+
+        // LocalStorage speichern
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+        // Optional: In DB speichern
+        await DB.saveValueToDB('appearanceToggleInput', isDark);
     });
-
-    // LocalStorage speichern
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-
-    // Optional: In DB speichern
-    await DB.saveValueToDB('appearanceToggleInput', isDark);
-});
 
 
 
@@ -186,6 +186,43 @@ $(document).on('change', '#appearanceToggleInput', async function () {
             Helper.updateDatabaseTable();
         }
     });
+
+
+    $(document).on('focusout keydown', 'input#searchInput', async function (event) {
+        if(event.type === 'keydown' && event.key !== "Enter") return
+        const inputPattern = $('#searchInput').val();
+        if(inputPattern == ""){
+            // alles sichtbar machen
+            $(this).closest(".databaseHeader").next("table").find('tbody tr').each(function () {
+                $(this).show();
+            });
+            return
+        }
+        const pattern = inputPattern.toLowerCase();
+
+        //durchsuche jede tr auf inputvalue, wenn nicht gefunden, tr invisible machen
+        $(this).closest(".databaseHeader").next("table").find('tbody tr').each(function () {
+            let match = false;
+
+            $(this).find('td').each(function () {
+                const input = $(this).find('input');
+                const text = input.length ? input.val().toLowerCase() : $(this).text().toLowerCase();
+
+                if (text.includes(pattern)) {
+                    match = true;
+                    return false; // Abbruch der inneren each-Schleife
+                }
+            });
+
+            if (match) {
+                $(this).show();
+            } else {
+                $(this).hide(); // oder slideUp() für sanftes Ausblenden
+            }
+        });
+        // wenn value = "", dann alles visible
+    });
+
 
 
 

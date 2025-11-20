@@ -155,6 +155,27 @@ label:hover {
   margin: 0 auto;
 }
 
+.databaseHeader {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.databaseHeader h2 {
+  margin-top: 0;
+  top: 20px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.databaseHeader input {
+  margin-top: 20px;
+  margin-right: 10px;
+  height: 25px;
+}
+
 /* --- Tables --- */
 table {
   border-collapse: collapse;
@@ -239,6 +260,7 @@ table tr:nth-child(odd) {
 #database {
   display: block;
   width: auto;
+  min-width: var(--containerWidth);
   margin: 5px auto;
   border: 1px solid black;
   border-radius: 5px;

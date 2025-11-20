@@ -35,17 +35,19 @@ export function registerListeners() {
         }
     });
 
-    // ===== TABLE SETTINGS ICON LISTENER =====
+    // ===== TABLE COLLAPSE ICON LISTENER =====
     $(document).on('click', 'img.tableCollapseIcon', async function () {
         const container = $(this).closest('.annualTableContainer');
+        const extractedYear = container.attr('id').match(/^[0-9]{4}/)[0];
 
         // Tabelle und Canvas-Wrapper togglen
-        await container.find('.canvasWrapper').slideToggle(300);
-        await container.find('.tableWrapper').slideToggle(300);
+        container.find('.canvasWrapper').slideToggle(300);
+        container.find('.tableWrapper').slideToggle(300);
 
-
-        // Optional: Icon rotieren, wenn collapsed
         $(this).toggleClass('rotated');
+
+        const isCollapsed = $(this).hasClass('rotated') ? 'true' : 'false';
+        await DB.saveValueToDB(`${extractedYear}_tableCollapsed`, isCollapsed);
     });
 
 
@@ -68,7 +70,7 @@ export function registerListeners() {
             const datasets = await Helper.createEnergyGraphDatasets(year);
             const datesArray = Helper.createEnergyGraphDatesArray(year);
 
-             Helper.renderEnergyGraph(year, datesArray, datasets);
+            Helper.renderEnergyGraph(year, datesArray, datasets);
         }
     });
 

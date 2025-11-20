@@ -303,11 +303,34 @@ export async function createEnergyTable(year) {
       rowHTML += '</tr>';
       $(`#${year}_energyTableContainer tbody`).append(rowHTML);
    }
+
+
+   // prüfen, ob collaped DB eintrag, wenn ja
+   const tableCollapsed = await DB.getValueFromDB(`${year}_tableCollapsed`);
+   const container = $(`#${year}_energyTableContainer`);
+   const icon = container.find('.tableCollapseIcon');
+   if (tableCollapsed === null) {
+      await DB.saveValueToDB(`${year}_tableCollapsed`, 'false');
+   }
+
+
+   if (tableCollapsed == 'true') {
+
+      // Tabelle und Canvas-Wrapper togglen
+      await container.find('.canvasWrapper').slideUp(300);
+      await container.find('.tableWrapper').slideUp(300);
+      icon.addClass('rotated');
+   }
+   else {
+      await container.find('.canvasWrapper').slideDown(300);
+      await container.find('.tableWrapper').slideDown(300);
+      icon.removeClass('rotated');
+   }
 }
 
 
-export function createEnergyGraphDatesArray(year){
-      const datesArray = [];
+export function createEnergyGraphDatesArray(year) {
+   const datesArray = [];
 
    // Datumswerte sammeln
    $(`#${year}_energyTableContainer tbody tr`).each(function () {
@@ -318,7 +341,7 @@ export function createEnergyGraphDatesArray(year){
    return datesArray;
 }
 
-export async function createEnergyGraphDatasets(year){
+export async function createEnergyGraphDatasets(year) {
 
    const datasets = [];
    const apartmentCount = await DB.getValueFromDB('apartmentcount');
@@ -373,11 +396,11 @@ export async function createEnergyGraphDatasets(year){
    }
 
 
-//===============================
-//=== Zählerstände ignorieren ===
-//===============================
+   //===============================
+   //=== Zählerstände ignorieren ===
+   //===============================
 
-const filteredDatasets = datasets.filter(ds => !ds.label.startsWith("Zählerstand"));
+   const filteredDatasets = datasets.filter(ds => !ds.label.startsWith("Zählerstand"));
 
 
    return filteredDatasets;
@@ -388,63 +411,63 @@ const filteredDatasets = datasets.filter(ds => !ds.label.startsWith("Zählerstan
 const energyCharts = {};
 
 export function renderEnergyGraph(year, datesArray, datasets) {
-    const ctx = document.getElementById(`${year}_energyGraph`);
+   const ctx = document.getElementById(`${year}_energyGraph`);
 
-    // Prüfen, ob für dieses Jahr bereits ein Chart existiert
-    if (energyCharts[year]) {
-        // Bestehendes Chart updaten
-        const chart = energyCharts[year];
-        chart.data.labels = datesArray;
-        chart.data.datasets = datasets;
-        chart.update();
-    } else {
-        // Neues Chart erstellen
-        energyCharts[year] = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: datesArray,
-                datasets: datasets
+   // Prüfen, ob für dieses Jahr bereits ein Chart existiert
+   if (energyCharts[year]) {
+      // Bestehendes Chart updaten
+      const chart = energyCharts[year];
+      chart.data.labels = datesArray;
+      chart.data.datasets = datasets;
+      chart.update();
+   } else {
+      // Neues Chart erstellen
+      energyCharts[year] = new Chart(ctx, {
+         type: 'line',
+         data: {
+            labels: datesArray,
+            datasets: datasets
+         },
+         options: {
+            responsive: true,
+            interaction: {
+               mode: 'index',
+               intersect: false
             },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: `${year}`
-                    },
-                    tooltip: {
-                        mode: 'nearest',
-                        intersect: false,
-                        position: 'nearest',
-                    },
-                    legend: {
-                        labels: {
-                            font: {
-                                size: 16
-                            },
-                            usePointStyle: true,
-                            pointStyle: "line"
-                        },
-                        onHover(event, item) {
-                            event.native.target.style.cursor = "pointer";
-                        },
-                        onLeave(event, item) {
-                            event.native.target.style.cursor = "default";
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false
-                    }
-                }
+            plugins: {
+               title: {
+                  display: true,
+                  text: `${year}`
+               },
+               tooltip: {
+                  mode: 'nearest',
+                  intersect: false,
+                  position: 'nearest',
+               },
+               legend: {
+                  labels: {
+                     font: {
+                        size: 16
+                     },
+                     usePointStyle: true,
+                     pointStyle: "line"
+                  },
+                  onHover(event, item) {
+                     event.native.target.style.cursor = "pointer";
+                  },
+                  onLeave(event, item) {
+                     event.native.target.style.cursor = "default";
+                  }
+               }
+            },
+            scales: {
+               y: {
+                  beginAtZero: false
+               }
             }
-        });
-    }
+         }
+      });
+   }
 }
 
 
@@ -458,9 +481,9 @@ export async function createEnergyGraph(year) {
             </div>
         `);
    }
-  const datasets = await createEnergyGraphDatasets(year);
-  const datesArray = createEnergyGraphDatesArray(year);
-  renderEnergyGraph(year,datesArray, datasets);
+   const datasets = await createEnergyGraphDatasets(year);
+   const datesArray = createEnergyGraphDatesArray(year);
+   renderEnergyGraph(year, datesArray, datasets);
 }
 
 
@@ -626,11 +649,11 @@ export async function createEnergyOverviewGraph() {
 
    console.log("Overview Graph Datasets:", datasets);
 
-//===============================
-//=== Zählerstände ignorieren ===
-//===============================
+   //===============================
+   //=== Zählerstände ignorieren ===
+   //===============================
 
-const filteredDatasets = datasets.filter(ds => !ds.label.startsWith("Zählerstand"));
+   const filteredDatasets = datasets.filter(ds => !ds.label.startsWith("Zählerstand"));
 
 
 

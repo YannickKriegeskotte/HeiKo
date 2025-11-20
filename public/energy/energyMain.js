@@ -25,6 +25,11 @@ $(document).ready(async function () {
             await Helper.createEnergyTable(year);
             await Helper.createEnergyGraph(year);
         }
+
+        // Overview graph erzeugen
+        await Helper.createEnergyOverviewGraph();
+
+
     }
 
     registerListeners();

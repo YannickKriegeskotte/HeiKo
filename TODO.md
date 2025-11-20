@@ -16,6 +16,4 @@
 
 - Suchfeld für  Datenbank Einblick Tabelle implementieren
 
-- Overview Graph für Energy Tab erzeugen
-
 - Jahresgraphen bei tabellen input focusout aktuallisieren

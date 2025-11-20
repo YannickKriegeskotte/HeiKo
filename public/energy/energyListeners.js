@@ -6,17 +6,12 @@ export function registerListeners() {
     // ===== ADD TABLE ICON LISTENER =====
     $(document).on('click', 'img.addTableIcon', async function () {
 
-        // window.scrollTo({ top: 0, behavior: 'smooth' });
-
-
         // aktuelles jahr bekommen
         let currentYear = Helper.getDate();
         currentYear = currentYear.getFullYear();
 
         let tablesRaw = await DB.getValueFromDB('energyTables');
         let tables = tablesRaw ? JSON.parse(tablesRaw) : [];
-
-
 
         while (tables.includes(String(currentYear))) {
             currentYear++;
@@ -60,13 +55,15 @@ $(document).on('click', 'img.tableCollapseIcon', async function () {
     $(document).on('focusout', 'input', async function () {
         const id = $(this).attr('id');
         const value = $(this).val();
-        console.log("input click", id);
 
-        if(value == ""){
-            return;
+        if(value === "") return;
+
+        if($(this).hasClass("tableHeaderInput")){
+            //... value in input gleich zu gespeichertem db wert?
+            
+        } else {
+            await DB.saveValueToDB(id, value);
         }
-
-        await DB.saveValueToDB(id, value);
     });
 
 }

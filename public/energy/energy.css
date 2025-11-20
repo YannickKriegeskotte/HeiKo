@@ -32,11 +32,12 @@ body {
 /*=== Ganz großer Container ===*/
 /*=============================*/
 .sectionContainer {
-  width: 80vw;
+  width: 60vw;
   border: 1px solid #000000;
   border-radius: 8px;
   margin: 5px;
   background-color: #fff9c4;
+  overflow: hidden;
 }
 
 /*=======================================*/
@@ -71,6 +72,20 @@ body {
   justify-content: space-between;
   padding: 10px;
   background-color: #f2e59c;
+  border-top: 1px solid black;
+}
+
+.tableHeaderInput{
+  text-align: center;
+  font-size: 2rem;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 /*=====================*/

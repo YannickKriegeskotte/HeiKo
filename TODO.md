@@ -14,6 +14,4 @@
 
 - EnergyTable Name in Settings änderbar
 
-- Suchfeld für  Datenbank Einblick Tabelle implementieren
-
-- Jahresgraphen bei tabellen input focusout aktuallisieren
+- Graph Einstellungen (welche datensets ausgeblendet sind) irgendwie speichern und verwenden

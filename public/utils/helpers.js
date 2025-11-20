@@ -228,10 +228,10 @@ export function renderDatabaseTable(sortedDatabaseData) {
 // ===========================
 
 export async function createEnergyTable(year) {
-    const apartmentCount = await DB.getValueFromDB('apartmentcount');
+   const apartmentCount = await DB.getValueFromDB('apartmentcount');
 
-    // Container & Tabelle erstellen
-    $('.annualTablesWrapper').prepend(`
+   // Container & Tabelle erstellen
+   $('.annualTablesWrapper').prepend(`
         <div class="annualTableContainer" id="${year}_energyTableContainer">
             <div class="annualTableHeaderContainer" id="${year}_energyTableHeaderContainer">
                 <img class="tableCollapseIcon" src="../assets/caret-down-solid-full.svg">
@@ -252,74 +252,62 @@ export async function createEnergyTable(year) {
         </div>    
     `);
 
-    // Kopfzeilen für jedes Apartment erstellen
-    for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-        const aptName = await DB.getValueFromDB(`apartment${apartment}name`) || `Wohnung ${apartment}`;
-        $(`#${year}_energyTableContainer thead tr`).append(`
+   // Kopfzeilen für jedes Apartment erstellen
+   for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+      const aptName = await DB.getValueFromDB(`apartment${apartment}name`) || `Wohnung ${apartment}`;
+      $(`#${year}_energyTableContainer thead tr`).append(`
             <th>Zählerstand ${aptName}</th>
             <th>Verbrauch ${aptName}</th>
             <th>Kosten ${aptName}</th>
         `);
-    }
-
-    // Tabelle Zeile für Zeile füllen (Monat 1–12)
-    for (let i = 1; i <= 12; i++) {
-        let rowHTML = '<tr>';
-
-        // Datum abrufen oder leer lassen
-        let date = await DB.getValueFromDB(`${year}_energyTableDate${i}`) || "";
-        rowHTML += `<td><input type="text" id="${year}_energyTableDate${i}" value="${date}"></td>`;
-
-        for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-            const aptName = await DB.getValueFromDB(`apartment${apartment}name`) || `Wohnung ${apartment}`;
-
-            // Zählerstand, Verbrauch und Kosten aus DB abrufen
-            let aptMeterCount = await DB.getValueFromDB(`${year}_energyTableMeterCount${i}_apartment${apartment}`);
-            let aptConsumption = await DB.getValueFromDB(`${year}_energyTableConsumption${i}_apartment${apartment}`);
-            let aptCost = await DB.getValueFromDB(`${year}_energyTableCost${i}_apartment${apartment}`);
-
-            if (aptMeterCount === null) aptMeterCount = "";
-
-            // Verbrauch automatisch berechnen, falls leer
-            if (aptConsumption === null) {
-                const prevMeter = i === 1 
-                    ? 0 
-                    : Number(await DB.getValueFromDB(`${year}_energyTableMeterCount${i-1}_apartment${apartment}`)) || 0;
-                const currentMeter = Number(aptMeterCount) || 0;
-                aptConsumption = Math.max(currentMeter - prevMeter, 0);
-                await DB.saveValueToDB(`${year}_energyTableConsumption${i}_apartment${apartment}`, aptConsumption);
-            }
-
-            // Kosten automatisch berechnen, falls leer (hier optional auf 0)
-            if (aptCost === null) {
-                aptCost = 0;
-                await DB.saveValueToDB(`${year}_energyTableCost${i}_apartment${apartment}`, aptCost);
-            }
-
-            // Inputs in Tabelle einfügen
-            rowHTML += `<td><input type="text" id="${year}_energyTableMeterCount${i}_apartment${apartment}" value="${aptMeterCount}"></td>`;
-            rowHTML += `<td><input type="text" id="${year}_energyTableConsumption${i}_apartment${apartment}" value="${aptConsumption}"></td>`;
-            rowHTML += `<td><input type="text" id="${year}_energyTableCost${i}_apartment${apartment}" value="${aptCost}"></td>`;
-        }
-
-        rowHTML += '</tr>';
-        $(`#${year}_energyTableContainer tbody`).append(rowHTML);
-    }
-}
-
-export async function createEnergyGraph(year) {
-
-   // Canvas einfügen, falls noch nicht vorhanden
-   if (!$(`#${year}_energyGraph`).length) {
-      $(`#${year}_energyTableContainer table`).after(`
-            <div class="canvasWrapper">
-            <canvas id="${year}_energyGraph" width="400" height="200"></canvas>
-            </div>
-        `);
    }
 
-   const ctx = document.getElementById(`${year}_energyGraph`);
-   const datesArray = [];
+   // Tabelle Zeile für Zeile füllen (Monat 1–12)
+   for (let i = 1; i <= 12; i++) {
+      let rowHTML = '<tr>';
+
+      // Datum abrufen oder leer lassen
+      let date = await DB.getValueFromDB(`${year}_energyTableDate${i}`) || "";
+      rowHTML += `<td><input type="text" id="${year}_energyTableDate${i}" value="${date}"></td>`;
+
+      for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+         const aptName = await DB.getValueFromDB(`apartment${apartment}name`) || `Wohnung ${apartment}`;
+
+         // Zählerstand, Verbrauch und Kosten aus DB abrufen
+         let aptMeterCount = await DB.getValueFromDB(`${year}_energyTableMeterCount${i}_apartment${apartment}`);
+         let aptConsumption = await DB.getValueFromDB(`${year}_energyTableConsumption${i}_apartment${apartment}`);
+         let aptCost = await DB.getValueFromDB(`${year}_energyTableCost${i}_apartment${apartment}`);
+
+         if (aptMeterCount === null) aptMeterCount = "";
+
+         // Verbrauch automatisch berechnen, falls leer
+         if (aptConsumption === null) {
+            const prevMeter = i === 1 ? 0 : Number(await DB.getValueFromDB(`${year}_energyTableMeterCount${i - 1}_apartment${apartment}`)) || 0;
+            const currentMeter = Number(aptMeterCount) || 0;
+            aptConsumption = Math.max(currentMeter - prevMeter, 0);
+            await DB.saveValueToDB(`${year}_energyTableConsumption${i}_apartment${apartment}`, aptConsumption);
+         }
+
+         // Kosten automatisch berechnen, falls leer (hier optional auf 0)
+         if (aptCost === null) {
+            aptCost = 0;
+            await DB.saveValueToDB(`${year}_energyTableCost${i}_apartment${apartment}`, aptCost);
+         }
+
+         // Inputs in Tabelle einfügen
+         rowHTML += `<td><input type="text" id="${year}_energyTableMeterCount${i}_apartment${apartment}" value="${aptMeterCount}"></td>`;
+         rowHTML += `<td><input type="text" id="${year}_energyTableConsumption${i}_apartment${apartment}" value="${aptConsumption}"></td>`;
+         rowHTML += `<td><input type="text" id="${year}_energyTableCost${i}_apartment${apartment}" value="${aptCost}"></td>`;
+      }
+
+      rowHTML += '</tr>';
+      $(`#${year}_energyTableContainer tbody`).append(rowHTML);
+   }
+}
+
+
+export function createEnergyGraphDatesArray(year){
+      const datesArray = [];
 
    // Datumswerte sammeln
    $(`#${year}_energyTableContainer tbody tr`).each(function () {
@@ -327,7 +315,10 @@ export async function createEnergyGraph(year) {
       datesArray.push(dateValue);
    });
 
-   // -------------------------------------------
+   return datesArray;
+}
+
+export async function createEnergyGraphDatasets(year){
 
    const datasets = [];
    const apartmentCount = await DB.getValueFromDB('apartmentcount');
@@ -381,53 +372,98 @@ export async function createEnergyGraph(year) {
       }
    }
 
-   // Chart erstellen
-   new Chart(ctx, {
-      type: 'line',
-      data: {
-         labels: datesArray,
-         datasets: datasets
-      },
-      options: {
-         responsive: true,
-         interaction: {
-            mode: 'index',
-            intersect: false
-         },
-         plugins: {
-            title: {
-               display: true,
-               text: `${year}`
-            },
-            tooltip: {
-               mode: 'nearest',      // Tooltip folgt dem nächsten Punkt
-               intersect: false,      // Tooltip erscheint nur, wenn Cursor über dem Punkt ist
-               position: 'nearest',  // Tooltip direkt am Punkt
-            },
-            legend: {
-               labels: {
-                  font: {
-                     size: 16 // etwas größere Schrift
-                  },
-                  usePointStyle: true,
-                  pointStyle: "line"
-               },
-               onHover(event, item) {
-                  event.native.target.style.cursor = "pointer";
-               },
-               onLeave(event, item) {
-                  event.native.target.style.cursor = "default";
-               }
-            }
-         },
-         scales: {
-            y: {
-               beginAtZero: true
-            }
-         }
-      }
-   });
+   return datasets;
 }
+
+
+
+const energyCharts = {};
+
+export function renderEnergyGraph(year, datesArray, datasets) {
+    const ctx = document.getElementById(`${year}_energyGraph`);
+
+    // Prüfen, ob für dieses Jahr bereits ein Chart existiert
+    if (energyCharts[year]) {
+        // Bestehendes Chart updaten
+        const chart = energyCharts[year];
+        chart.data.labels = datesArray;
+        chart.data.datasets = datasets;
+        chart.update();
+    } else {
+        // Neues Chart erstellen
+        energyCharts[year] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: datesArray,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `${year}`
+                    },
+                    tooltip: {
+                        mode: 'nearest',
+                        intersect: false,
+                        position: 'nearest',
+                    },
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 16
+                            },
+                            usePointStyle: true,
+                            pointStyle: "line"
+                        },
+                        onHover(event, item) {
+                            event.native.target.style.cursor = "pointer";
+                        },
+                        onLeave(event, item) {
+                            event.native.target.style.cursor = "default";
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+}
+
+
+export async function createEnergyGraph(year) {
+
+   // Canvas einfügen, falls noch nicht vorhanden
+   if (!$(`#${year}_energyGraph`).length) {
+      $(`#${year}_energyTableContainer table`).after(`
+            <div class="canvasWrapper">
+            <canvas id="${year}_energyGraph" width="400" height="200"></canvas>
+            </div>
+        `);
+   }
+  const datasets = await createEnergyGraphDatasets(year);
+  const datesArray = createEnergyGraphDatesArray(year);
+  renderEnergyGraph(year,datesArray, datasets);
+}
+
+
+
+
+
+
+
+
+
+
 
 export async function createEnergyOverviewGraph() {
 
@@ -498,17 +534,39 @@ export async function createEnergyOverviewGraph() {
       // Für jedes Datum den passenden Key finden
       for (const date of xAxisDates) {
 
-         // Key, der zu diesem Datum passt
-         const year = date.slice(-4);
-         console.log("date, year", date, year);
+         const year = date.slice(-4); // letzte 4 Zeichen = Jahr
 
-         const mcEntry = meterCountEntries.find(entry => entry.key.startsWith(`${year}_energyTableMeterCount`));
-         const consEntry = consumptionEntries.find(entry => entry.key.startsWith(`${year}_energyTableConsumption`));
-         const costEntry = costEntries.find(entry => entry.key.startsWith(`${year}_energyTableCost`));
+         // MeterCount: nach Index sortieren, dann letzten Eintrag nehmen
+         const mcEntry = meterCountEntries
+            .filter(entry => entry.key.startsWith(`${year}_energyTableMeterCount`))
+            .sort((a, b) => {
+               const aIndex = Number(a.key.match(/MeterCount(\d+)_apartment/)[1]);
+               const bIndex = Number(b.key.match(/MeterCount(\d+)_apartment/)[1]);
+               return aIndex - bIndex;
+            })
+            .pop(); // letzter Eintrag
 
-         console.log("meterCountEntries", meterCountEntries);
-         console.log("mcEntry", mcEntry);
+         // Consumption: dasselbe
+         const consEntry = consumptionEntries
+            .filter(entry => entry.key.startsWith(`${year}_energyTableConsumption`))
+            .sort((a, b) => {
+               const aIndex = Number(a.key.match(/Consumption(\d+)_apartment/)[1]);
+               const bIndex = Number(b.key.match(/Consumption(\d+)_apartment/)[1]);
+               return aIndex - bIndex;
+            })
+            .pop();
 
+         // Cost: dasselbe
+         const costEntry = costEntries
+            .filter(entry => entry.key.startsWith(`${year}_energyTableCost`))
+            .sort((a, b) => {
+               const aIndex = Number(a.key.match(/Cost(\d+)_apartment/)[1]);
+               const bIndex = Number(b.key.match(/Cost(\d+)_apartment/)[1]);
+               return aIndex - bIndex;
+            })
+            .pop();
+
+         // Werte in Overview-Datenstruktur speichern
          overviewData[apartment].MeterCount.push(mcEntry ? Number(mcEntry.value) : 0);
          overviewData[apartment].Consumption.push(consEntry ? Number(consEntry.value) : 0);
          overviewData[apartment].Cost.push(costEntry ? Number(costEntry.value) : 0);
@@ -596,11 +654,6 @@ export async function createEnergyOverviewGraph() {
       }
    });
 }
-
-
-
-
-
 
 function getMinMax(data) {
    const minValue = Math.min(...data);

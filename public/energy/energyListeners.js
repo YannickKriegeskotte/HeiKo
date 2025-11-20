@@ -36,17 +36,17 @@ export function registerListeners() {
     });
 
     // ===== TABLE SETTINGS ICON LISTENER =====
-$(document).on('click', 'img.tableCollapseIcon', async function () {
-    const container = $(this).closest('.annualTableContainer');
+    $(document).on('click', 'img.tableCollapseIcon', async function () {
+        const container = $(this).closest('.annualTableContainer');
 
-    // Tabelle und Canvas-Wrapper togglen
-    await container.find('.canvasWrapper').slideToggle(300);
-    await container.find('.tableWrapper').slideToggle(300);
-    
+        // Tabelle und Canvas-Wrapper togglen
+        await container.find('.canvasWrapper').slideToggle(300);
+        await container.find('.tableWrapper').slideToggle(300);
 
-    // Optional: Icon rotieren, wenn collapsed
-    $(this).toggleClass('rotated');
-});
+
+        // Optional: Icon rotieren, wenn collapsed
+        $(this).toggleClass('rotated');
+    });
 
 
 
@@ -56,13 +56,19 @@ $(document).on('click', 'img.tableCollapseIcon', async function () {
         const id = $(this).attr('id');
         const value = $(this).val();
 
-        if(value === "") return;
+        if (value === "") return;
 
-        if($(this).hasClass("tableHeaderInput")){
-            //... value in input gleich zu gespeichertem db wert?
-            
+        if ($(this).hasClass("tableHeaderInput")) {
+            //... input value = db wert?
+
         } else {
             await DB.saveValueToDB(id, value);
+
+            const year = id.substring(0, 4); // z.B. '2024_energyTableMeterCount1_apartment1'
+            const datasets = await Helper.createEnergyGraphDatasets(year);
+            const datesArray = Helper.createEnergyGraphDatesArray(year);
+
+             Helper.renderEnergyGraph(year, datesArray, datasets);
         }
     });
 

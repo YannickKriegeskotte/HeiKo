@@ -372,7 +372,15 @@ export async function createEnergyGraphDatasets(year){
       }
    }
 
-   return datasets;
+
+//===============================
+//=== Zählerstände ignorieren ===
+//===============================
+
+const filteredDatasets = datasets.filter(ds => !ds.label.startsWith("Zählerstand"));
+
+
+   return filteredDatasets;
 }
 
 
@@ -431,7 +439,7 @@ export function renderEnergyGraph(year, datesArray, datasets) {
                 },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: false
                     }
                 }
             }
@@ -618,6 +626,14 @@ export async function createEnergyOverviewGraph() {
 
    console.log("Overview Graph Datasets:", datasets);
 
+//===============================
+//=== Zählerstände ignorieren ===
+//===============================
+
+const filteredDatasets = datasets.filter(ds => !ds.label.startsWith("Zählerstand"));
+
+
+
    // -------------------------------------------
    // 6. Chart erstellen
    // -------------------------------------------
@@ -625,7 +641,7 @@ export async function createEnergyOverviewGraph() {
       type: "line",
       data: {
          labels: xAxisDates,
-         datasets: datasets
+         datasets: filteredDatasets
       },
       options: {
          responsive: true,

@@ -8,8 +8,9 @@
 15.10.25:   10-11 Uhr 12-13 Uhr
 17.10.25:   23-00 Uhr
 18.10.25:   17-22 Uhr
-Settings backend fertig (51 Stunden)
+Settings backend fertig: 51 Stunden
 19.10.25:   13-15 Uhr 16-22 Uhr
+Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 15 Stunden
 
 ========Projekt mit sqlite neu Aufgesetzt========
 28.10.25:   12-16 Uhr 17-23 Uhr
@@ -22,3 +23,15 @@ Settings backend fertig (51 Stunden)
 18.11.25:   18-22 Uhr
 19.11.25:   13-00 Uhr
 20.11.25:   10-15 Uhr 19-22 Uhr
+21.11.25:   15-16 Uhr
+23.11.25:   20-00 Uhr
+27.11.25:   16-17 Uhr
+29.11.25:   19:30-
+
+
+Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 15 Stunden
+
+
+
+
+

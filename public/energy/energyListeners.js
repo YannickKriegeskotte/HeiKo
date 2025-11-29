@@ -31,7 +31,7 @@ export function registerListeners() {
         });
 
         if (!tableExisting) {
-            await Helper.createEnergyTable(currentYear);
+            await Helper.createTable("energy",currentYear);
         }
     });
 
@@ -67,10 +67,10 @@ export function registerListeners() {
             await DB.saveValueToDB(id, value);
 
             const year = id.substring(0, 4); // z.B. '2024_energyTableMeterCount1_apartment1'
-            const datasets = await Helper.createEnergyGraphDatasets(year);
-            const datesArray = Helper.createEnergyGraphDatesArray(year);
+            const datasets = await Helper.createEnergyGraphDatasets("energy",year);
+            const datesArray = Helper.createEnergyGraphDatesArray("energy",year);
 
-            Helper.renderEnergyGraph(year, datesArray, datasets);
+            Helper.renderEnergyGraph("energy",year, datesArray, datasets);
         }
     });
 

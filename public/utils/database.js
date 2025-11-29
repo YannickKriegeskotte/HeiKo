@@ -1,4 +1,6 @@
 import * as Helper from "./helpers.js";
+
+const debug = false;
 /**
  * 
  * @param {String} url 
@@ -21,14 +23,14 @@ export async function checkServerAvailability(url) {
  * @param {String} value
  */
 export async function saveValueToDB(key, value) {
-    console.log("saveValueToDB:", key, value);
+    if(debug) console.log("saveValueToDB:", key, value);
     const response = await fetch("/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value }),
     });
     if (!response.ok){
-        console.error("saveValueToDB failed", response.status);
+        if(debug) console.error("saveValueToDB failed", response.status);
     }
     else{
     $('#databaseTable tbody').append(`
@@ -51,7 +53,7 @@ export async function saveValueToDB(key, value) {
  * @returns {} String or null
  */
 export async function getValueFromDB(key) {
-    console.log("getValueFromDB key", key);
+    if(debug) console.log("getValueFromDB key", key);
     let response;
     let data;
     response = await fetch(`/get?key=${key}`);
@@ -67,7 +69,7 @@ export async function getValueFromDB(key) {
  * @returns {Array} 
  */
 export async function getAllValuesFromDB() {
-    console.log("getAllValuesFromDB");
+    if(debug) console.log("getAllValuesFromDB");
     let response;
     let data;
     response = await fetch(`/getAll`);
@@ -89,8 +91,8 @@ export async function updateValueInDB(key, value) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value }),
     });
-    if (!response.ok) console.error("updateValueInDB failed", response.status);
-    if (response.ok) console.log("updatedValueInDB:", key, "=>", value);
+    if (!response.ok) if(debug) console.error("updateValueInDB failed", response.status);
+    if (response.ok) if(debug) console.log("updatedValueInDB:", key, "=>", value);
 
     const row = $(`tbody tr`).filter(function () {
         return $(this).find("td:first").text() === key;
@@ -117,7 +119,7 @@ export async function renameKeyInDB(oldKey, newKey) {
   if (data.success) {
     await Helper.updateDatabaseTable();
   } else {
-    console.error("Fehler beim Rename:", data.error);
+    if(debug) console.error("Fehler beim Rename:", data.error);
   }
 }
 
@@ -132,20 +134,20 @@ export async function getNewestValueFromDB(key) {
     // Finde alle Einträge, die key enthalten
     let matches = await getAllKeysContaining(key);
     if (matches.length == 0) {
-        console.log("getNewestValueFromDB", key, ": no matches");
+        // if(debug) console.log("getNewestValueFromDB", key, ": no matches");
         return null;
     }
     // Wenn Array nur länge 1, dann nimm die value
     if (matches.length == 1) {
-        console.log("getNewestValueFromDB", key, ": one match:", matches[0]);
+       // if(debug) console.log("getNewestValueFromDB", key, ": one match:", matches[0]);
         return matches[0].value;
     }
     // Sonst sortiere array, sodass neustes Datum vorne und nimm die value des ersten Eintrags
-    console.log("getNewestValueFromDB", key, ": matches:", matches);
+    if(debug) console.log("getNewestValueFromDB", key, ": matches:", matches);
     const sorted = matches
         .filter(item => extractDate(item.key))
         .sort((a, b) => extractDate(b.key) - extractDate(a.key));
-    console.log("sorted[0]", sorted[0]);
+    if(debug) console.log("sorted[0]", sorted[0]);
     return sorted[0].value;
 }
 
@@ -155,7 +157,7 @@ export async function getNewestValueFromDB(key) {
  * @returns {Array}
  */
 export async function getAllKeysContaining(pattern) {
-    console.log("getAllKeysContaining", pattern);
+    if(debug) console.log("getAllKeysContaining", pattern);
     const response = await fetch(`/getAllContaining?pattern=${pattern}`);
     if (!response.ok) return [];
     return await response.json();
@@ -165,17 +167,17 @@ export async function getAllKeysContaining(pattern) {
  * @param {String} apartmendID 
  */
 export async function deleteAllValuesFromApartmentInDB(apartmendID) {
-    console.log("deleteAllValuesFromApartmendInDB", apartmendID);
+    if(debug) console.log("deleteAllValuesFromApartmendInDB", apartmendID);
     const response = await fetch(`/removeApartmentEntries?apartmentID=${apartmendID}`, { method: "DELETE" });
     const result = await response.json();
     if (result.success) {
-        console.log("Gelöscht!");
+        if(debug) console.log("Gelöscht!");
     }
 }
 
 
 export async function deleteKeyInDB(key) {
-    console.log("deleteKeyInDB", key);
+    if(debug) console.log("deleteKeyInDB", key);
     const response = await fetch("/delete", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -183,7 +185,7 @@ export async function deleteKeyInDB(key) {
     });
     const result = await response.json();
     if (result.success) {
-        console.log("Gelöscht!");
+        if(debug) console.log("Gelöscht!");
 
         // Finde html datenbank zeile und lösche
         $(`${key}_row`).remove();
@@ -199,7 +201,7 @@ export async function deleteKeyInDB(key) {
  * @returns {String}
  */
 export async function getNewestKey(key) {
-    console.log("getNewestKey", key);
+    if(debug) console.log("getNewestKey", key);
     const response = await fetch(`/getAllContaining?pattern=${key}`);
     const data = await response.json();
 
@@ -219,7 +221,7 @@ export async function getNewestKey(key) {
  * @returns {Date}
  */
 export async function getTimestampOfNewestKey(key) {
-    console.log("getTimestampOfNewestKey", key);
+    if(debug) console.log("getTimestampOfNewestKey", key);
     const newestKey = await getNewestKey(key);
     if (!newestKey) return null;
 
@@ -240,7 +242,7 @@ export async function getTimestampOfNewestKey(key) {
  * @returns {String}
  */
 function extractDate(key) {
-    console.log("extractDate", key);
+    if(debug) console.log("extractDate", key);
     const match = key.match(/(\d{1,2}-\d{1,2}-\d{4})$/);
     if (!match) { return null }
     const [day, month, year] = match[1].split('-').map(Number);

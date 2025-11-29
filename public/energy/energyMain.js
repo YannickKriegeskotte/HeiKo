@@ -22,15 +22,59 @@ $(document).ready(async function () {
         console.log("energyTables:", tables);
 
         for (let year of tables) {
-            await Helper.createEnergyTable(year);
-            await Helper.createEnergyGraph(year);
+            await Helper.createTable("energy",year);
+            await Helper.createGraph("energy",year);
         }
 
         // Overview graph erzeugen
-        await Helper.createEnergyOverviewGraph();
+        await Helper.createOverviewGraph("energy");
 
 
     }
 
     registerListeners();
 });
+
+
+
+  /*
+  Anzahl Wohnungen holen
+  Leere Tabelle mit section & year in ID
+  Tabellenkopfzeile:
+    Für jede Wohnung:
+      Switch section:
+        - energy:
+          - Zählerstand
+          - Verbrauch
+          - Kosten
+        - water:
+          - Zählerstand Warmwasser OG
+          - Zählerstand Kaltwasser OG
+          - Wasser UG (Gesamtwasser - [Warm OG + Kalt OG] )
+          - Gesamtwasser (Extra Zähler, da ist OG + UG)
+          - Abwasser (= Geamtwasser)
+          - Druck Heizung (Bar)
+          - Druck Wasser (Bar)
+          - Druck Solar (Bar)
+          - Laufzeit Solarpumpe
+          - Solarenergie (KWh)
+        - heating:
+          - Ölstand Tanks
+          - Verbrauch (Differenz Öltankstände)
+          - Laufzeit Heizung
+          - Kosten
+  Tabellenbody füllen
+    12 Zeilen:
+      Datum aus DB holen
+      Switch section:
+        - energy:
+          - getMeterData("energy",year,Zeile)
+          - daten im dataArray speichern (für jahres graph)
+        
+        - water:
+          -
+        - heating:
+          -
+      - Daten in dataArray speichern
+      - Zeile an HTML table body anhängen
+  */

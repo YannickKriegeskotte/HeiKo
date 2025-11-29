@@ -15,3 +15,10 @@
 - EnergyTable Name in Settings änderbar
 
 - Graph Einstellungen (welche datensets ausgeblendet sind) irgendwie speichern und verwenden
+
+- Kostenberechnung für energy
+
+- ausklappen von jahrestabellen macht graph nicht sichtbar
+- datenbanktabelle alle löschen funktion => alle sichtbaren zeilen werden gelöscht
+
+- overviewgraph durch folgendes ersetzen: layered jahresgraphen. alle jahresgraphen für alle datensets in einem graph anzeigen

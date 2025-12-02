@@ -62,7 +62,7 @@ $(document).ready(async function () {
           - Ölstand Tanks
           - Verbrauch (Differenz Öltankstände)
           - Laufzeit Heizung
-          - Kosten
+          - (Kosten)
   Tabellenbody füllen
     12 Zeilen:
       Datum aus DB holen

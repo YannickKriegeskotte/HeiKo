@@ -26,7 +26,9 @@ Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 15 Stunden
 21.11.25:   15-16 Uhr
 23.11.25:   20-00 Uhr
 27.11.25:   16-17 Uhr
-29.11.25:   19:30-
+29.11.25:   19-23 Uhr
+03.12.25:   00-01 Uhr
+
 
 
 Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 15 Stunden

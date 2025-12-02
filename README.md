@@ -173,7 +173,13 @@ Das Projekt besteht aus **drei technologischen Entwicklungsphasen**:
 ### 2.14.2
 - Fix: Einklappbare Tabellen speichern ihren Zustand in der Datenbank
 
+### 2.15.0
+- 'createTable' Helper Funktion wurde für verallgemeinerung vorbereitet 
+### 2.15.0-a1
+- Index script wurde mit Bauanleitung für Anpassungen aufgrund von Verallgemeinerung der Helperfunktionen versehen
+
+
 ---
 
 # Aktuelle Version
-**2.14.2**
+**2.15.0-a1**

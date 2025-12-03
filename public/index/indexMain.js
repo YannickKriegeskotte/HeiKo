@@ -36,14 +36,16 @@ $(document).ready(async function () {
     }
   }
 
-  // ==Allgemein==
+  //===================
+  //==== ALLGEMEIN ====
+  //===================
+
   // 1. Apartmentcount laden und in input schreiben
   let apartmentcount = await DB.getValueFromDB(`apartmentcount`);
   if (apartmentcount === null) {
-    console.log("init apartmentcount");
     apartmentcount = 1;
     await DB.saveValueToDB("apartmentcount", apartmentcount);
-    window.location.reload();
+    window.location.reload(); //... (update funktion bauen um reload zu vermeiden)
   }
   $(`#apartmentcount`).val(apartmentcount);
 
@@ -64,34 +66,24 @@ $(document).ready(async function () {
 
   //=== Ab hier fast alles mit Zeitstempel ===
 
-  // ==Strom==
-  // 1. Entsprechende viele Wohnungssektionen erzeugen
-  // 2. Bei jedem Input Server anfragen, ob in DB eintrag mit apartmendID vorhanden. Wenn ja, einfügen, wenn nein, leer lassen
-  for (let i = 1; i <= apartmentcount; i++) {
-    const meterFee =
-      (await DB.getNewestValueFromDB(`apartment${i}electricityMeterFee`)) || "";
-    const meterNumber =
-      (await DB.getNewestValueFromDB(`apartment${i}electricityMeterNumber`)) ||
-      "";
-    const electricityFee =
-      (await DB.getNewestValueFromDB(`apartment${i}electricityFee`)) || "";
-    const apartmentName =
-      (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
+  //===============
+  //==== STROM ====
+  //===============
 
-    Helper.appendApartmentEnergy(
-      meterFee,
-      meterNumber,
-      electricityFee,
-      apartmentName,
-      i
-    );
+  // 1. Entsprechende viele Wohnungssektionen erzeugen
+  // 2. Bei jedem Input DB fragen, ob Eintrag mit apartmendID vorhanden. Wenn ja, einfügen, wenn nein, leer lassen
+  for (let i = 1; i <= apartmentcount; i++) {
+    const meterFee =(await DB.getNewestValueFromDB(`apartment${i}electricityMeterFee`)) || "";
+    const meterNumber =(await DB.getNewestValueFromDB(`apartment${i}electricityMeterNumber`)) ||"";
+    const electricityFee =(await DB.getNewestValueFromDB(`apartment${i}electricityFee`)) || "";
+    const apartmentName =(await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
+
+    Helper.appendApartmentEnergy(meterFee, meterNumber, electricityFee, apartmentName, i);
   }
 
-  // ==Wasser==
-
-  //=================
-  //=== BAUSTELLE ===
-  //=================
+  //================
+  //==== WASSER ====
+  //================
 
   // GENERAL STUFF (betrifft alle Wohnungen)
 
@@ -99,6 +91,40 @@ $(document).ready(async function () {
   // Hauptwasserzählergebühren (jährlich)
   // Preis pro Liter Wasser
   // Preis pro Liter Abwasser
+
+let mainWaterMeterNumber = await DB.getValueFromDB('mainWaterMeterNumber') || '';
+let mainWaterMeterFee = await DB.getNewestValueFromDB('mainWaterMeterFee') || '';
+let costPerLiterWater = await DB.getNewestValueFromDB('costPerLiterWater') || '';
+let costPerLiterSewage = await DB.getNewestValueFromDB('costPerLiterSewage') || '';
+let precipitationArea = await DB.getNewestValueFromDB(`precipitationArea`) || '';
+let precipitationFee = await DB.getNewestValueFromDB(`precipitationFee`) || '';
+
+  $("#water").append(`
+           <div class="apartmentContainer">
+           <label class="preInputLabel" for="mainWaterMeterNumber">Hauptwasserzählernummer</label>
+           <input type="number" id="mainWaterMeterNumber" name="mainWaterMeterNumber" min="0" value="${mainWaterMeterNumber}">
+
+           <label class="preInputLabel" for="mainWaterMeterFee">Hauptwasserzählergebühren</label>
+           <input type="number" id="mainWaterMeterFee" name="mainWaterMeterFee" min="0" value="${mainWaterMeterFee}">
+           <label class="postInputLabel" for="mainWaterMeterFee">€</label>
+
+           <label class="preInputLabel" for="costPerLiterWater">Preis pro Liter Trinkwasser</label>
+           <input type="number" id="costPerLiterWater" name="costPerLiterWater" min="0" value="${costPerLiterWater}">
+           <label class="postInputLabel" for="costPerLiterWater">€</label>
+
+           <label class="preInputLabel" for="costPerLiterSewage">Preis pro Liter Abwasser</label>
+           <input type="number" id="costPerLiterSewage" name="costPerLiterSewage" min="0" value="${costPerLiterSewage}">
+           <label class="postInputLabel" for="costPerLiterSewage">€</label>
+
+           <label class="preInputLabel" for="precipitationArea">Versiegelte Fläche</label>
+           <input type="number" id="precipitationArea" name="precipitationArea" min="0" value="${precipitationArea}">
+           <label class="postInputLabel" for="precipitationArea">m²</label>
+
+           <label class="preInputLabel" for="precipitationFee">Preis pro m² versiegelter Fläche</label>
+           <input type="number" id="precipitationFee" name="precipitationFee" min="0" value="${precipitationFee}">
+           <label class="postInputLabel" for="precipitationFee">€</label>
+           </div>
+       `);
 
   // PRO WOHNUNG
 
@@ -113,55 +139,55 @@ $(document).ready(async function () {
   // Wenn nein:
   //      Kein Inputfeld
 
-  // 1. Allgemeine versiegelungs Inputs erzeugen, Server anfragen, ob in DB checkobx state gespeichert. Wenn ja, setzen, wenn nein standardmäßig aktivieren
-  let generalPrecipitation = await DB.getValueFromDB("generalPrecipitation");
-  generalPrecipitation = generalPrecipitation == 1 ? true : false;
-  const precipitationFee = (await DB.getValueFromDB("precipitationFee")) || "";
-  const precipitationArea =
-    (await DB.getValueFromDB("precipitationArea")) || "";
-  Helper.appendGeneralWater(
-    generalPrecipitation,
-    precipitationFee,
-    precipitationArea
-  );
+  for (let apartment = 1; apartment <= apartmentcount; apartment++) {
 
-  const generalWaterChecked = $("#generalPrecipitation").is(":checked");
-  Helper.sectionUpdate("water", generalWaterChecked);
+    let apartmentName = await DB.getValueFromDB(`apartment${apartment}name`) || `Wohnung ${apartment}`;
+    let isWarmWaterMeterExisting = await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`);
+    if(isWarmWaterMeterExisting === null){
+      isWarmWaterMeterExisting = 'checked';
+      await DB.saveValueToDB(`apartment${apartment}IsWarmWaterMeterExisting`,'checked');
+    }
+    let isColdWaterMeterExisting = await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`);
+    if(isColdWaterMeterExisting === null){
+      isColdWaterMeterExisting = 'checked';
+      await DB.saveValueToDB(`apartment${apartment}IsColdWaterMeterExisting`,'checked');
+    }
+    let warmWaterMeterNumber = await DB.getValueFromDB('warmWaterMeterNumber') || '';
+    let coldWaterMeterNumber = await DB.getValueFromDB('coldWaterMeterNumber') || '';
+    let warmWaterMeterFee = await DB.getNewestValueFromDB('warmWaterMeterFee') || '';
+    let coldWaterMeterFee = await DB.getNewestValueFromDB('coldWaterMeterFee') || '';
 
-  // 2. Entsprechende viele Wohnungssektionen erzeugen
-  // 3. Bei jedem Input Server anfragen, ob in DB eintrag mit apartmendID vorhanden. Wenn ja, einfügen, wenn nein, leer lassen. Wenn Input ? Niederschlagsgebühr erstmal checkbox state prüfen.
-  for (let i = 1; i <= apartmentcount; i++) {
-    const meterFee =
-      (await DB.getNewestValueFromDB(`apartment${i}waterMeterFee`)) || "";
-    const meterNumber =
-      (await DB.getNewestValueFromDB(`apartment${i}waterMeterNumber`)) || "";
-    const waterFee =
-      (await DB.getNewestValueFromDB(`apartment${i}waterFee`)) || "";
-    const sewageFee =
-      (await DB.getNewestValueFromDB(`apartment${i}sewageFee`)) || "";
-    const precipitationArea =
-      (await DB.getNewestValueFromDB(`apartment${i}precipitationArea`)) || "";
-    const precipitationFee =
-      (await DB.getNewestValueFromDB(`apartment${i}precipitationFee`)) || "";
-    const apartmentName =
-      (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
+    $("#water").append(`
+                <div class="apartment${apartment}container apartmentContainer">
+                   <h3 id="apartment${apartment}name_water" class="apartmentHeader">${apartmentName}</h3>
 
-    Helper.appendApartmentWater(
-      meterFee,
-      meterNumber,
-      waterFee,
-      sewageFee,
-      precipitationArea,
-      precipitationFee,
-      apartmentName,
-      i
-    );
+                   <label class="preInputLabel" for="apartment${apartment}IsWarmWaterMeterExisting">Warmwasserzähler vorhanden?</label>
+                   <input type="checkbox" id="apartment${apartment}IsWarmWaterMeterExisting" name="apartment${apartment}IsWarmWaterMeterExisting" ${isWarmWaterMeterExisting}>
+
+                   <label class="preInputLabel" for="apartment${apartment}warmWaterMeterNumber">Zählernummer</label>
+                   <input type="number" id="apartment${apartment}warmWaterMeterNumber" name="apartment${apartment}warmWaterMeterNumber" min="0" value="${warmWaterMeterNumber}">
+                   
+                   <label class="preInputLabel" for="apartment${apartment}warmWaterMeterFee">Zählergebühren</label>
+                   <input type="number" id="apartment${apartment}warmWaterMeterFee" name="apartment${apartment}warmWaterMeterFee" min="0" value="${warmWaterMeterFee}">
+                   <label class="postInputLabel" for="apartment${apartment}warmWaterMeterFee">€</label>
+
+
+
+                   <label class="preInputLabel" for="apartment${apartment}IsColdWaterMeterExisting">Kaltwasserzähler vorhanden?</label>
+                   <input type="checkbox" id="apartment${apartment}IsColdWaterMeterExisting" name="apartment${apartment}IsColdWaterMeterExisting" ${isColdWaterMeterExisting}>
+
+                   <label class="preInputLabel" for="apartment${apartment}coldWaterMeterNumber">Zählernummer</label>
+                   <input type="number" id="apartment${apartment}coldWaterMeterNumber" name="apartment${apartment}coldWaterMeterNumber" min="0" value="${coldWaterMeterNumber}">
+                   
+                   <label class="preInputLabel" for="apartment${apartment}coldWaterMeterFee">Zählergebühren</label>
+                   <input type="number" id="apartment${apartment}coldWaterMeterFee" name="apartment${apartment}coldWaterMeterFee" min="0" value="${coldWaterMeterFee}">
+                   <label class="postInputLabel" for="apartment${apartment}coldWaterMeterFee">€</label>
+                </div>
+           `);
   }
 
-  // ==Heizung==
-
   //=================
-  //=== BAUSTELLE ===
+  //==== HEIZUNG ====
   //=================
 
   // Wieviele Öltanks?
@@ -171,52 +197,38 @@ $(document).ready(async function () {
   // Wenn nein:
   //    Vermerken für krasse Berechnungen
   //    (Öltanks Namen geben)
+  // Wieviel Öl pro Cm?
 
 
-
-
-
-
-  // 1. Allgemeine Einstellungs Checkbox erzeugen, Server anfragen, ob in DB checkbox state gespeichert. Wenn ja, setzen, wenn nein standardmäßig aktivieren
-  let generalHeating = await DB.getValueFromDB(`generalHeating`);
-  generalHeating = generalHeating == 1 ? true : false;
-  const oilPerCm = (await DB.getNewestValueFromDB(`oilPerCm`)) || "";
-  const numberOfOilTanks =
-    (await DB.getNewestValueFromDB(`numberOfOilTanks`)) || "";
-
-  Helper.appendGeneralHeating(generalHeating, oilPerCm, numberOfOilTanks);
-  Helper.sectionUpdate("heating", generalHeating);
-
-  // 2. Wenn Checkbox aktiv: Allgmeine Inputs erzeugen, Server anfragen, ob in DB eintrag vorhanden, wenn ja, eingügen, wenn nein, leer lassen.
-  // 3. Wenn Checkbox nicht aktiv: Entsprechend viele Wohnungen mit Inputs erzeugen, bei jedem input Server anfragen, ob in DB wert vorhanden. Wenn ja, einfügen, wenn nein, leer lassen.
-  if ($("#generalHeating").prop("checked")) {
-    // Allgemeine Inputs – Werte aus DB laden
-    const oilPerCm = (await DB.getValueFromDB("oilPerCm")) || "";
-    const numberOfTanks = (await DB.getValueFromDB("numberOfOilTanks")) || "";
-    $(`#oilPerCm`).val(oilPerCm);
-    $(`#numberOfOilTanks`).val(numberOfTanks);
-
-    // Wohnungen löschen
-    for (let i = 1; i <= apartmentcount; i++) {
-      $(`.apartment${i}container`).remove();
-      await DB.deleteKeyInDB(`apartment${i}oilPerCm`);
-      await DB.deleteKeyInDB(`apartment${i}numberOfOilTanks`);
+let numberOfOilTanks = await DB.getValueFromDB('numberOfOilTanks') || '';
+let areOilTanksConnected = await DB.getValueFromDB('areOilTanksConnected');
+    if(areOilTanksConnected === null){
+      areOilTanksConnected = 'checked';
+      await DB.saveValueToDB('areOilTanksConnected','checked');
     }
-  } else {
-    // Pro-Wohnung Inputs erzeugen
-    for (let i = 1; i <= apartmentcount; i++) {
-      const oilPerCm =
-        (await DB.getNewestValueFromDB(`apartment${i}oilPerCm`)) || "";
-      const numberOfTanks =
-        (await DB.getNewestValueFromDB(`apartment${i}numberOfOilTanks`)) || "";
-      const apartmentName =
-        (await DB.getValueFromDB(`apartment${i}name`)) || `Wohnung ${i}`;
+let howMuchOilPerCm = await DB.getValueFromDB('howMuchOilPerCm') || '';
 
-      Helper.appendApartmentHeating(oilPerCm, numberOfTanks, apartmentName, i);
-    }
-  }
 
-  // ==Datenbank==
+$("#heating").append(`
+   <div class="apartmentContainer">
+      
+      <label class="preInputLabel" for="areOilTanksConnected">Sind die Öltanks verbunden?</label>
+      <input type="checkbox" id="areOilTanksConnected" name="areOilTanksConnected" ${areOilTanksConnected}>
+
+      <label class="preInputLabel" for="numberOfOilTanks">Anzahl der Öltanks</label>
+      <input type="number" id="numberOfOilTanks" name="numberOfOilTanks" min="0" value="${numberOfOilTanks}">
+
+      <label class="preInputLabel" for="howMuchOilPerCm">Litermenge pro cm Füllstand</label>
+      <input type="number" id="howMuchOilPerCm" name="howMuchOilPerCm" min="0" value="${howMuchOilPerCm}">
+      <label class="postInputLabel" for="howMuchOilPerCm">Liter</label>
+    </div>
+  `);
+
+
+  //===================
+  //==== DATENBANK ====
+  //===================
+
   Helper.updateDatabaseTable();
   /*
     const dbData = await DB.getAllValuesFromDB();

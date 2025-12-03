@@ -46,9 +46,7 @@ export function registerListeners() {
         }
 
 
-
-
-        // Wenn id = apartmentcount, vergleiche value mit db, wenn value kleiner, lösche alle höheren db einträge
+        // Wenn id = apartmentcount, vergleiche value mit db, wenn value kleiner, lösche alle höheren DB Einträge
         if (id == "apartmentcount") {
             let data = await DB.getValueFromDB('apartmentcount');
             while (data > value) {
@@ -112,38 +110,55 @@ export function registerListeners() {
         }
     });
 
-    // === Checkboxes === 
-    $(document).on('change', 'input[type="checkbox"]', async function () {
-        const id = $(this).attr('id');
-        const checked = $(this).is(':checked');
-        /*
-        Prüfe ob state in DB
-        Wenn ja, Wert auslesen und Checkbox setzen
-        Wenn nein, aktuellen Wert in DB speichern
-        */
+// === Checkboxes ===
+$(document).on('change', 'input[type="checkbox"]', async function () {
+    const id = $(this).attr('id');         // z.B. "apartment1IsWarmWaterMeterExisting"
+    const checked = $(this).is(':checked');
 
-        let data = (await DB.getValueFromDB(id));
-        if (data === null) {
-            await DB.saveValueToDB(id, checked);
-            data = checked;
-        }
-        else {
-            await DB.updateValueInDB(id, checked);
-        }
+    // ----------------------
+    // Wert in DB speichern
+    // ----------------------
+    if (checked) {
+        await DB.updateValueInDB(id, 'checked');
+    } else {
+        await DB.updateValueInDB(id, '');
+    }
 
-        // Water Checkbox
-        if (id == "generalPrecipitation") {
-            // Watersection GUI toggle
-            Helper.sectionUpdate('water', checked);
-
+    // ----------------------
+    // Warmwasser / Kaltwasser Inputs toggeln
+    // ----------------------
+    if (id.includes('IsWarmWaterMeterExisting')) {
+        const apartment = id.match(/\d+/)?.[0]; // Nummer der Wohnung extrahieren
+        if (apartment) {
+            const selector = `.apartment${apartment}container`;
+            $(`${selector} #apartment${apartment}warmWaterMeterNumber`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}warmWaterMeterNumber"]`).toggle(checked);
+            $(`${selector} #apartment${apartment}warmWaterMeterFee`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}warmWaterMeterFee"]`).toggle(checked);
         }
+    }
 
-        // Heating Checkbox
-        if (id == "generalHeating") {
-            // HeatingSectionUpdate() ausführen um inputs zu toggeln
-            Helper.sectionUpdate('heating', checked);
+    if (id.includes('IsColdWaterMeterExisting')) {
+        const apartment = id.match(/\d+/)?.[0]; // Nummer der Wohnung extrahieren
+        if (apartment) {
+            const selector = `.apartment${apartment}container`;
+            $(`${selector} #apartment${apartment}coldWaterMeterNumber`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}coldWaterMeterNumber"]`).toggle(checked);
+            $(`${selector} #apartment${apartment}coldWaterMeterFee`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}coldWaterMeterFee"]`).toggle(checked);
         }
-    });
+    }
+
+    // ----------------------
+    // Öltanks Checkbox (Grundkonstrukt)
+    // ----------------------
+    if (id === 'areOilTanksConnected') {
+        // Hier kommt später die Logik
+        console.log('areOilTanksConnected changed, checked:', checked);
+    }
+});
+
+
 
     // === Delete Buttons === 
     $(document).on('click', 'button.deleteButton', async function () {
@@ -187,7 +202,7 @@ export function registerListeners() {
         }
     });
 
-
+    // === Datenbank Suchen Input === 
     $(document).on('focusout keydown', 'input#searchInput', async function (event) {
         if(event.type === 'keydown' && event.key !== "Enter") return
         const inputPattern = $('#searchInput').val();

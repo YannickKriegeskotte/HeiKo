@@ -996,5 +996,3 @@ function stableColorFor(label) {
   const light = 50;
   return `hsl(${hue}, ${sat}%, ${light}%)`;
 }
-
-export async function calculateCost() {}

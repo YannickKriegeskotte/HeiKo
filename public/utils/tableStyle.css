@@ -1,0 +1,157 @@
+:root {
+}
+
+/*========================*/
+/*=== THEMES (Colors) ====*/
+/*========================*/
+
+:root[data-tableTheme="electricity"] {
+  --tableHeaderBg: #f2e59c;
+  --tableBorder: #838a2669;
+  --tableThBg: #ffef64;
+  --tableTrEven: #fff6a5;
+  --tableTrOdd: #fffacf;
+  --inputBg: #00000000;
+  --inputBorder: #838a2600;
+  --iconBorder: #2f4f4f;
+  --addIconBg: #f2e59c;
+}
+
+:root[data-tableTheme="water"] {
+  --tableHeaderBg: #d5edf9;
+  --tableBorder: #5a7a8c69;
+  --tableThBg: #cfefff;
+  --tableTrEven: #e8f8ff;
+  --tableTrOdd: #f2fbff;
+  --inputBg: #00000000;
+  --inputBorder: #5a7a8c00;
+  --iconBorder: #375a6a;
+  --addIconBg: #d5edf9;
+}
+
+:root[data-tableTheme="heating"] {
+  --tableHeaderBg: #ffe1db;
+  --tableBorder: #a36a6a69;
+  --tableThBg: #ffd8d1;
+  --tableTrEven: #ffece8;
+  --tableTrOdd: #fff4f1;
+  --inputBg: #00000000;
+  --inputBorder: #a36a6a00;
+  --iconBorder: #7a3f3f;
+  --addIconBg: #ffe1db;
+}
+
+
+
+/*=======================================================*/
+/*=== Container um Tabellenkopf Container und Tabelle ===*/
+/*=======================================================*/
+.annualTableContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+
+/*====================*/
+/*=== Tabellenkopf ===*/
+/*====================*/
+.annualTableHeaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: var(--tableHeaderBg);
+  border-top: 1px solid black;
+}
+
+.tableHeaderInput {
+  text-align: center;
+  font-size: 2rem;
+}
+
+
+/*=====================*/
+/*=== Table Element ===*/
+/*=====================*/
+table {
+  border-collapse: collapse;
+  margin: 10px auto;
+}
+
+table, th, td {
+  border: 1px solid var(--tableBorder);
+  text-align: center;
+}
+
+th {
+  width: auto;
+  max-width: 150px;
+  background-color: var(--tableThBg);
+}
+
+table tr:nth-child(even) {
+  background-color: var(--tableTrEven);
+}
+
+table tr:nth-child(odd) {
+  background-color: var(--tableTrOdd);
+}
+
+
+/*=====================*/
+/*=== Input Element ===*/
+/*=====================*/
+input {
+  width: 99%;
+  height: 99%;
+  background-color: var(--inputBg);
+  border: 1px solid var(--inputBorder);
+}
+
+
+/*=============*/
+/*=== ICONS ===*/
+/*=============*/
+
+.tableCollapseIcon {
+  width: 70px;
+  height: auto;
+}
+
+.tableSettingsIcon {
+  width: 50px;
+  height: auto;
+}
+
+.addTableIcon {
+  display: block;
+  width: 50px;
+  height: auto;
+  margin: 0 auto 10px;
+  border: 1px solid var(--iconBorder);
+  border-radius: 50%;
+  padding: 5px;
+  fill: white;
+  transition: fill 0.2s, transform 0.2s;
+  background-color: var(--addIconBg);
+}
+
+.addTableIcon:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.tableCollapseIcon {
+  transition: transform 0.3s ease;
+}
+
+.tableCollapseIcon:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.tableCollapseIcon.rotated {
+  transform: rotate(-90deg);
+}

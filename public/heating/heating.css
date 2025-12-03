@@ -103,6 +103,26 @@ body {
   font-size: var(--fontSize);
 }
 
+/*=============================*/
+/*=== Ganz großer Container ===*/
+/*=============================*/
+.sectionContainer {
+  max-width: 85vw;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  margin: 5px;
+  background-color: var(--primaryBackgroundColor);
+  overflow: auto;
+}
+
+/*=======================================*/
+/*=== Überschrift in großem Container ===*/
+/*=======================================*/
+.sectionHeader {
+  text-align: center;
+  padding: 10px;
+}
+
 /* Section Selection Icons */
 .sectionSelectionIcon {
   width: 75px;
@@ -114,7 +134,7 @@ body {
   mask-repeat: no-repeat;
   mask-position: center;
   -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat; 
   -webkit-mask-position: center;
 }
 
@@ -187,25 +207,4 @@ body {
 #indexTab {
   mask-image: url("../assets/gear-solid-full.svg");
   -webkit-mask-image: url("../assets/gear-solid-full.svg");
-}
-
-/* --- Headers --- */
-.sectionHeader {
-  display: block;
-  text-align: center;
-}
-
-.apartmentHeader {
-  grid-column: 1 / -1;
-  justify-self: center;
-  text-align: center;
-  margin: 0 auto;
-}
-
-/* --- Server Error --- */
-.serverConnectionErrorImg{
-  display: block;
-  width: 25%;
-  height: auto;
-  margin: 0 auto;
 }

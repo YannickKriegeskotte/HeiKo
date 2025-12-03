@@ -1,9 +1,12 @@
 import * as DB from "../utils/database.js";
 import * as Helper from "../utils/helpers.js";
-import { registerListeners } from "./energyListeners.js";
+import { registerListeners } from "./heatingListeners.js";
+import { registerTableListeners } from "../utils/tableListeners.js";
 
 $(document).ready(async function () {
 
+    // Tabellentheme laden
+    document.documentElement.setAttribute("data-tableTheme", "heating");
 
     // aktuelles jahr bekommen
     let currentYear = Helper.getDate();
@@ -19,18 +22,19 @@ $(document).ready(async function () {
     else {
         // Wenn Master Registry in DB vorhanden
         tables = tablesRaw ? JSON.parse(tablesRaw) : [];
-        console.log("energyTables:", tables);
+        console.log("heatingTables:", tables);
 
         for (let year of tables) {
-            await Helper.createHeatingTable(year);
-            await Helper.createHeatingGraph(year);
+            await Helper.createTable("heating",year);
+            // await Helper.createHeatingGraph(year);
         }
 
         // Overview graph erzeugen
-        await Helper.createHeatingOverviewGraph();
+        // await Helper.createHeatingOverviewGraph();
 
 
     }
 
     registerListeners();
+    registerTableListeners();
 });

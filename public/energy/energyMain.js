@@ -1,9 +1,12 @@
 import * as DB from "../utils/database.js";
 import * as Helper from "../utils/helpers.js";
 import { registerListeners } from "./energyListeners.js";
+import { registerTableListeners } from "../utils/tableListeners.js";
 
 $(document).ready(async function () {
 
+    // Tabellentheme laden
+    document.documentElement.setAttribute("data-tableTheme", "electricity");
 
     // aktuelles jahr bekommen
     let currentYear = Helper.getDate();
@@ -33,6 +36,7 @@ $(document).ready(async function () {
     }
 
     registerListeners();
+    registerTableListeners();
 });
 
 

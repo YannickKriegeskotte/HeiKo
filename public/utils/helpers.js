@@ -153,36 +153,52 @@ export async function createTable(section, year) {
 
   // Tabellenkopfzeile je nach Sektion für jede Wohnung füllen:
 
-  for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-    // Wohnungsname, falls in DB vorhanden, sonst Standardname
-    const apartmentName =
-      (await DB.getValueFromDB(`apartment${apartment}name`)) ||
-      `Wohnung ${apartment}`;
-
-    // Je nach Sektion andere Überschriften
-    switch (section) {
-      // Strom Sektion
-      case "energy":
+  // Je nach Sektion andere Überschriften
+  switch (section) {
+    // Strom Sektion
+    case "energy":
+      for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+        // Wohnungsname, falls in DB vorhanden, sonst Standardname
+        const apartmentName =
+          (await DB.getValueFromDB(`apartment${apartment}name`)) ||
+          `Wohnung ${apartment}`;
         $(`#${year}_${section}TableContainer thead tr`).append(`
             <th>Zählerstand ${apartmentName}</th>
             <th>Verbrauch ${apartmentName}</th>
             <th>Kosten ${apartmentName}</th>
         `);
-        break;
+      }
+      break;
 
-      // Wasser Sektion
-      case "water":
+    // Wasser Sektion
+    case "water":
+      for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+        // Wohnungsname, falls in DB vorhanden, sonst Standardname
+        const apartmentName =
+          (await DB.getValueFromDB(`apartment${apartment}name`)) ||
+          `Wohnung ${apartment}`;
         // Hat Wohnung Warmwasserzähler?
-        //...
+        let hasWarmWaterMeter = await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`);
+        hasWarmWaterMeter = (hasWarmWaterMeter == "checked") ? true : false;
+
         // Hat Wohnung Kaltwasserzähler?
-        //...
+        let hasColdWaterMeter = await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`);
+        hasColdWaterMeter = (hasColdWaterMeter == "checked") ? true : false;
+
         // Falls beides nein, was ist die Gesamtzählernummer
-        //...
+        let mainWaterMeterNumber;
+        if (!hasWarmWaterMeter && !hasColdWaterMeter) {
+          mainWaterMeterNumber = await DB.getNewestValueFromDB('mainWaterMeterNumber') || null;
+        }
+
+
         // Gibt es andere Warmwasser Zählernummern, die ebenfalls auf dem Gesamtzähler laufen?
-        //...
+        let allExtraWaterMeters = await DB.getAllKeysContaining('IsWarmWaterMeterExisting');
+        let filteredExtraWaterMeters = allExtraWaterMeters.filter(key => key !== `apartment${apartment}IsWarmWaterMeterExisting`);
         // Gibt es andere Kaltwasser Zählernummern, die ebenfalls auf dem Gesamtzähler laufen?
         //...
 
+        // OPTIONALES:
         // Druck Heizung angeben aktiviert?
         //...
         // Druck Wasser angeben aktiviert?
@@ -191,37 +207,78 @@ export async function createTable(section, year) {
         //...
         // Druck Solar angeben aktiviert?
         //...
+        if (apartment == 1) {
+          $(`#${year}_${section}TableContainer thead tr`).append(`
+          <th>Druck Heizung</th>
+          <th>Druck Wasser</th>
+          <th>Druck Solar</th>
+          <th>Zählerstand Gesamt</th>
+          <th>Verbrauch Gesamt</th>h>
+        `);
+        }
+
+        if (hasWarmWaterMeter) {
+          $(`#${year}_${section}TableContainer thead tr`).append(`
+          <th>Zählerstand Warm ${apartmentName}</th>
+          <th>Verbrauch Warm ${apartmentName}</th>
+          `);
+        }
+        if (hasColdWaterMeter) {
+          $(`#${year}_${section}TableContainer thead tr`).append(`
+          <th>Zählerstand Kalt ${apartmentName}</th>
+          <th>Verbrauch Kalt ${apartmentName}</th>
+          `);
+        }
 
         $(`#${year}_${section}TableContainer thead tr`).append(`
-            <th>Zählerstand Warmwasser ${apartmentName}</th>
-            <th>Zählerstand Kaltwasser ${apartmentName}</th>
-            <th>Zählerstand Gesamtwasser ${apartmentName}</th>
-            <th>Verbrauch Warmwasser ${apartmentName}</th>
-            <th>Verbrauch Kaltwasser ${apartmentName}</th>
-            <th>Verbrauch Gesamtwasser ${apartmentName}</th>
             <th>Kosten Wasser ${apartmentName}</th>
             <th>Kosten Abwasser ${apartmentName}</th>
-            <th>Laufzeit Solarpumpe ${apartmentName}</th>
-            <th>Druck Heizung ${apartmentName}</th>
-            <th>Druck Wasser ${apartmentName}</th>
-            <th>Druck Solar ${apartmentName}</th>
-            <th>Solarenergie ${apartmentName}</th>
         `);
-        break;
 
-      // Heizung Sektion
-      case "heating":
-        // Wieviele Öltanks?
-        // Name der Öltanks? Falls nicht vorhanden, Standardwert (Öltank 1, Öltank 2,...)
+
+
+      }
+      break;
+
+    // Heizung Sektion
+    case "heating":
+
+      // Wieviele Öltanks?
+      let areTanksConnected = await DB.getValueFromDB('areOilTanksConnected');
+      areTanksConnected = (areTanksConnected == "checked") ? true : false;
+
+      if (!areTanksConnected) {
+        let numberOfOilTanks = await DB.getNewestValueFromDB('numberOfOilTanks');
+        if (numberOfOilTanks !== null) {
+          for (let tank = 1; tank <= numberOfOilTanks; tank++) {
+            $(`#${year}_${section}TableContainer thead tr`).append(`
+                <th>Ölstand Tank ${tank}</th>
+            `);
+          }
+        }
+      }
+      else {
         $(`#${year}_${section}TableContainer thead tr`).append(`
-            <th>Ölstand Tank x ${apartmentName}</th>
-            <th>Verbrauch Öl ${apartmentName}</th>
-            <th>Laufzeit Heizung ${apartmentName}</th>
-            <th>Kosten ${apartmentName}</th>
+            <th>Ölstand</th>
         `);
-        break;
-    }
+      }
+      $(`#${year}_${section}TableContainer thead tr`).append(`
+            <th>Verbrauch Öl</th>
+            <th>Öl Kosten</th>
+            <th>Betriebstunden Heizung</th>
+            <th>Laufzeit Heizung</th>
+            <th>Betriebstunden Solarpumpe</th>
+            <th>Laufzeit Solarpumpe</th>
+            <th>Solar Zählerstand</th>
+            <th>Erzeugte Energie</th>
+        `);
+
+
+      // OPTIONAL:
+      // Name der Öltanks? Falls nicht vorhanden, Standardwert (Öltank 1, Öltank 2,...)
+      break;
   }
+
 
   // Tabellenkörper füllen:
 
@@ -238,13 +295,13 @@ export async function createTable(section, year) {
 
     for (let apartment = 1; apartment <= apartmentCount; apartment++) {
 
-    // Sektionsspezifisches
-    switch (section) {
+      // Sektionsspezifisches
+      switch (section) {
 
-      // Strom Sektion
-      case "energy":
-        // Zählerstand pro Wohnung
-        
+        // Strom Sektion
+        case "energy":
+          // Zählerstand pro Wohnung
+
           let meterCount = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_meterCount`) || "";
           let consumption = 0;
 
@@ -291,55 +348,150 @@ export async function createTable(section, year) {
           <td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_consumption" value="${consumption}"></td>
           <td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_cost" value="${cost}"></td>
           `;
-        
-        break;
 
-      // Wasser Sektion
-      case "water":
-        // Zählerstand Warmwasser pro Wohnung
-        //...
-        // Zählerstand Kaltwasser pro Wohnung
-        //...
-        // Zählerstand Gesamtwasser pro Wohnung
-        //...
-        // Verbrauch Warmwasser pro Wohnung
-        //...
-        // Verbrauch Kaltwasser pro Wohnung
-        //...
-        // Verbrauch Gesamtwasser pro Wohnung
-        //...
-        // Kosten Wasser pro Wohnung
-        //...
-        // Kosten Abwasser pro Wohnung
-        //...
-        // Laufzeit Solarpumpe pro Wohnung
-        //...
-        // Druck Heizung pro Wohnung
-        //...
-        // Druck Wasser pro Wohnung
-        //...
-        // Härte Wasser pro Wohnung
-        //...
-        // Druck Solar pro Wohnung
-        //...
-        // Solarenergie pro Wohnung
-        //...
-        break;
+          break;
 
-      // Heizung Sektion
-      case "heating":
-        // Öltank x Füllstand pro Wohnung
-        //...
-        // Verbrauch Öl pro Wohnung
-        //...
-        // Laufzeit Heizung pro Wohnung
-        //...
-        // Kosten pro Wohnung
-        //...
+        // Wasser Sektion
+        case "water":
 
-        break;
+          if (apartment == 1) {
+            // Druck Heizung
+            //...
+            let heatingPressure = 0;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_heatingPressure" value="${heatingPressure}"></td>`;
+            // Druck Wasser
+            //...
+            let waterPressure = 0;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_waterPressure" value="${waterPressure}"></td>`;
+            // Druck Solar
+            //...
+            let solarPressure = 0;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_solarPressure" value="${solarPressure}"></td>`;
+
+            // Zählerstand Gesamtwasser
+            let mainWaterMeterCount = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_mainWaterMeterCount`) || '000';
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_mainWaterMeterCount" value="${mainWaterMeterCount}"></td>`;
+
+            // Verbrauch Gesamtwasser
+            //...
+            let mainWaterConsumption = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_mainWaterConsumption`) || '111';
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_mainWaterConsumption" value="${mainWaterConsumption}"></td>`;
+          }
+
+
+          let hasWarmWaterMeter = await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`);
+          hasWarmWaterMeter = (hasWarmWaterMeter == "checked") ? true : false;
+
+          // Hat Wohnung Kaltwasserzähler?
+          let hasColdWaterMeter = await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`);
+          hasColdWaterMeter = (hasColdWaterMeter == "checked") ? true : false;
+
+          // Falls beides nein, was ist die Gesamtzählernummer
+          let mainWaterMeterNumber = await DB.getNewestValueFromDB('mainWaterMeterNumber') || null;
+
+
+
+          // Zählerstand Warmwasser pro Wohnung (falls vorhanden)
+          if (hasWarmWaterMeter) {
+            let warmWaterMeterCount = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_warmWaterMeterCount`) || '222';
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_warmWaterMeterCount" value="${warmWaterMeterCount}"></td>`;
+
+            // Verbauch Warmwasser pro Wohnung
+            //...
+            let warmWaterConsumption = 333;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_warmWaterConsumption" value="${warmWaterConsumption}"></td>`;
+          }
+
+
+          // Zählerstand Kaltwasser pro Wohnung (falls vorhanden)
+          console.log("hasColdWaterMeter", hasColdWaterMeter);
+          if (hasColdWaterMeter) {
+            let coldWaterMeterCount = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_coldWaterMeterCount`) || '444';
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_coldWaterMeterCount" value="${coldWaterMeterCount}"></td>`;
+
+            // Verbauch Kaltwasser pro Wohnung
+            //...
+            let coldWaterConsumption = 555;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_coldWaterConsumption" value="${coldWaterConsumption}"></td>`;
+          }
+
+          // Kosten Wasser
+          let waterCost = 666
+          rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_waterCost" value="${waterCost}"></td>`;
+
+          // Kosten Abwasser
+          let sewageCost = 666
+          rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_sewageCost" value="${sewageCost}"></td>`;
+
+
+
+          break;
+
+        // Heizung Sektion
+        case "heating":
+
+          if (apartment == 1) {
+            // Wieviele Öltanks?
+            let areTanksConnected = await DB.getValueFromDB('areOilTanksConnected');
+            areTanksConnected = (areTanksConnected == "checked") ? true : false;
+
+            if (!areTanksConnected) {
+              let numberOfOilTanks = await DB.getNewestValueFromDB('numberOfOilTanks');
+              if (numberOfOilTanks !== null) {
+                for (let tank = 1; tank <= numberOfOilTanks; tank++) {
+                  let oilLevelInTank = 777;
+                  rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_oilLevelInTank${tank}" value="${oilLevelInTank}"></td>`;
+                }
+              }
+            }
+            else {
+              let oilLevelInTanks = 888;
+              rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_oilLevelInTanks" value="${oilLevelInTanks}"></td>`;
+            }
+
+            // Verbauch Öl
+            let oilConsumption = 999;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_oilConsumption" value="${oilConsumption}"></td>`;
+
+            // Öl Kosten 
+            //...
+            let oilCost = 123;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_oilCost" value="${oilCost}"></td>`;
+
+            // Betriebstunden Heizung 
+            //...
+            let operatingHoursBoiler = 234;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_operatingHoursBoiler" value="${operatingHoursBoiler}"></td>`;
+
+            // Laufzeit Heizung 
+            //...
+            let runtimeBoiler = 345;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_runtimeBoiler" value="${runtimeBoiler}"></td>`;
+
+            // Betriebstunden Solarpumpe 
+            //...
+            let operatingHoursSolarPump = 456;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_operatingHoursSolarPump" value="${operatingHoursSolarPump}"></td>`;
+
+            // Laufzeit Solarpumpe 
+            //...
+            let runtimeSolarPump = 567;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_runtimeSolarPump" value="${runtimeSolarPump}"></td>`;
+
+            // Solar Zählerstand 
+            //...
+            let solarPumpMeterCount = 678;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_solarPumpMeterCount" value="${solarPumpMeterCount}"></td>`;
+
+            // Erzeugte Energie 
+            //...
+            let producedEnergy = 789;
+            rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_producedEnergy" value="${producedEnergy}"></td>`;
+
+          }
+          break;
+      }
     }
-  }
 
     // HTML Zeile beenden
     rowString += "</tr>";

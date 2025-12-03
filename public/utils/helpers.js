@@ -11,40 +11,7 @@ let apartmentCount;
 // ===== Main Helper =====
 // =======================
 
-export async function sectionUpdate(sectionString, checked) {
-  const precFeeID = `precipitationFee`;
-  const precAreaID = `precipitationArea`;
-  const oilID = "oilPerCm";
-  const tanksID = "numberOfOilTanks";
 
-  const root = document.documentElement;
-  const textColor = getComputedStyle(root)
-    .getPropertyValue("--primaryTextColor")
-    .trim();
-  const disabledTextColor = getComputedStyle(root)
-    .getPropertyValue("--disabledTextColor")
-    .trim();
-
-  let input1 = sectionString == "water" ? precFeeID : oilID;
-  let input2 = sectionString == "water" ? precAreaID : tanksID;
-  let color1 = checked ? textColor : disabledTextColor;
-  let color2 = checked ? disabledTextColor : textColor;
-
-  $(`#${input1}, #${input2}`).prop(`disabled`, !checked);
-  $(`#${input1}, #${input2}`).css(`color`, color1);
-  $(`label[for="${input1}"], label[for="${input2}"]`).css(`color`, color1);
-  const apartmentcount = await DB.getValueFromDB(`apartmentcount`);
-  for (let i = 1; i <= apartmentcount; i++) {
-    $(`#apartment${i}${input1}, #apartment${i}${input2}`).prop(
-      `disabled`,
-      checked
-    );
-    $(`#apartment${i}${input1}, #apartment${i}${input2}`).css(`color`, color2);
-    $(
-      `label[for="apartment${i}${input1}"], label[for="apartment${i}${input2}"]`
-    ).css(`color`, color2);
-  }
-}
 
 export function getDate() {
   const date = new Date();
@@ -71,99 +38,6 @@ export function appendApartmentEnergy(
                 <label class="postInputLabel" for="apartment${i}electricityFee">€</label>
             </div>
         `);
-}
-
-export function appendGeneralWater(
-  generalPrecipitation,
-  precipitationFee,
-  precipitationArea
-) {
-  $("#water").append(`
-           <div class="apartmentContainer">
-           <label class="preInputLabel" for="generalPrecipitation">Allgemeine Einstellungen für Versiegelte Fläche verwenden</label>
-           <input type="checkbox" id="generalPrecipitation" name="generalPrecipitation" checked>
-           <label class="preInputLabel" for="precipitationFee">Allgemeine Versiegeltungsgebühr</label>
-           <input type="number" id="precipitationFee" name="precipitationFee" min="0" value="${precipitationFee}">
-           <label class="postInputLabel" for="precipitationFee">€/m²</label>
-           <label class="preInputLabel" for="precipitationArea">Allgemeine Versiegelte Fläche</label>
-           <input type="number" id="precipitationArea" name="precipitationArea" min="0" value="${precipitationArea}">
-           <label class="postInputLabel" for="precipitationArea">m²</label>
-           </div>
-       `);
-  $("#generalPrecipitation").prop(
-    "checked",
-    generalPrecipitation === true || generalPrecipitation === "true"
-  );
-}
-
-export function appendApartmentWater(
-  meterFee,
-  meterNumber,
-  waterFee,
-  sewageFee,
-  precipitationArea,
-  precipitationFee,
-  apartmentName,
-  i
-) {
-  $("#water").append(`
-                <div class="apartment${i}container apartmentContainer">
-                   <h3 id="apartment${i}name_water" class="apartmentHeader">${apartmentName}</h3>
-                   <label class="preInputLabel" for="apartment${i}waterMeterNumber">Zählernummer</label>
-                   <input type="number" id="apartment${i}waterMeterNumber" name="apartment${i}waterMeterNumber" value="${meterNumber}">
-                   <label class="preInputLabel" for="apartment${i}waterMeterFee">Zählergebühren</label>
-                   <input type="number" id="apartment${i}waterMeterFee" name="apartment${i}waterMeterFee" min="0" value="${meterFee}">
-                   <label class="postInputLabel" for="apartment${i}meterFee">€</label>
-                   <label class="preInputLabel" for="apartment${i}waterFee">Preis pro m³ Wasser</label>
-                   <input type="number" id="apartment${i}waterFee" name="apartment${i}waterFee" min="0" value="${waterFee}">
-                   <label class="postInputLabel" for="apartment${i}waterFee">€</label>
-                   <label class="preInputLabel" for="apartment${i}sewageFee">Preis pro m³ Abwasser</label>
-                   <input type="number" id="apartment${i}sewageFee" name="apartment${i}sewageFee" min="0" value="${sewageFee}">
-                   <label class="postInputLabel" for="apartment${i}sewageFee">€</label>
-                   <label class="preInputLabel" for="apartment${i}precipitationArea">Versiegelte Fläche</label>
-                   <input type="number" id="apartment${i}precipitationArea" name="apartment${i}precipitationArea" min="0" value="${precipitationArea}">
-                   <label class="postInputLabel" for="apartment${i}precipitationArea">m²</label>
-                   <label class="preInputLabel" for="apartment${i}precipitationFee">Niederschlagsgebühr</label>
-                   <input type="number" id="apartment${i}precipitationFee" name="apartment${i}precipitationFee" min="0" value="${precipitationFee}">
-                   <label class="postInputLabel" for="apartment${i}precipitationFee">€</label>
-                </div>
-           `);
-}
-
-export function appendGeneralHeating(
-  generalHeating,
-  oilPerCm,
-  numberOfOilTanks
-) {
-  $("#heating").append(`
-           <div class="apartmentContainer">
-           <label class="preInputLabel" for="generalHeating">Allgemeine Einstellungen für alle Wohnungen verwenden</label>
-           <input type="checkbox" id="generalHeating" name="generalHeating">
-           <label class="preInputLabel" for="oilPerCm">1cm Tankfüllung entsprechen</label>
-           <input type="text" id="oilPerCm" name="oilPerCm" min="0" value="${oilPerCm}">
-           <label class="postInputLabel" for="oilPerCm">Liter Öl</label>
-           <label class="preInputLabel" for="numberOfOilTanks">Anzahl der Öltanks</label>
-           <input type="text" id="numberOfOilTanks" name="numberOfOilTanks" min="0" value="${numberOfOilTanks}">
-           </div>
-       `);
-  $("#generalHeating").prop("checked", generalHeating);
-}
-
-export function appendApartmentHeating(
-  oilPerCm,
-  numberOfTanks,
-  apartmentName,
-  i
-) {
-  $("#heating").append(`
-                   <div class="apartment${i}container apartmentContainer">
-                       <h3 id="apartment${i}name_heating" class="apartmentHeader">${apartmentName}</h3>
-                       <label class="preInputLabel" for="apartment${i}oilPerCm">1cm Tankfüllung entsprechen</label>
-                       <input type="text" id="apartment${i}oilPerCm" min="0" value="${oilPerCm}">
-                       <label class="preInputLabel" for="apartment${i}numberOfOilTanks">Anzahl der Öltanks</label>
-                       <input type="text" id="apartment${i}numberOfOilTanks" min="0" value="${numberOfTanks}">
-                   </div>
-               `);
 }
 
 export function extractBaseKey(key) {
@@ -334,7 +208,7 @@ export async function createTable(section, year) {
             <th>Solarenergie ${apartmentName}</th>
         `);
         break;
-      
+
       // Heizung Sektion
       case "heating":
         // Wieviele Öltanks?
@@ -352,60 +226,104 @@ export async function createTable(section, year) {
   // Tabellenkörper füllen:
 
   // 12 Zeilen maximal
-  for(let row=1;row<=12;row++){
+  for (let row = 1; row <= 12; row++) {
 
     // HTML Zeile beginnen
     let rowString = "<tr>";
     // Jede Zeile hat folgende spalten:
-    
+
     // Datum
-    let date =
-      (await DB.getValueFromDB(`${year}_${section}TableDate${i}`)) || "";
-    rowString += `<td><input type="text" id="${year}_${section}TableDate${row}" value="${date}"></td>`;
+    let rowDate = (await DB.getValueFromDB(`${year}_${section}TableDate${row}`)) || "";
+    rowString += `<td><input type="text" id="${year}_${section}TableDate${row}" value="${rowDate}"></td>`;
+
+    for (let apartment = 1; apartment <= apartmentCount; apartment++) {
 
     // Sektionsspezifisches
-    switch (section){
+    switch (section) {
 
       // Strom Sektion
       case "energy":
         // Zählerstand pro Wohnung
-        //...
-        // Verbrauch pro Wohnung
-        //...
-        // Kosten pro Wohnung
-        //...
+        
+          let meterCount = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_meterCount`) || "";
+          let consumption = 0;
+
+          if (meterCount !== "") {
+            let oldMeterCount = 0;
+
+            if (row == 1) {
+              let checkRow = 12;
+              while (checkRow > 0 && oldMeterCount === 0) {
+                oldMeterCount = await DB.getValueFromDB(`apartment${apartment}_${year - 1}_${section}Table${checkRow}_meterCount`) || 0;
+                checkRow--;
+              }
+              // Wenn im Vorjahr kein Zählerstand gefunden wird, bleibt consumption = 0
+              if (oldMeterCount === 0) {
+                consumption = 0;
+              } else {
+                consumption = meterCount - oldMeterCount;
+              }
+            } else {
+              oldMeterCount = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row - 1}_meterCount`) || 0;
+              consumption = meterCount - oldMeterCount;
+            }
+          } else {
+            consumption = 0;
+          }
+
+
+          // verbrauch vorhanden? ja, gut. nein, keine kosten, weil kein verbauch.
+          // zählergebühren vorhanden? ja, gut. nein, mit 0 weiter rechnen
+          // kwhpreis vorhanden? ja, gut. nein, keine kosten, weil kein kwh preis.
+          // berechnung: (verbauch * kwhpreis) + (zählergebühren / 12) = kosten
+          let cost = 0;
+          if (consumption > 0) {
+            let electricityFee = await DB.getNewestValueFromDB(`apartment${apartment}electricityFee`) || 0;
+            if (electricityFee != 0) {
+              let electricityMeterFee = await DB.getNewestValueFromDB(`apartment${apartment}electricityMeterFee`) || 0;
+              cost = (consumption * electricityFee) + (electricityMeterFee / 12);
+              cost = parseFloat(cost.toFixed(2));
+            }
+          }
+
+          rowString += `
+          <td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_meterCount" value="${meterCount}"></td>
+          <td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_consumption" value="${consumption}"></td>
+          <td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_cost" value="${cost}"></td>
+          `;
+        
         break;
 
       // Wasser Sektion
       case "water":
-      // Zählerstand Warmwasser pro Wohnung
-      //...
-      // Zählerstand Kaltwasser pro Wohnung
-      //...
-      // Zählerstand Gesamtwasser pro Wohnung
-      //...
-      // Verbrauch Warmwasser pro Wohnung
-      //...
-      // Verbrauch Kaltwasser pro Wohnung
-      //...
-      // Verbrauch Gesamtwasser pro Wohnung
-      //...
-      // Kosten Wasser pro Wohnung
-      //...
-      // Kosten Abwasser pro Wohnung
-      //...
-      // Laufzeit Solarpumpe pro Wohnung
-      //...
-      // Druck Heizung pro Wohnung
-      //...
-      // Druck Wasser pro Wohnung
-      //...
-      // Härte Wasser pro Wohnung
-      //...
-      // Druck Solar pro Wohnung
-      //...
-      // Solarenergie pro Wohnung
-      //...
+        // Zählerstand Warmwasser pro Wohnung
+        //...
+        // Zählerstand Kaltwasser pro Wohnung
+        //...
+        // Zählerstand Gesamtwasser pro Wohnung
+        //...
+        // Verbrauch Warmwasser pro Wohnung
+        //...
+        // Verbrauch Kaltwasser pro Wohnung
+        //...
+        // Verbrauch Gesamtwasser pro Wohnung
+        //...
+        // Kosten Wasser pro Wohnung
+        //...
+        // Kosten Abwasser pro Wohnung
+        //...
+        // Laufzeit Solarpumpe pro Wohnung
+        //...
+        // Druck Heizung pro Wohnung
+        //...
+        // Druck Wasser pro Wohnung
+        //...
+        // Härte Wasser pro Wohnung
+        //...
+        // Druck Solar pro Wohnung
+        //...
+        // Solarenergie pro Wohnung
+        //...
         break;
 
       // Heizung Sektion
@@ -421,174 +339,18 @@ export async function createTable(section, year) {
 
         break;
     }
+  }
 
     // HTML Zeile beenden
     rowString += "</tr>";
+
+    $(`#${year}_${section}TableContainer tbody`).append(rowString);
   }
 
 
 
 
 
-
-
-
-
-
-// ====================
-// ===== OLD CODE =====
-// ====================
-
-  for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-    const aptName =
-      (await DB.getValueFromDB(`apartment${apartment}name`)) ||
-      `Wohnung ${apartment}`;
-
-    switch (section.toLowerCase()) {
-      case "energy":
-        $(`#${year}_${section}TableContainer thead tr`).append(`
-            <th>Zählerstand ${aptName}</th>
-            <th>Verbrauch ${aptName}</th>
-            <th>Kosten ${aptName}</th>
-        `);
-
-        break;
-      case "water":
-        $(`#${year}_${section}TableContainer thead tr`).append(`
-            <th>Wasser Zählerstand ${aptName}</th>
-            <th>Abwasser Zählerstand ${aptName}</th>
-            <th>Wasser Verbrauch ${aptName}</th>
-            <th>Abwasser Erzeugung ${aptName}</th>
-            <th>Wasser Kosten ${aptName}</th>
-            <th>Abwasser Kosten ${aptName}</th>
-        `);
-
-        break;
-      case "heating":
-        $(`#${year}_${section}TableContainer thead tr`).append(`
-            <th>Zählerstand ${aptName}</th>
-            <th>Verbrauch ${aptName}</th>
-            <th>Kosten ${aptName}</th>
-        `);
-        //... Was muss da alles rein?
-        /*
-        ölstand links/rechts => wieviele öltanks, 
-        demeentsprechend anpassen, 
-        öltanks namen geben, 
-        in db speichern, 
-        allgemeine einstellungen beachten,
-        laufzeit heiunzg,
-        was für ein zählerstand?,
-        */
-        break;
-    }
-  }
-
-  // Tabelle Zeile für Zeile füllen (Monat 1–12)
-  for (let i = 1; i <= 12; i++) {
-    let rowHTML = "<tr>";
-
-    // Datum abrufen oder leer lassen
-    let date =
-      (await DB.getValueFromDB(`${year}_${section}TableDate${i}`)) || "";
-    rowHTML += `<td><input type="text" id="${year}_${section}TableDate${i}" value="${date}"></td>`;
-
-    for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-      const aptName =
-        (await DB.getValueFromDB(`apartment${apartment}name`)) ||
-        `Wohnung ${apartment}`;
-
-      let aptEnergyMeterCount;
-      let aptEnergyConsumption;
-      let aptEnergyCost;
-
-      let aptWaterMeterCount;
-      let aptWaterConsumption;
-      let aptWaterCost;
-
-      let aptSewageMeterCount;
-      let aptSewageConsumption;
-      let aptSewageCost;
-      //...
-
-      switch (section) {
-        case "energy":
-          break;
-        case "water":
-          break;
-        case "heating":
-          break;
-      }
-      // Zählerstand, Verbrauch und Kosten aus DB abrufen
-      aptEnergyMeterCount = await DB.getValueFromDB(
-        `${year}_${section}TableMeterCount${i}_apartment${apartment}`
-      );
-      aptEnergyConsumption = await DB.getValueFromDB(
-        `${year}_${section}TableConsumption${i}_apartment${apartment}`
-      );
-      aptEnergyCost = await DB.getValueFromDB(
-        `${year}_${section}TableCost${i}_apartment${apartment}`
-      );
-
-      if (aptEnergyMeterCount === null) aptEnergyMeterCount = "";
-
-      // Verbrauch automatisch berechnen, falls leer
-      if (aptEnergyConsumption === null) {
-        const prevMeter =
-          i === 1
-            ? 0
-            : Number(
-                await DB.getValueFromDB(
-                  `${year}_${section}TableEnergyMeterCount${
-                    i - 1
-                  }_apartment${apartment}`
-                )
-              ) || 0;
-        const currentMeter = Number(aptEnergyMeterCount) || 0;
-        aptEnergyConsumption = Math.max(currentMeter - prevMeter, 0);
-        await DB.saveValueToDB(
-          `${year}_${section}TableEnergyConsumption${i}_apartment${apartment}`,
-          aptEnergyConsumption
-        );
-      }
-
-      // Kosten automatisch berechnen, faslls nicht in DB
-      if (aptEnergyCost === null) {
-        let allCostKeys = await DB.getAllKeysContaining(
-          `apartment${apartment}electricityFee`
-        );
-        console.log(allCostKeys);
-        let filteredCostKeys = allCostKeys.filter((item) =>
-          item.key.includes(year)
-        );
-        console.log("filteredCostKeys", filteredCostKeys);
-        let match = await DB.getNewestKey(filteredCostKeys[0].key);
-
-        aptEnergyCost = await DB.getValueFromDB(match);
-        await DB.saveValueToDB(
-          `${year}_energyTableCost${i}_apartment${apartment}`,
-          aptEnergyCost
-        );
-      }
-
-      // Inputs in Tabelle einfügen
-      //...
-      switch (section) {
-        case "energy":
-          rowHTML += `<td><input type="text" id="${year}_${section}TableEnergyMeterCount${i}_apartment${apartment}" value="${aptEnergyMeterCount}"></td>`;
-          rowHTML += `<td><input type="text" id="${year}_${section}TableEnergyConsumption${i}_apartment${apartment}" value="${aptEnergyConsumption}"></td>`;
-          rowHTML += `<td><input type="text" id="${year}_${section}TableEnergyCost${i}_apartment${apartment}" value="${aptEnergyCost}"></td>`;
-          break;
-        case "water":
-          break;
-        case "heating":
-          break;
-      }
-    }
-
-    rowHTML += "</tr>";
-    $(`#${year}_${section}TableContainer tbody`).append(rowHTML);
-  }
 
   // prüfen, ob collaped DB eintrag, wenn ja
   const tableCollapsed = await DB.getValueFromDB(
@@ -609,6 +371,10 @@ export async function createTable(section, year) {
     icon.removeClass("rotated");
   }
 }
+
+
+
+
 
 // kann bleiben, hat keine DB abfragen, liest aus HTML
 export function createEnergyGraphDatesArray(section, year) {

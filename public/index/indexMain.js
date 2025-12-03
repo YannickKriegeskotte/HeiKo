@@ -92,7 +92,7 @@ $(document).ready(async function () {
   // Preis pro Liter Wasser
   // Preis pro Liter Abwasser
 
-let mainWaterMeterNumber = await DB.getValueFromDB('mainWaterMeterNumber') || '';
+let mainWaterMeterNumber = await DB.getNewestValueFromDB('mainWaterMeterNumber') || '';
 let mainWaterMeterFee = await DB.getNewestValueFromDB('mainWaterMeterFee') || '';
 let costPerLiterWater = await DB.getNewestValueFromDB('costPerLiterWater') || '';
 let costPerLiterSewage = await DB.getNewestValueFromDB('costPerLiterSewage') || '';
@@ -152,8 +152,8 @@ let precipitationFee = await DB.getNewestValueFromDB(`precipitationFee`) || '';
       isColdWaterMeterExisting = 'checked';
       await DB.saveValueToDB(`apartment${apartment}IsColdWaterMeterExisting`,'checked');
     }
-    let warmWaterMeterNumber = await DB.getValueFromDB('warmWaterMeterNumber') || '';
-    let coldWaterMeterNumber = await DB.getValueFromDB('coldWaterMeterNumber') || '';
+    let warmWaterMeterNumber = await DB.getNewestValueFromDB('warmWaterMeterNumber') || '';
+    let coldWaterMeterNumber = await DB.getNewestValueFromDB('coldWaterMeterNumber') || '';
     let warmWaterMeterFee = await DB.getNewestValueFromDB('warmWaterMeterFee') || '';
     let coldWaterMeterFee = await DB.getNewestValueFromDB('coldWaterMeterFee') || '';
 
@@ -184,7 +184,37 @@ let precipitationFee = await DB.getNewestValueFromDB(`precipitationFee`) || '';
                    <label class="postInputLabel" for="apartment${apartment}coldWaterMeterFee">€</label>
                 </div>
            `);
+
+
+      // Toggle input fields depending on checkbox state
+      let id = `apartment${apartment}IsWarmWaterMeterExisting`;
+      let checked = $(`#${id}`).is(':checked');
+      
+      if (id.includes('IsWarmWaterMeterExisting')) {
+        const apartment = id.match(/\d+/)?.[0]; // Nummer der Wohnung extrahieren
+        if (apartment) {
+            const selector = `.apartment${apartment}container`;
+            $(`${selector} #apartment${apartment}warmWaterMeterNumber`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}warmWaterMeterNumber"]`).toggle(checked);
+            $(`${selector} #apartment${apartment}warmWaterMeterFee`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}warmWaterMeterFee"]`).toggle(checked);
+        }
+    }
+
+    id = `apartment${apartment}IsColdWaterMeterExisting`;
+    checked = $(`#${id}`).is(':checked');
+    if (id.includes('IsColdWaterMeterExisting')) {
+        const apartment = id.match(/\d+/)?.[0]; // Nummer der Wohnung extrahieren
+        if (apartment) {
+            const selector = `.apartment${apartment}container`;
+            $(`${selector} #apartment${apartment}coldWaterMeterNumber`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}coldWaterMeterNumber"]`).toggle(checked);
+            $(`${selector} #apartment${apartment}coldWaterMeterFee`).toggle(checked);
+            $(`${selector} label[for="apartment${apartment}coldWaterMeterFee"]`).toggle(checked);
+        }
+    }
   }
+
 
   //=================
   //==== HEIZUNG ====
@@ -218,11 +248,13 @@ $("#heating").append(`
       <label class="preInputLabel" for="numberOfOilTanks">Anzahl der Öltanks</label>
       <input type="number" id="numberOfOilTanks" name="numberOfOilTanks" min="0" value="${numberOfOilTanks}">
 
-      <label class="preInputLabel" for="howMuchOilPerCm">Litermenge pro cm Füllstand</label>
+      <label class="preInputLabel" for="howMuchOilPerCm">Liter pro cm Füllstand</label>
       <input type="number" id="howMuchOilPerCm" name="howMuchOilPerCm" min="0" value="${howMuchOilPerCm}">
       <label class="postInputLabel" for="howMuchOilPerCm">Liter</label>
     </div>
   `);
+
+  
 
 
   //===================

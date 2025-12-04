@@ -110,6 +110,19 @@ input {
   border: 1px solid var(--inputBorder);
 }
 
+table tr:nth-child(even) td:has(input:disabled) {
+  background-color: var(--tableTrEven);
+  filter: grayscale(10%) brightness(90%);
+}
+
+table tr:nth-child(odd) td:has(input:disabled) {
+  background-color: var(--tableTrOdd);
+  filter: grayscale(10%) brightness(90%);
+}
+
+td:has(input:disabled){
+  color: green;
+}
 
 /*=============*/
 /*=== ICONS ===*/

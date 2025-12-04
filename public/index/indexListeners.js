@@ -166,13 +166,13 @@ $(document).on('change', 'input[type="checkbox"]', async function () {
         console.log("key", key);
         const trimmedKey = key.replace("_button", "");
         console.log("trimmedKey", trimmedKey);
-        const confirmed = confirm(`Möchten Sie ${trimmedKey} und den dazugehörigen Wert wirklich löschen?`);
-        if (confirmed) {
+        //const confirmed = confirm(`Möchten Sie ${trimmedKey} und den dazugehörigen Wert wirklich löschen?`);
+        //if (confirmed) {
             await DB.deleteKeyInDB(trimmedKey);
             // Finde input anhand von trimmedKey, setze value auf "", finde Parent von this und lösche
             $(`#${trimmedKey}`).val("");
             $(`#${trimmedKey}_row`).remove();
-        }
+        //}
     });
 
     // === Datenbank Inputs === 

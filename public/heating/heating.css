@@ -101,6 +101,7 @@ body {
   background-color: var(--primaryBackgroundColor);
   color: var(--primaryTextColor);
   font-size: var(--fontSize);
+  overflow-y: scroll;
 }
 
 /*=============================*/

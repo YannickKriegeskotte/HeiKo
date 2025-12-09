@@ -87,7 +87,6 @@ table, th, td {
 
 th {
   width: auto;
-  max-width: 150px;
   background-color: var(--tableThBg);
 }
 

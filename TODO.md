@@ -12,6 +12,8 @@ t- Appearance Toggle lädt immer nur dunkles theme aus DB
 - overviewgraph durch folgendes ersetzen: layered jahresgraphen. alle jahresgraphen für alle datensets in einem graph anzeigen.
 
 
+- HT & NT Stromzähler beachten (Doppeltarifzähler)
+
 # Grobe Übersicht
 Jede wohnung hat einen Stromzähler + zählergebühr (jährlich) + kwh gebühr (pro kwh immer)
 

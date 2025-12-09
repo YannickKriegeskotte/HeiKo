@@ -67,7 +67,7 @@ async function makeTableHead(section, year) {
 
         case "water":
             // Allgemeine Inputs (vor allen Wohnungen)
-            firstRow += `<th colspan="5">Allgemein</th>`; // Druck Heizung, Druck Wasser, Druck Solar, Zählerstand Gesamt, Verbrauch Gesamt
+            firstRow += `<th colspan="7">Allgemein</th>`; // Druck Heizung, Druck Wasser, Druck Solar, Zählerstand Gesamt, Verbrauch Gesamt
 
             for (let apartment = 1; apartment <= apartmentCount; apartment++) {
                 const apartmentName =
@@ -81,7 +81,7 @@ async function makeTableHead(section, year) {
 
                 if (hasWarm) colSpan += 2;
                 if (hasCold) colSpan += 2;
-                colSpan += 2; // Kosten Wasser + Kosten Abwasser
+                // colSpan += 2; // Kosten Wasser + Kosten Abwasser
 
                 firstRow += `<th colspan="${colSpan}">${apartmentName}</th>`;
             }
@@ -118,6 +118,8 @@ async function makeTableHead(section, year) {
                 <th>Druck Solar</th>
                 <th>Zählerstand Gesamt</th>
                 <th>Verbrauch Gesamt</th>
+                <th>Kosten Wasser Gesamt</th>
+                <th>Kosten Abwasser Gesamt</th>
             `;
 
             for (let apartment = 1; apartment <= apartmentCount; apartment++) {
@@ -321,6 +323,28 @@ async function makeWaterRow(section, year, apartment, row) {
             }
         }
         rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_mainWaterConsumption" value="${mainWaterConsumption}" disabled></td>`;
+
+
+
+
+
+
+        // Hauptwasser / Hauptabwasser Kosten
+        let mainWaterCost;
+        let mainSewageCost;
+
+        let mainCostPerLiter = await DB.getValueFromDB(`costPerLiterWater`) || 0;
+        let mainCostPerLiterSewage = await DB.getValueFromDB(`costPerLiterSewage`) || 0;
+
+        let mainWaterMeterFee = await DB.getValueFromDB(`mainWaterMeterFee`) || 0;
+
+        // MainWasserVerbrauch * mainWasserkosten + mainZählergebühr
+        mainWaterCost = (mainWaterConsumption * mainCostPerLiter) + mainWaterMeterFee;
+        // MainWasserVerbrauch * mainSewagekosten + mainZählergebühr
+        mainSewageCost = (mainWaterConsumption * mainCostPerLiterSewage) + mainWaterMeterFee;
+
+        rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_mainWaterCost" value="${mainWaterCost}" disabled></td>`;
+        rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_mainSewageCost" value="${mainSewageCost}" disabled></td>`;
     }
 
     let hasWarmWaterMeter = (await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`)) == "checked";
@@ -416,11 +440,14 @@ async function makeWaterRow(section, year, apartment, row) {
         let totalConsumption = coldWaterConsumption + warmWaterConsumption;
         let coldWaterMeterFee = await DB.getNewestValueFromDB(`apartment${apartment}coldWaterMeterFee`) || 0;
         let warmWaterMeterFee = await DB.getNewestValueFromDB(`apartment${apartment}warmWaterMeterFee`) || 0;
-        let waterCostPerLiter = await DB.getNewestValueFromDB(`apartment${apartment}costPerLiterWater`) || 0;;
-        let sewageCostPerLiter = await DB.getNewestValueFromDB(`apartment${apartment}costPerLiterSewage`) || 0;;
+        let waterCostPerLiter = await DB.getNewestValueFromDB(`costPerLiterWater`) || 0;;
+        let sewageCostPerLiter = await DB.getNewestValueFromDB(`costPerLiterSewage`) || 0;
+
+        console.log(totalConsumption,waterCostPerLiter,coldWaterMeterFee,warmWaterMeterFee);
 
         let totalWaterCost = ((totalConsumption * waterCostPerLiter) + (coldWaterMeterFee / 12) + (warmWaterMeterFee / 12)).toFixed(2);
         let totalSewageCost = ((totalConsumption * sewageCostPerLiter) + (coldWaterMeterFee / 12) + (warmWaterMeterFee / 12)).toFixed(2);
+
 
         waterCost = totalWaterCost;
         sewageCost = totalSewageCost;

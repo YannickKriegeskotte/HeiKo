@@ -56,6 +56,7 @@ export function registerTableListeners() {
 
     // ===== INPUT LISTENERS =====
     $(document).on('focusout', 'input', async function () {
+        console.log("Focusout Listener");
         const id = $(this).attr('id');
         const value = $(this).val();
 
@@ -67,11 +68,13 @@ export function registerTableListeners() {
         } else {
             await DB.saveValueToDB(id, value);
 
+            /*
             const year = id.substring(0, 4); // z.B. '2024_energyTableMeterCount1_apartment1'
             const datasets = await Helper.createEnergyGraphDatasets("energy",year);
             const datesArray = Helper.createEnergyGraphDatesArray("energy",year);
 
             Helper.renderEnergyGraph("energy",year, datesArray, datasets);
+            */
         }
     });
 

@@ -9,9 +9,8 @@ import * as DB from "./database.js";
 export async function createSectionTable(section, year) {
 
     makeTableWrapper(section, year);
-    makeTableHead(section, year);
-    makeTableBody(section, year);
-
+    await makeTableBody(section, year);
+    fillTableWithData(section, year);
     toggleTableCollapsed(section, year);
 }
 
@@ -30,13 +29,10 @@ function makeTableWrapper(section, year) {
             </div>
             <div class="tableWrapper">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Datum</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
                 </table>
             </div>
         </div>    
@@ -45,15 +41,17 @@ function makeTableWrapper(section, year) {
 
 // 2.
 //======================
-//===== TABLE HEAD =====
+//===== TABLE BODY =====
 //======================
-async function makeTableHead(section, year) {
+async function makeTableBody(section, year) {
     let apartmentCount = await DB.getValueFromDB("apartmentcount");
-    const $thead = $(`#${year}_${section}TableContainer thead`);
-    $thead.empty(); // sicherstellen, dass nichts drin ist
+    const $tbody = $(`#${year}_${section}TableContainer tbody`);
+    $tbody.empty();
 
-    // 1. Erste Zeile: Wohnungsnamen + ggf. andere Spalten (Datum bleibt links)
-    let firstRow = '<tr><th rowspan="2">Datum</th>'; // Datum erstreckt sich über 2 Zeilen
+    let tableRows = "";
+
+    // Datumszeile
+    tableRows += makeDateRow(section, year);
 
     switch (section) {
         case "energy":
@@ -61,13 +59,87 @@ async function makeTableHead(section, year) {
                 const apartmentName =
                     (await DB.getValueFromDB(`apartment${apartment}name`)) ||
                     `Wohnung ${apartment}`;
-                firstRow += `<th colspan="3">${apartmentName}</th>`;
+
+                tableRows += `
+            <tr>
+                <td rowspan="3">${apartmentName}</td>
+                <td>Zählerstand</td>
+            `;
+                tableRows += makeApartmentRow(section, year, apartment, "electricityMeterCount");
+                tableRows += "</tr>";
+
+                tableRows += `
+            <tr>
+                <td>Verbrauch</td>
+            `;
+                tableRows += makeApartmentRow(section, year, apartment, "electricityConsumption");
+                tableRows += "</tr>";
+
+                tableRows += `
+            <tr>
+                <td>Kosten</td>
+            `;
+                tableRows += makeApartmentRow(section, year, apartment, "electricityCost");
+                tableRows += "</tr>";
+
             }
             break;
 
         case "water":
             // Allgemeine Inputs (vor allen Wohnungen)
-            firstRow += `<th colspan="7">Allgemein</th>`; // Druck Heizung, Druck Wasser, Druck Solar, Zählerstand Gesamt, Verbrauch Gesamt
+            tableRows += `
+            <tr>
+                <td rowspan="7">Allgemein</td>
+                <td>Druck Heizung</td>
+            `;
+            tableRows += makeMainRow(section, year, "heatingPressure");
+            tableRows += "</tr>";
+
+            tableRows += `
+            <tr>
+                <td>Druck Wasser</td>
+            `;
+            tableRows += makeMainRow(section, year, "waterPressure");
+            tableRows += "</tr>";
+
+
+            tableRows += `
+            <tr>
+                <td>Druck Solar</td>
+            `;
+            tableRows += makeMainRow(section, year, "solarPressure");
+            tableRows += "</tr>";
+
+
+            tableRows += `
+            <tr>
+                <td>Zählerstand Gesamt</td>
+            `;
+            tableRows += makeMainRow(section, year, "mainWaterMeterCount");
+            tableRows += "</tr>";
+
+            tableRows += `
+            <tr>
+                <td>Verbrauch Gesamt</td>
+            `;
+            tableRows += makeMainRow(section, year, "mainWaterConsumption");
+            tableRows += "</tr>";
+
+
+            tableRows += `
+            <tr>
+                <td>Kosten Wasser Gesamt</td>
+            `;
+            tableRows += makeMainRow(section, year, "mainWaterCost");
+            tableRows += "</tr>";
+
+            tableRows += `
+            <tr>
+                <td>Kosten Abwasser Gesamt</td>
+            `;
+            tableRows += makeMainRow(section, year, "mainSewageCost");
+            tableRows += "</tr>";
+
 
             for (let apartment = 1; apartment <= apartmentCount; apartment++) {
                 const apartmentName =
@@ -75,158 +147,303 @@ async function makeTableHead(section, year) {
                     `Wohnung ${apartment}`;
 
                 // Berechne wie viele Spalten pro Wohnung benötigt werden
-                let colSpan = 2; // default Verbrauch + Kosten
+                let rowSpan = 2; // default Verbrauch + Kosten
                 let hasWarm = (await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`)) === "checked";
                 let hasCold = (await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`)) === "checked";
 
-                if (hasWarm) colSpan += 2;
-                if (hasCold) colSpan += 2;
-                // colSpan += 2; // Kosten Wasser + Kosten Abwasser
+                if (hasWarm) rowSpan += 2;
+                if (hasCold) rowSpan += 2;
+                // rowSpan += 2; // Kosten Wasser + Kosten Abwasser
 
-                firstRow += `<th colspan="${colSpan}">${apartmentName}</th>`;
+                tableRows += `
+                <tr>
+                    <td rowspan="6">${apartmentName}</td>
+                    <td>Zählerstand Warm</td>
+                `;
+                tableRows += makeApartmentRow(section, year, apartment, "warmWaterMeterCount");
+                tableRows += "</tr>";
+
+
+                tableRows += `
+                <tr>
+                    <td>Zählerstand Kalt</td>
+                `;
+                tableRows += makeApartmentRow(section, year, apartment, "coldWaterMeterCount");
+                tableRows += "</tr>";
+
+                tableRows += `
+                <tr>
+                    <td>Verbrauch Warm</td>
+                `;
+                tableRows += makeApartmentRow(section, year, apartment, "warmWaterConsumption");
+                tableRows += "</tr>";
+
+                tableRows += `
+                <tr>
+                    <td>Verbrauch Kalt</td>
+                `;
+                tableRows += makeApartmentRow(section, year, apartment, "coldWaterConsumption");
+                tableRows += "</tr>";
+
+                tableRows += `
+                <tr>
+                    <td>Kosten Wasser</td>
+                `;
+                tableRows += makeApartmentRow(section, year, apartment, "waterCost");
+                tableRows += "</tr>";
+
+                tableRows += `
+                <tr>
+                    <td>Kosten Abwasser</td>
+                `;
+                tableRows += makeApartmentRow(section, year, apartment, "sewageCost");
+                tableRows += "</tr>";
+
             }
             break;
 
         case "heating":
-            // 1. Erste Zeile: allgemeine Spalten
-            firstRow += `<th colspan="10">Allgemein</th>`; // Ölstand, Verbrauch Öl, Kosten, Betriebsstunden etc.
-            break;
-    }
-
-    firstRow += '</tr>';
-    $thead.append(firstRow);
-
-    // 2. Zweite Zeile: Detailspalten
-    let secondRow = '<tr>';
-
-    switch (section) {
-        case "energy":
-            for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-                secondRow += `
-                    <th>Zählerstand</th>
-                    <th>Verbrauch</th>
-                    <th>Kosten</th>
-                `;
-            }
-            break;
-
-        case "water":
-            // Allgemeine Inputs
-            secondRow += `
-                <th>Druck Heizung</th>
-                <th>Druck Wasser</th>
-                <th>Druck Solar</th>
-                <th>Zählerstand Gesamt</th>
-                <th>Verbrauch Gesamt</th>
-                <th>Kosten Wasser Gesamt</th>
-                <th>Kosten Abwasser Gesamt</th>
+            tableRows += `
+            <tr>
+                <td rowspan="3">Öl</td>
+                <td>Füllstand</td>
             `;
+            tableRows += makeMainRow(section, year, "oilLevelInTank");
+            tableRows += "</tr>";
 
-            for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-                let hasWarm = (await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`)) === "checked";
-                let hasCold = (await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`)) === "checked";
+            tableRows += `
+            <tr>
+                <td>Verbrauch</td>
+            `;
+            tableRows += makeMainRow(section, year, "oilConsumption");
+            tableRows += "</tr>";
 
-                if (hasWarm) {
-                    secondRow += `
-                        <th>Zählerstand Warm</th>
-                        <th>Verbrauch Warm</th>
-                    `;
-                }
-                if (hasCold) {
-                    secondRow += `
-                        <th>Zählerstand Kalt</th>
-                        <th>Verbrauch Kalt</th>
-                    `;
-                }
+            tableRows += `
+            <tr>
+                <td>Kosten</td>
+            `;
+            tableRows += makeMainRow(section, year, "oilCost");
+            tableRows += "</tr>";
 
-                secondRow += `
-                    <th>Kosten Wasser</th>
-                    <th>Kosten Abwasser</th>
-                `;
-            }
-            break;
+            tableRows += `
+            <tr>
+                <td rowspan="2">Heizung</td>
+                <td>Betriebstunden</td>
+            `;
+            tableRows += makeMainRow(section, year, "boilerOperatingHours");
+            tableRows += "</tr>";
 
-        case "heating":
-            secondRow += `
-            <th>Ölstand</th>
-            <th>Verbrauch Öl</th>
-            <th>Öl Kosten</th>
-            <th>Betriebstunden Heizung</th>
-            <th>Laufzeit Heizung</th>
-            <th>Betriebstunden Solarpumpe</th>
-            <th>Laufzeit Solarpumpe</th>
-            <th>Solar Zählerstand</th>
-            <th>Erzeugte Energie</th>`;
+            tableRows += `
+            <tr>
+                <td>Laufzeit</td>
+            `;
+            tableRows += makeMainRow(section, year, "boilerRuntime");
+            tableRows += "</tr>";
 
-            // Optional: Falls mehrere Tanks angeschlossen
-            let areTanksConnected = (await DB.getValueFromDB('areOilTanksConnected')) === "checked";
-            if (!areTanksConnected) {
-                let numberOfOilTanks = await DB.getNewestValueFromDB('numberOfOilTanks') || 1;
-                for (let tank = 1; tank <= numberOfOilTanks; tank++) {
-                    secondRow = `<th>Ölstand Tank ${tank}</th>` + secondRow;
-                }
-            } else {
-                secondRow = `<th>Ölstand</th>` + secondRow;
-            }
+            tableRows += `
+            <tr>
+                <td rowspan="4">Solar Pumpe</td>
+                <td>Betriebstunden</td>
+            `;
+            tableRows += makeMainRow(section, year, "solarpumpOperatingHours");
+            tableRows += "</tr>";
+
+            tableRows += `
+            <tr>
+                <td>Laufzeit</td>
+            `;
+            tableRows += makeMainRow(section, year, "solarpumpRuntime");
+            tableRows += "</tr>";
+
+            tableRows += `
+            <tr>
+                <td>Zählerstand</td>
+            `;
+            tableRows += makeMainRow(section, year, "solarpumpMeterCount");
+            tableRows += "</tr>";
+
+            tableRows += `
+            <tr>
+                <td>Erzeugte Energie</td>
+            `;
+            tableRows += makeMainRow(section, year, "solarpumpProducedEnergy");
+            tableRows += "</tr>";
+
             break;
     }
 
-    secondRow += '</tr>';
-    $thead.append(secondRow);
+    $tbody.append(tableRows);
+}
+
+
+function makeDateRow(section, year) {
+    let colString = `
+    <tr>
+        <td></td>
+        <td>Datum</td>
+    `;
+    for (let col = 1; col <= 12; col++) {
+        colString += `<td><input type="text" id="${year}_${section}Table_date${col}" value=""></td>`;
+    }
+    colString += "</tr>";
+    return colString;
 }
 
 
 
-// 3.
-//======================
-//===== TABLE BODY =====
-//======================
-async function makeTableBody(section, year) {
-    let apartmentCount = await DB.getValueFromDB("apartmentcount");
+function makeMainRow(section, year, metric) {
+    let disabled = (metric.toLowerCase().includes("cost") || metric.toLowerCase().includes("consumption") ? "disabled" : "");
 
-    for (let row = 1; row <= 12; row++) {
-        // HTML Zeile beginnen
-        let rowString = "<tr>";
+    let colString = "";
+    for (let col = 1; col <= 12; col++) {
+        colString += `<td><input type="text" id="${year}_${section}Table_${metric}${col}" value="" ${disabled}></td>`;
+    }
+    return colString;
+}
 
-        // Datum
-        let rowDate = (await DB.getValueFromDB(`${year}_${section}TableDate${row}`)) || "";
-        rowString += `<td><input type="text" id="${year}_${section}TableDate${row}" value="${rowDate}"></td>`;
 
-        for (let apartment = 1; apartment <= apartmentCount; apartment++) {
 
-            switch (section) {
+function makeApartmentRow(section, year, apartment, metric) {
+    let disabled = (metric.toLowerCase().includes("cost") || metric.toLowerCase().includes("consumption") ? "disabled" : "");
 
-                // Strom Sektion
-                case "energy":
-                    rowString += await makeEnergyRow(section, year, apartment, row);
-                    break;
+    let colString = "";
+    for (let col = 1; col <= 12; col++) {
+        colString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table_${metric}${col}" value="" ${disabled}></td>`;
+    }
+    return colString;
+}
 
-                // Wasser Sektion
-                case "water":
-                    rowString += await makeWaterRow(section, year, apartment, row);
-                    break;
 
-                // Heizung Sektion
-                case "heating":
-                    if (apartment == 1) {
-                        rowString += await makeHeatingRow(section, year, apartment, row);
-                    }
-                    break;
-            }
+
+async function fillTableWithData(section, year) {
+
+    const $tbody = $(`#${year}_${section}TableContainer tbody`);
+    const allInputs = $tbody.find("input");
+
+    // DB values
+    await Promise.all(allInputs.toArray().map(async element => {
+        const $input = $(element);
+        const id = $input.attr("id");
+        const value = $input.val();
+
+        if (id.toLowerCase().includes("cost") || id.toLowerCase().includes("consumption") || value !== "") return;
+
+        const data = await DB.getValueFromDB(id);
+        if (data) $input.val(data);
+    }));
+
+
+    // Consumption calculations
+    const filteredInputs = allInputs.filter(function () {
+        return this.id.toLowerCase().includes("consumption");
+    });
+
+    /*
+    id vom aktuellen consumption input feld
+    aktueller zählerstand
+    */
+    await Promise.all(filteredInputs.toArray().map(async element => {
+        const $input = $(element);
+        const id = $input.attr("id");
+
+        const parsedID = parseInputId(id);
+        const { apartment, year, section, metric, col } = parsedID;
+
+        // Meterstände laden
+
+        // apartment1_2019_energyTable_electricityMeterCount1
+        // apartment1_2019_energyTable_electricityConsumption1
+
+        // 2019_waterTable_mainWaterMeterCount1
+        // 2019_waterTable_mainWaterConsumption1
+
+        // apartment1_2019_waterTable_coldWaterMeterCount1
+        // apartment1_2019_waterTable_coldWaterConsumption1
+
+        //...
+        // 2019_heatingTable_solarpumpMeterCount1
+
+        let currentMeterCountInputID = id.replace("Consumption", "MeterCount");
+        const currentMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
+
+        let oldMeterCountInputID;
+        let oldMeterCount;
+        if (col == 1) {
+            oldMeterCountInputID = currentMeterCountInputID.replace(year,year-1).replace(/[0-9]{1,2}$/, 12);
+            oldMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
+        }
+        else{
+            oldMeterCountInputID = currentMeterCountInputID.replace(/[0-9]{1,2}$/, col - 1);
+            oldMeterCount = await DB.getValueFromDB(oldMeterCountInputID);
         }
 
-        // HTML Zeile beenden
-        rowString += "</tr>";
+        // Consumption berechnen
+        const consumption = calculateConsumption(oldMeterCount, currentMeterCount);
+        $input.val(consumption);
+    }));
 
-        $(`#${year}_${section}TableContainer tbody`).append(rowString);
+    // Cost calculations
+
+
+
+
+    // apartment1_2019_energyTable_electricityCost1
+    // apartment1_2019_energyTable_electricityConsumption1
+
+    // 2019_waterTable_mainWaterCost1
+    // 2019_waterTable_mainWaterConsumption1
+
+    // apartment1_2019_waterTable_waterCost1
+    // apartment1_2019_waterTable_coldWaterConsumption1
+    // apartment1_2019_waterTable_warmdWaterConsumption1
+
+    //...
+    // 2026_heatingTable_oilCost1
+
+}
+
+
+
+function parseInputId(id) {
+    // Beispiele für IDs:
+    // apartment2_2019_energyTable_electricityCost12
+    // 2019_energyTable_date3
+    // 2021_waterTable_mainWaterCost7
+
+    const colMatch = id.match(/[0-9]{1,2}$/);
+    const col = colMatch ? Number(colMatch[0]) : null;
+
+    const parts = id.split("_");
+
+    let apartment = null;
+    let idx = 0;
+
+    // Apartment?
+    if (parts[0].startsWith("apartment")) {
+        apartment = Number(parts[0].replace("apartment", ""));
+        idx = 1;
     }
+
+    const year = Number(parts[idx]);
+    const section = parts[idx + 1].replace("Table", "");
+    const rawMetric = parts[idx + 2]; // z.B. electricityCost12
+
+    const metric = rawMetric.replace(/[0-9]{1,2}$/, "");
+
+    return {
+        apartment,
+        year,
+        section,
+        metric,
+        col
+    };
 }
 
 // 3.1
 //----------------------
 //----- Energy Row -----
 //----------------------
-async function makeEnergyRow(section, year, apartment, row) {
+async function makeEnergyBody(section, year) {
     const key = (y, r) => `apartment${apartment}_${y}_${section}Table${r}_meterCount`;
 
     const rawMeter = await DB.getValueFromDB(key(year, row));
@@ -273,11 +490,36 @@ async function makeEnergyRow(section, year, apartment, row) {
 
 
 // 3.2
-//---------------------
-//----- Water Row -----
-//---------------------
-async function makeWaterRow(section, year, apartment, row) {
+//----------------------
+//----- Water Body -----
+//----------------------
+async function makeWaterBody(section, year) {
+    const $tbody = $(`#${year}_${section}TableContainer tbody`);
+    const tableRows = $($tbody).find('tr').length;
+
     let apartmentCount = await DB.getValueFromDB("apartmentcount");
+
+    let heatingPressure;
+    let waterPressure;
+    let solarPressure;
+    let mainMeterCount;
+    let mainConsumption;
+    let mainWaterCost;
+    let mainSewageCost;
+
+
+
+
+    //~~~~~~~~~~~~~~~~~
+    //~~~ Allgemein ~~~
+    //~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+
 
     let rowString = "";
     let mainWaterConsumption = 0;
@@ -443,7 +685,7 @@ async function makeWaterRow(section, year, apartment, row) {
         let waterCostPerLiter = await DB.getNewestValueFromDB(`costPerLiterWater`) || 0;;
         let sewageCostPerLiter = await DB.getNewestValueFromDB(`costPerLiterSewage`) || 0;
 
-        console.log(totalConsumption,waterCostPerLiter,coldWaterMeterFee,warmWaterMeterFee);
+        console.log(totalConsumption, waterCostPerLiter, coldWaterMeterFee, warmWaterMeterFee);
 
         let totalWaterCost = ((totalConsumption * waterCostPerLiter) + (coldWaterMeterFee / 12) + (warmWaterMeterFee / 12)).toFixed(2);
         let totalSewageCost = ((totalConsumption * sewageCostPerLiter) + (coldWaterMeterFee / 12) + (warmWaterMeterFee / 12)).toFixed(2);
@@ -557,7 +799,7 @@ async function makeWaterRow(section, year, apartment, row) {
 //-----------------------
 //----- Heating Row -----
 //-----------------------
-async function makeHeatingRow(section, year, apartment, row) {
+async function makeHeatingBody(section, year) {
 
     let rowString = "";
 
@@ -754,20 +996,10 @@ async function toggleTableCollapsed(section, year) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-async function getTankLevel(apartment, yearVal, section, rowVal, tank = null) {
+async function getTankLevel(apartment, year, section, row, tank = null) {
     const key = tank === null
-        ? `apartment${apartment}_${yearVal}_${section}Table${rowVal}_oilLevelInTanks`
-        : `apartment${apartment}_${yearVal}_${section}Table${rowVal}_oilLevelInTank${tank}`;
+        ? `apartment${apartment}_${year}_${section}Table${row} _oilLevelInTanks`
+        : `apartment${apartment}_${year}_${section}Table${row}_oilLevelInTank${tank} `;
 
     return await DB.getValueFromDB(key);
 }
@@ -775,4 +1007,15 @@ async function getTankLevel(apartment, yearVal, section, rowVal, tank = null) {
 function calculateConsumption(oldLevel, newLevel) {
     if (newLevel === null || oldLevel === null) return 0;
     return Math.abs(newLevel - oldLevel);
+}
+
+/**
+ * 
+ * @param {number} consumption 
+ * @param {number} fee 
+ * @param {number} meterFee 
+ * @returns {number} cost
+ */
+function calculateCost(consumption, fee, meterFee) {
+    return (consumption * fee) + meterFee;
 }

@@ -133,6 +133,7 @@ export async function renameKeyInDB(oldKey, newKey) {
 export async function getNewestValueFromDB(key) {
     // Finde alle Einträge, die key enthalten
     let matches = await getAllKeysContaining(key);
+    
     if (matches.length == 0) {
         // if(debug) console.log("getNewestValueFromDB", key, ": no matches");
         return null;

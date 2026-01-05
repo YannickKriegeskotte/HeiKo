@@ -285,6 +285,7 @@ function makeDateRow(section, year) {
     for (let col = 1; col <= 12; col++) {
         colString += `<td><input type="text" id="${year}_${section}Table_date${col}" value=""></td>`;
     }
+    colString += `<td id="${year}_${section}Table_date13">Summe</td>`;
     colString += "</tr>";
     return colString;
 }
@@ -298,6 +299,7 @@ function makeMainRow(section, year, metric) {
     for (let col = 1; col <= 12; col++) {
         colString += `<td><input type="text" id="${year}_${section}Table_${metric}${col}" value="" ${disabled}></td>`;
     }
+    colString += `<td id="${year}_${section}Table_${metric}13"></td>`;
     return colString;
 }
 
@@ -310,6 +312,7 @@ function makeApartmentRow(section, year, apartment, metric) {
     for (let col = 1; col <= 12; col++) {
         colString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table_${metric}${col}" value="" ${disabled}></td>`;
     }
+    colString += `<td id="apartment${apartment}_${year}_${section}Table_${metric}13"></td>`;
     return colString;
 }
 
@@ -321,129 +324,96 @@ async function fillTableWithData(section, year) {
     const allInputs = $tbody.find("input");
 
     // DB values
-    await Promise.all(allInputs.toArray().map(async element => {
-        const $input = $(element);
-        const id = $input.attr("id");
-        const value = $input.val();
+    for (const element of allInputs.toArray()) {
+    const $input = $(element);
+    const id = $input.attr("id");
+    const value = $input.val();
 
-        if (id.toLowerCase().includes("cost") || id.toLowerCase().includes("consumption") || value !== "") return;
+    if (id.toLowerCase().includes("cost") || id.toLowerCase().includes("consumption") || value !== "") continue;
 
-        const data = await DB.getValueFromDB(id);
-        if (data) $input.val(data);
-    }));
+    const data = await DB.getValueFromDB(id);
+    if (data) $input.val(data);
+}
+
 
 
     // Consumption calculations
     let filteredInputs = allInputs.filter(function () {
-        return this.id.toLowerCase().includes("consumption");
-    });
+    return this.id.toLowerCase().includes("consumption");
+});
 
-    /*
-    id vom aktuellen consumption input feld
-    aktueller zählerstand
-    */
-    await Promise.all(filteredInputs.toArray().map(async element => {
-        const $input = $(element);
-        const id = $input.attr("id");
+for (const element of filteredInputs.toArray()) {
+    const $input = $(element);
+    const id = $input.attr("id");
 
-        const parsedID = parseInputId(id);
-        const { apartment, year, section, metric, col } = parsedID;
+    const { apartment, year, section, metric, col } = parseInputId(id);
 
-        // Meterstände laden
+    const totalID = id.replace(/\d+$/, 13);
+    const $total = $(`#${totalID}`);
 
-        // apartment1_2019_energyTable_electricityMeterCount1
-        // apartment1_2019_energyTable_electricityConsumption1
+    // IMMER aktuellen Wert aus DOM lesen
+    let totalVar = parseFloat($total.text()) || 0;
 
-        // 2019_waterTable_mainWaterMeterCount1
-        // 2019_waterTable_mainWaterConsumption1
+    let currentMeterCountInputID = id.replace("Consumption", "MeterCount");
+    const currentMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
 
-        // apartment1_2019_waterTable_coldWaterMeterCount1
-        // apartment1_2019_waterTable_coldWaterConsumption1
+    let oldMeterCountInputID;
+    if (col == 1) {
+        oldMeterCountInputID = currentMeterCountInputID
+            .replace(year, year - 1)
+            .replace(/[0-9]{1,2}$/, 12);
+    } else {
+        oldMeterCountInputID = currentMeterCountInputID.replace(/[0-9]{1,2}$/, col - 1);
+    }
 
-        //...
-        // 2019_heatingTable_solarpumpMeterCount1
+    const oldMeterCount = await DB.getValueFromDB(oldMeterCountInputID);
 
-        let currentMeterCountInputID = id.replace("Consumption", "MeterCount");
-        const currentMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
+    const consumption = calculateConsumption(oldMeterCount, currentMeterCount) || 0;
 
-        let oldMeterCountInputID;
-        let oldMeterCount;
-        if (col == 1) {
-            oldMeterCountInputID = currentMeterCountInputID.replace(year,year-1).replace(/[0-9]{1,2}$/, 12);
-            oldMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
-        }
-        else{
-            oldMeterCountInputID = currentMeterCountInputID.replace(/[0-9]{1,2}$/, col - 1);
-            oldMeterCount = await DB.getValueFromDB(oldMeterCountInputID);
-        }
+    totalVar += consumption;
 
-        // Consumption berechnen
-        const consumption = calculateConsumption(oldMeterCount, currentMeterCount);
-        $input.val(consumption);
-    }));
+    $input.val(consumption);
+    $total.text(totalVar.toFixed(2));
+}
+
 
     // Cost calculations
+filteredInputs = allInputs.filter(function () {
+    return this.id.toLowerCase().includes("cost");
+});
 
+for (const element of filteredInputs.toArray()) {
+    const $input = $(element);
+    const id = $input.attr("id");
 
+    const { apartment, year, section, metric, col } = parseInputId(id);
 
+    const totalID = id.replace(/\d+$/, 13);
+    const $total = $(`#${totalID}`);
 
-    // apartment1_2019_energyTable_electricityCost1
-    // apartment1_2019_energyTable_electricityConsumption1
+    // eigenes Total nur für COST
+    let totalVar = parseFloat($total.text()) || 0;
 
-    // 2019_waterTable_mainWaterCost1
-    // 2019_waterTable_mainWaterConsumption1
+    let consumption = $(`#apartment${apartment}_${year}_${section}Table_electricityConsumption${col}`).val();
+    let costPerKwh = await DB.getNewestValueFromDB(`apartment${apartment}electricityFee`);
+    let metercountFee = await DB.getNewestValueFromDB(`apartment${apartment}electricityMeterFee`);
 
-    // apartment1_2019_waterTable_waterCost1
-    // apartment1_2019_waterTable_coldWaterConsumption1
-    // apartment1_2019_waterTable_warmdWaterConsumption1
+    consumption = parseFloat(consumption) || 0;
+    costPerKwh = parseFloat(costPerKwh) || 0;
+    metercountFee = parseFloat(metercountFee) || 0;
 
-    //...
-    // 2026_heatingTable_oilCost1
-    // Consumption calculations
-    filteredInputs = allInputs.filter(function () {
-        return this.id.toLowerCase().includes("cost");
-    });
+    let cost = (consumption * costPerKwh) + (metercountFee / 12);
+    cost = parseFloat(cost.toFixed(2));
 
-    /*
-    id vom aktuellen consumption input feld
-    aktueller zählerstand
-    */
-    await Promise.all(filteredInputs.toArray().map(async element => {
-        const $input = $(element);
-        const id = $input.attr("id");
+    console.log(`(${consumption} * ${costPerKwh}) + (${metercountFee} / 12) = ${cost}`);
 
-        const parsedID = parseInputId(id);
-        const { apartment, year, section, metric, col } = parsedID;
+    totalVar += cost;
 
-        let consumption = $(`#apartment${apartment}_${year}_${section}Table_electricityConsumption${col}`).val();
-        let costPerKwh= await DB.getNewestValueFromDB(`#apartment${apartment}_electricityFee`);
-        let metercountFee =await DB.getNewestValueFromDB(`#apartment${apartment}_electricityMeterFee`);
+    $input.val(cost);
+    $total.text(totalVar.toFixed(2));
+}
 
-        consumption = parseFloat(consumption) || 0;
-        costPerKwh = parseFloat(costPerKwh) || 0;
-        metercountFee = parseFloat(metercountFee) || 0;
-
-        let cost = (consumption * costPerKwh) + (metercountFee / 12);
-
-        cost = cost.toFixed(2);
-
-        console.log({consumption,costPerKwh,metercountFee,cost});
-        // Meterstände laden
-
-        // apartment1_2019_energyTable_electricityMeterCount1
-        // apartment1_2019_energyTable_electricityConsumption1
-
-        // 2019_waterTable_mainWaterMeterCount1
-        // 2019_waterTable_mainWaterConsumption1
-
-        // apartment1_2019_waterTable_coldWaterMeterCount1
-        // apartment1_2019_waterTable_coldWaterConsumption1
-
-        //...
-        // 2019_heatingTable_solarpumpMeterCount1
-
-        $input.val(cost);
-    }));
+    
 
 
 }

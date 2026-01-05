@@ -100,7 +100,10 @@ function compareVersions(v1, v2) {
 
         //...
         // Auto-Updater
-        break;
+        
+        console.log("Starte externen Updater...");
+        spawn("node", ["updater.js"], { detached: true, stdio: "ignore" }).unref();
+        process.exit(0);
     }
 
     await main();

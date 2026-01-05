@@ -1,4 +1,4 @@
-t- Appearance Toggle lädt immer nur dunkles theme aus DB
+- Appearance Toggle lädt immer nur dunkles theme aus DB
 - Nach frischem laden der seite muss man 2x auf appearance toggel drücken für hellen modus
 
 - Appearance toggle auf andere seiten als index implementieren (angefangen)

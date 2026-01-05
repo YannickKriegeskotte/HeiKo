@@ -8,10 +8,10 @@ import * as DB from "./database.js";
  */
 export async function createSectionTable(section, year) {
 
-    makeTableWrapper(section, year);
+    await makeTableWrapper(section, year);
     await makeTableBody(section, year);
-    fillTableWithData(section, year);
-    toggleTableCollapsed(section, year);
+    await fillTableWithData(section, year);
+    await toggleTableCollapsed(section, year);
 }
 
 
@@ -278,7 +278,7 @@ async function makeTableBody(section, year) {
 
 function makeDateRow(section, year) {
     let colString = `
-    <tr>
+    <tr id="${year}_${section}_dateRow">
         <td></td>
         <td>Datum</td>
     `;
@@ -334,7 +334,7 @@ async function fillTableWithData(section, year) {
 
 
     // Consumption calculations
-    const filteredInputs = allInputs.filter(function () {
+    let filteredInputs = allInputs.filter(function () {
         return this.id.toLowerCase().includes("consumption");
     });
 
@@ -399,6 +399,52 @@ async function fillTableWithData(section, year) {
 
     //...
     // 2026_heatingTable_oilCost1
+    // Consumption calculations
+    filteredInputs = allInputs.filter(function () {
+        return this.id.toLowerCase().includes("cost");
+    });
+
+    /*
+    id vom aktuellen consumption input feld
+    aktueller zählerstand
+    */
+    await Promise.all(filteredInputs.toArray().map(async element => {
+        const $input = $(element);
+        const id = $input.attr("id");
+
+        const parsedID = parseInputId(id);
+        const { apartment, year, section, metric, col } = parsedID;
+
+        let consumption = $(`#apartment${apartment}_${year}_${section}Table_electricityConsumption${col}`).val();
+        let costPerKwh= await DB.getNewestValueFromDB(`#apartment${apartment}_electricityFee`);
+        let metercountFee =await DB.getNewestValueFromDB(`#apartment${apartment}_electricityMeterFee`);
+
+        consumption = parseFloat(consumption) || 0;
+        costPerKwh = parseFloat(costPerKwh) || 0;
+        metercountFee = parseFloat(metercountFee) || 0;
+
+        let cost = (consumption * costPerKwh) + (metercountFee / 12);
+
+        cost = cost.toFixed(2);
+
+        console.log({consumption,costPerKwh,metercountFee,cost});
+        // Meterstände laden
+
+        // apartment1_2019_energyTable_electricityMeterCount1
+        // apartment1_2019_energyTable_electricityConsumption1
+
+        // 2019_waterTable_mainWaterMeterCount1
+        // 2019_waterTable_mainWaterConsumption1
+
+        // apartment1_2019_waterTable_coldWaterMeterCount1
+        // apartment1_2019_waterTable_coldWaterConsumption1
+
+        //...
+        // 2019_heatingTable_solarpumpMeterCount1
+
+        $input.val(cost);
+    }));
+
 
 }
 

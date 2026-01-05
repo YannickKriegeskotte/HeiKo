@@ -1,7 +1,7 @@
 {
   "name": "heiko",
   "type": "commonjs",
-  "version": "1.0.0",
+  "version": "2.15.0.a8",
   "main": "app.js",
   "bin": "app.js",
   "pkg": {

@@ -26,7 +26,7 @@ $(document).ready(async function () {
 
         for (let year of tables) {
             await Helper.createTable("energy",year);
-            // await Helper.createGraph("energy",year);
+            await Helper.createGraph("energy",year);
         }
 
         // Overview graph erzeugen

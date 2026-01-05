@@ -1,18 +1,14 @@
 import * as DB from "./database.js";
-import {createSectionTable} from "./createSectionTable.js";
+import { createSectionTable } from "./createSectionTable.js";
 
 // =======================
 // ===== Global Vars =====
 // =======================
 let apartmentCount;
 
-
-
 // =======================
 // ===== Main Helper =====
 // =======================
-
-
 
 export function getDate() {
   const date = new Date();
@@ -122,82 +118,106 @@ export function renderDatabaseTable(sortedDatabaseData) {
 /**
  * Erzeugt eine Jahrestabelle für die passende Seite (section) und das passende Jahr (year).
  * Füllt außerdem noch die Daten Arrays für den dazugehörigen Graphen, um code Dopplung zu vermeiden.
- * @param {String} section 
- * @param {String} year 
+ * @param {String} section
+ * @param {String} year
  * @returns {HTML}
  */
 export async function createTable(section, year) {
-  createSectionTable(section,year);
+  await createSectionTable(section, year);
 }
 
-
-
-
-
-
-
-// kann bleiben, hat keine DB abfragen, liest aus HTML
-export function createEnergyGraphDatesArray(section, year) {
+export function createGraphDatesArray(section, year) {
   const datesArray = [];
 
-  // Datumswerte sammeln
-  $(`#${year}_energyTableContainer tbody tr`).each(function () {
-    const dateValue = $(this).find("td:first-child input").val();
+  $(`#${year}_${section}_dateRow td input`).each(function () {
+    const dateValue = $(this).val();
     datesArray.push(dateValue);
   });
 
+  //console.log("datesArray",datesArray);
   return datesArray;
 }
 
-export async function createEnergyGraphDatasets(section, year) {
+function getAllMetricsOfTableRow(apartment,year,section,metric){
+  let data = [];
+  for (let col = 1; col <= 12; col++) {
+          
+          const dataValue = $(`#apartment${apartment}_${year}_${section}Table_${metric}${col}`).val();
+          
+          //console.log(`#apartment${apartment}_${year}_${section}Table_${metric}${col}`,dataValue);
+          data.push(Number(dataValue) || 0);
+        }
+        //console.log(`${apartment}-${metric}-Data`,data);
+      return data;
+}
+
+function makeDatasetLayout(apartmentName,metric,dataArray,){
+  // Min/Max bestimmen
+  const meta = getMinMax(dataArray);
+  const label = `${metric} ${apartmentName}`;
+
+  return {
+          label: label,
+          data: dataArray,
+          borderWidth: 2,
+          tension: 0, // Linien zackig
+          fill: false,
+          borderColor: stableColorFor(label),
+          pointRadius: dataArray.map((v, i) =>
+            i === meta.minIndex || i === meta.maxIndex ? 6 : 2
+          ),
+          pointBackgroundColor: dataArray.map((v, i) => {
+            if (i === meta.maxIndex) return "red";
+            if (i === meta.minIndex) return "blue";
+            return stableColorFor(label);
+          }),
+          _minIndex: meta.minIndex,
+          _maxIndex: meta.maxIndex,
+          _minValue: meta.minValue,
+          _maxValue: meta.maxValue,
+        }
+}
+
+export async function createGraphDatasets(section, year) {
   const datasets = [];
   const apartmentCount = await DB.getValueFromDB("apartmentcount");
 
   for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-    const apartmentName =
-      (await DB.getValueFromDB(`apartment${apartment}name`)) ||
-      `Wohnung ${apartment}`;
+    const apartmentName = (await DB.getValueFromDB(`apartment${apartment}name`)) ||`Wohnung ${apartment}`;
 
-    const types = ["Zählerstand", "Verbrauch", "Kosten"];
+    
+    let metrics;
+    let displayMetrics;
+    let data;
 
-    for (let typeIndex = 0; typeIndex < types.length; typeIndex++) {
-      const type = types[typeIndex];
-      const dataArray = [];
+    switch (section) {
+      case "energy":
+          metrics = ["electricityMeterCount","electricityConsumption","electricityCost"];
+          displayMetrics = ["Zählerstand","Verbrauch","Kosten"];
 
-      // Spaltenindex berechnen
-      const columnIndex = 1 + (apartment - 1) * 3 + typeIndex;
+          for(let metric = 0; metric < metrics.length; metric++){
+            const data = getAllMetricsOfTableRow(apartment, year, section, metrics[metric]);
+            datasets.push(makeDatasetLayout(apartmentName, displayMetrics[metric], data));
+          }
+        break;
+      case "water":
+        metrics = [];
+        displayMetrics = [];
 
-      // Werte aller 12 Zeilen sammeln
-      $(`#${year}_energyTableContainer tbody tr`).each(function () {
-        const dataValue = $(this).find(`td:eq(${columnIndex}) input`).val();
-        dataArray.push(Number(dataValue) || 0);
-      });
+        for(let metric = 0; metric < metrics.length; metric++){
+            const data = getAllMetricsOfTableRow(apartment, year, section, metrics[metric]);
+            datasets.push(makeDatasetLayout(apartmentName, displayMetrics[metric], data));
+          }
+        break;
+      case "heating":
+        metrics = [];
+        displayMetrics = [];
 
-      // Min/Max bestimmen
-      const meta = getMinMax(dataArray);
-
-      const label = `${type} ${apartmentName}`;
-
-      datasets.push({
-        label: label,
-        data: dataArray,
-        borderWidth: 2,
-        tension: 0, // Linien zackig
-        fill: false,
-        borderColor: stableColorFor(label),
-        pointRadius: dataArray.map((v, i) =>
-          i === meta.minIndex || i === meta.maxIndex ? 6 : 2
-        ),
-        pointBackgroundColor: dataArray.map((v, i) => {
-          if (i === meta.maxIndex) return "red";
-          if (i === meta.minIndex) return "blue";
-          return stableColorFor(label);
-        }),
-        _minIndex: meta.minIndex,
-        _maxIndex: meta.maxIndex,
-        _minValue: meta.minValue,
-        _maxValue: meta.maxValue,
-      });
+        for(let metric = 0; metric < metrics.length; metric++){
+            const data = getAllMetricsOfTableRow(apartment, year, section, metrics[metric]);
+            datasets.push(makeDatasetLayout(apartmentName, displayMetrics[metric], data));
+          }
+        break;
     }
   }
 
@@ -214,8 +234,8 @@ export async function createEnergyGraphDatasets(section, year) {
 
 const energyCharts = {};
 
-export function renderEnergyGraph(section, year, datesArray, datasets) {
-  const ctx = document.getElementById(`${year}_energyGraph`);
+export function renderGraph(section, year, datesArray, datasets) {
+  const ctx = document.getElementById(`${year}_${section}Graph`);
 
   // Prüfen, ob für dieses Jahr bereits ein Chart existiert
   if (energyCharts[year]) {
@@ -274,42 +294,42 @@ export function renderEnergyGraph(section, year, datesArray, datasets) {
   }
 }
 
-export async function createEnergyGraph(section, year) {
+export async function createGraph(section, year) {
   // Canvas einfügen, falls noch nicht vorhanden
-  if (!$(`#${year}_energyGraph`).length) {
-    $(`#${year}_energyTableContainer table`).after(`
+  if (!$(`#${year}_${section}Graph`).length) {
+    $(`#${year}_${section}TableContainer table`).after(`
             <div class="canvasWrapper">
-            <canvas id="${year}_energyGraph" width="400" height="200"></canvas>
+            <canvas id="${year}_${section}Graph" width="400" height="200"></canvas>
             </div>
         `);
   }
-  const datasets = await createEnergyGraphDatasets(section, year);
-  const datesArray = createEnergyGraphDatesArray(section, year);
-  renderEnergyGraph(section, year, datesArray, datasets);
+  const datasets = await createGraphDatasets(section, year);
+  const datesArray = createGraphDatesArray(section, year);
+  renderGraph(section, year, datesArray, datasets);
 }
 
-export async function createEnergyOverviewGraph(section) {
+export async function createOverviewGraph(section) {
   // Canvas einfügen, falls nicht vorhanden
-  if (!$("#energyOverviewGraph").length) {
+  if (!$("#${section}OverviewGraph").length) {
     $("#overviewContainer h2").after(`
             <div class="canvasWrapper">
-                <canvas id="energyOverviewGraph" width="400" height="200"></canvas>
+                <canvas id="${section}OverviewGraph" width="400" height="200"></canvas>
             </div>
         `);
   }
 
-  const ctx = document.getElementById("energyOverviewGraph");
+  const ctx = document.getElementById("${section}OverviewGraph");
 
   // -------------------------------------------
   // 1. Alle DB-Entries holen (key + value)
   // -------------------------------------------
-  const allEntries = await DB.getAllKeysContaining("_energyTable");
+  const allEntries = await DB.getAllKeysContaining("_${section}Table");
 
   // -------------------------------------------
   // 2. X-Achse bestimmen (alle Date12-Werte)
   // -------------------------------------------
   const rawDates = allEntries
-    .filter((entry) => entry.key.includes("_energyTableDate12"))
+    .filter((entry) => entry.key.includes("_${section}TableDate12"))
     .map((entry) => entry.value);
 
   // Dubletten entfernen + sortieren
@@ -355,7 +375,7 @@ export async function createEnergyOverviewGraph(section) {
       // MeterCount: nach Index sortieren, dann letzten Eintrag nehmen
       const mcEntry = meterCountEntries
         .filter((entry) =>
-          entry.key.startsWith(`${year}_energyTableMeterCount`)
+          entry.key.startsWith(`${year}_${section}TableMeterCount`)
         )
         .sort((a, b) => {
           const aIndex = Number(a.key.match(/MeterCount(\d+)_apartment/)[1]);
@@ -367,7 +387,7 @@ export async function createEnergyOverviewGraph(section) {
       // Consumption: dasselbe
       const consEntry = consumptionEntries
         .filter((entry) =>
-          entry.key.startsWith(`${year}_energyTableConsumption`)
+          entry.key.startsWith(`${year}_${section}TableConsumption`)
         )
         .sort((a, b) => {
           const aIndex = Number(a.key.match(/Consumption(\d+)_apartment/)[1]);
@@ -378,7 +398,7 @@ export async function createEnergyOverviewGraph(section) {
 
       // Cost: dasselbe
       const costEntry = costEntries
-        .filter((entry) => entry.key.startsWith(`${year}_energyTableCost`))
+        .filter((entry) => entry.key.startsWith(`${year}_${section}TableCost`))
         .sort((a, b) => {
           const aIndex = Number(a.key.match(/Cost(\d+)_apartment/)[1]);
           const bIndex = Number(b.key.match(/Cost(\d+)_apartment/)[1]);

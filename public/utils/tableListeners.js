@@ -54,6 +54,49 @@ export function registerTableListeners() {
         await DB.saveValueToDB(`${extractedYear}_tableCollapsed`, isCollapsed);
     });
 
+    // ===== TABLE DELETE ICON LISTENER =====
+    $(document).on('click', 'img.tableDeleteIcon', async function () {
+        const container = $(this).closest('.annualTableContainer');
+        const extractedYear = container.attr('id').match(/^[0-9]{4}/)[0];
+        const confirmed = confirm(`${extractedYear} Tabelle wirklich löschen?`);
+        let section;
+        if(confirmed){
+            // richtige section extrahieren
+            const containerId = container.attr("id");
+            if(containerId.includes("energy")){
+                section = "energy";
+            }
+            else if(containerId.includes("water")){
+                section = "water";
+            }
+            else{
+                section = "heating";
+            }
+
+            // jahr aus jahresarray löschen
+            let tablesArray = `${section}Tables`;
+            let tablesArrayValues= await DB.getValueFromDB(tablesArray); // bekommt '["2019","2020",...]'
+            console.log(tablesArrayValues);
+            tablesArrayValues = JSON.parse(tablesArrayValues); // zu array datentyp konvertieren
+            tablesArrayValues = tablesArrayValues.filter(year => year !== extractedYear);
+            console.log(tablesArrayValues);
+
+             await DB.saveValueToDB(tablesArray, JSON.stringify(tablesArrayValues));
+            // alle einträge mit section und jahr aus db löschen
+
+            let matchingKeys = await DB.getAllKeysContaining(`${extractedYear}_${section}`);
+            matchingKeys.forEach(async obj =>{
+                await DB.deleteKeyInDB(obj.key);
+            });
+
+            // html container für jahr löschen
+            container.remove();
+        }
+        else{
+            //
+        }
+    });
+
     // ===== INPUT LISTENERS =====
     $(document).on('focusout', 'input', async function () {
         console.log("Focusout Listener");

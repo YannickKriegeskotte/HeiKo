@@ -3,6 +3,7 @@ import { registerListeners } from "./indexListeners.js";
 import * as Helper from "../utils/helpers.js";
 
 $(document).ready(async function () {
+  Helper.showLoader();
   const date = Helper.getDate();
 
   // HTTP Server availability check, um potentielles dauer reloading durch 1. zu vermeiden
@@ -270,4 +271,5 @@ $("#heating").append(`
 */
 
   registerListeners();
+  Helper.hideLoader();
 });

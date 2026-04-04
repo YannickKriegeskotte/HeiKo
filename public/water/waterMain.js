@@ -4,6 +4,7 @@ import { registerListeners } from "./waterListeners.js";
 import { registerTableListeners } from "../utils/tableListeners.js";
 
 $(document).ready(async function () {
+    Helper.showLoader();
 
     // Tabellentheme laden
     document.documentElement.setAttribute("data-tableTheme", "water");
@@ -37,4 +38,5 @@ $(document).ready(async function () {
 
     registerListeners();
     registerTableListeners();
+    Helper.hideLoader();
 });

@@ -132,7 +132,7 @@ td:has(input:disabled){
   height: auto;
 }
 
-.tableSettingsIcon {
+.tableDeleteIcon {
   width: 50px;
   height: auto;
 }

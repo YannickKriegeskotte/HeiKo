@@ -25,7 +25,7 @@ function makeTableWrapper(section, year) {
             <div class="annualTableHeaderContainer" id="${year}_${section}TableHeaderContainer">
                 <img class="tableCollapseIcon" src="../assets/caret-down-solid-full.svg">
                 <input class="tableHeaderInput" type="number" id="${year}_${section}TableHeaderH2" value="${year}">
-                <img class="tableSettingsIcon" src="../assets/sliders-solid-full.svg">
+                <img class="tableDeleteIcon" src="../assets/trash-solid-full.svg">
             </div>
             <div class="tableWrapper">
                 <table>
@@ -37,7 +37,7 @@ function makeTableWrapper(section, year) {
             </div>
         </div>    
     `);
-}
+} 
 
 // 2.
 //======================
@@ -373,7 +373,19 @@ for (const element of filteredInputs.toArray()) {
     totalVar += consumption;
 
     $input.val(consumption);
-    $total.text(totalVar.toFixed(2));
+    let measuringUnit;
+    switch(section){
+        case "energy":
+            measuringUnit = " kWh";
+            break;
+        case "water":
+            measuringUnit = "L";
+            break;
+        case "heating":
+            measuringUnit = "L";
+            break;
+    }
+    $total.text(`${totalVar.toFixed(2)}${measuringUnit}`);
 }
 
 
@@ -405,12 +417,12 @@ for (const element of filteredInputs.toArray()) {
     let cost = (consumption * costPerKwh) + (metercountFee / 12);
     cost = parseFloat(cost.toFixed(2));
 
-    console.log(`(${consumption} * ${costPerKwh}) + (${metercountFee} / 12) = ${cost}`);
+    //console.log(`(${consumption} * ${costPerKwh}) + (${metercountFee} / 12) = ${cost}`);
 
     totalVar += cost;
 
     $input.val(cost);
-    $total.text(totalVar.toFixed(2));
+    $total.text(`${totalVar.toFixed(2)}€`);
 }
 
     
@@ -701,7 +713,7 @@ async function makeWaterBody(section, year) {
         let waterCostPerLiter = await DB.getNewestValueFromDB(`costPerLiterWater`) || 0;;
         let sewageCostPerLiter = await DB.getNewestValueFromDB(`costPerLiterSewage`) || 0;
 
-        console.log(totalConsumption, waterCostPerLiter, coldWaterMeterFee, warmWaterMeterFee);
+        //console.log(totalConsumption, waterCostPerLiter, coldWaterMeterFee, warmWaterMeterFee);
 
         let totalWaterCost = ((totalConsumption * waterCostPerLiter) + (coldWaterMeterFee / 12) + (warmWaterMeterFee / 12)).toFixed(2);
         let totalSewageCost = ((totalConsumption * sewageCostPerLiter) + (coldWaterMeterFee / 12) + (warmWaterMeterFee / 12)).toFixed(2);
@@ -819,13 +831,13 @@ async function makeHeatingBody(section, year) {
 
     let rowString = "";
 
-    console.log("heating apartment 1");
+    //console.log("heating apartment 1");
     // Wieviele Öltanks?
     let areTanksConnected = await DB.getValueFromDB('areOilTanksConnected');
     areTanksConnected = (areTanksConnected == "checked") ? true : false;
 
     if (!areTanksConnected) {
-        console.log("tanks not connected");
+        //console.log("tanks not connected");
 
         let numberOfOilTanks = await DB.getNewestValueFromDB('numberOfOilTanks');
         if (numberOfOilTanks !== null) {
@@ -836,20 +848,20 @@ async function makeHeatingBody(section, year) {
         }
     }
     else {
-        console.log("tanks connected");
+        //console.log("tanks connected");
         let oilLevelInTanks = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_oilLevelInTanks`) || '';
         rowString += `<td><input type="text" id="apartment${apartment}_${year}_${section}Table${row}_oilLevelInTanks" value="${oilLevelInTanks}"></td>`;
     }
 
     // Verbauch Öl
     let oilConsumption = await DB.getValueFromDB(`apartment${apartment}_${year}_${section}Table${row}_oilConsumption`);
-    console.log("oilConsumption (beginning)", oilConsumption);
+    //console.log("oilConsumption (beginning)", oilConsumption);
 
     if (oilConsumption === null) {
-        console.log("no oil consumption for row", row, "in DB");
+        //console.log("no oil consumption for row", row, "in DB");
         if (areTanksConnected) {
 
-            console.log("tanks connected (again)");
+            //console.log("tanks connected (again)");
             const oldLevel = row === 1
                 ? await getTankLevel(apartment, year - 1, section, 12)
                 : await getTankLevel(apartment, year, section, row - 1);
@@ -858,10 +870,10 @@ async function makeHeatingBody(section, year) {
 
             oilConsumption = calculateConsumption(oldLevel, newLevel);
 
-            console.log("oldLevel", oldLevel, "newLevel", newLevel, "oilConsumption", oilConsumption);
+            //console.log("oldLevel", oldLevel, "newLevel", newLevel, "oilConsumption", oilConsumption);
         } else {
 
-            console.log("tanks not connected (again)");
+            //console.log("tanks not connected (again)");
             let combined = 0;
             let numberOfOilTanks = await DB.getNewestValueFromDB('numberOfOilTanks');
 
@@ -874,12 +886,12 @@ async function makeHeatingBody(section, year) {
 
                 combined += calculateConsumption(oldLevel, newLevel);
 
-                console.log("tank", tank, "oldLevel", oldLevel, "newLevel", newLevel, "combined", combined);
+                //console.log("tank", tank, "oldLevel", oldLevel, "newLevel", newLevel, "combined", combined);
 
             }
 
             oilConsumption = combined;
-            console.log("oilConsumption (combined)", oilConsumption);
+            //console.log("oilConsumption (combined)", oilConsumption);
         }
 
         await DB.saveValueToDB(

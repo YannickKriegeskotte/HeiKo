@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
@@ -16,6 +16,7 @@
 
     <link rel="stylesheet" href="energy.css" />
     <link rel="stylesheet" href="../utils/tableStyle.css" />
+    <link rel="stylesheet" href="../utils/commons.css" />
 
     <script src="../lib/jquery-3.7.1.min.js"></script>
     <script src="../lib/chart.js"></script>
@@ -24,6 +25,11 @@
     <script type="module" src="energyMain.js"></script>
   </head>
   <body>
+    <!-- LOADER OVERLAY -->
+    <div id="loadingOverlay">
+      <img src="../assets/loading.gif" alt="Loading..." />
+    </div>
+
     <!--
   <div class="appearanceToggle">
       <input
@@ -55,12 +61,11 @@
       <h2 class="sectionHeader">Gesamtübersicht</h2>
       <!-- <canvas id="overviewChart" width="400" height="200"></canvas> -->
     </div>
-    
 
     <div class="sectionContainer">
       <h2 class="sectionHeader">Jahrestabellen</h2>
       <div class="addIconSection">
-      <img class="addTableIcon" src="../assets/plus-solid-full.svg" />
+        <img class="addTableIcon" src="../assets/plus-solid-full.svg" />
       </div>
 
       <div id="energyTableWrapper" class="annualTablesWrapper"></div>

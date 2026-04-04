@@ -20,7 +20,7 @@ export function appendApartmentEnergy(
   meterNumber,
   electricityFee,
   apartmentName,
-  i
+  i,
 ) {
   $("#energy").append(`
             <div class="apartment${i}container apartmentContainer">
@@ -126,7 +126,7 @@ export async function createTable(section, year) {
   await createSectionTable(section, year);
 }
 
-export function createGraphDatesArray(section, year) {
+function createGraphDatesArray(section, year) {
   const datesArray = [];
 
   $(`#${year}_${section}_dateRow td input`).each(function () {
@@ -138,85 +138,112 @@ export function createGraphDatesArray(section, year) {
   return datesArray;
 }
 
-function getAllMetricsOfTableRow(apartment,year,section,metric){
+function getAllMetricsOfTableRow(apartment, year, section, metric) {
   let data = [];
   for (let col = 1; col <= 12; col++) {
-          
-          const dataValue = $(`#apartment${apartment}_${year}_${section}Table_${metric}${col}`).val();
-          
-          //console.log(`#apartment${apartment}_${year}_${section}Table_${metric}${col}`,dataValue);
-          data.push(Number(dataValue) || 0);
-        }
-        //console.log(`${apartment}-${metric}-Data`,data);
-      return data;
+    const dataValue = $(
+      `#apartment${apartment}_${year}_${section}Table_${metric}${col}`,
+    ).val();
+
+    //console.log(`#apartment${apartment}_${year}_${section}Table_${metric}${col}`,dataValue);
+    data.push(Number(dataValue) || 0);
+  }
+  //console.log(`${apartment}-${metric}-Data`,data);
+  return data;
 }
 
-function makeDatasetLayout(apartmentName,metric,dataArray,){
+function makeDatasetLayout(apartmentName, metric, dataArray) {
   // Min/Max bestimmen
   const meta = getMinMax(dataArray);
   const label = `${metric} ${apartmentName}`;
 
   return {
-          label: label,
-          data: dataArray,
-          borderWidth: 2,
-          tension: 0, // Linien zackig
-          fill: false,
-          borderColor: stableColorFor(label),
-          pointRadius: dataArray.map((v, i) =>
-            i === meta.minIndex || i === meta.maxIndex ? 6 : 2
-          ),
-          pointBackgroundColor: dataArray.map((v, i) => {
-            if (i === meta.maxIndex) return "red";
-            if (i === meta.minIndex) return "blue";
-            return stableColorFor(label);
-          }),
-          _minIndex: meta.minIndex,
-          _maxIndex: meta.maxIndex,
-          _minValue: meta.minValue,
-          _maxValue: meta.maxValue,
-        }
+    label: label,
+    data: dataArray,
+    borderWidth: 2,
+    tension: 0, // Linien zackig
+    fill: false,
+    borderColor: stableColorFor(label),
+    pointRadius: dataArray.map((v, i) =>
+      i === meta.minIndex || i === meta.maxIndex ? 6 : 2,
+    ),
+    pointBackgroundColor: dataArray.map((v, i) => {
+      if (i === meta.maxIndex) return "red";
+      if (i === meta.minIndex) return "blue";
+      return stableColorFor(label);
+    }),
+    _minIndex: meta.minIndex,
+    _maxIndex: meta.maxIndex,
+    _minValue: meta.minValue,
+    _maxValue: meta.maxValue,
+  };
 }
 
-export async function createGraphDatasets(section, year) {
+async function createGraphDatasets(section, year) {
   const datasets = [];
   const apartmentCount = await DB.getValueFromDB("apartmentcount");
 
   for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-    const apartmentName = (await DB.getValueFromDB(`apartment${apartment}name`)) ||`Wohnung ${apartment}`;
+    const apartmentName =
+      (await DB.getValueFromDB(`apartment${apartment}name`)) ||
+      `Wohnung ${apartment}`;
 
-    
     let metrics;
     let displayMetrics;
     let data;
 
     switch (section) {
       case "energy":
-          metrics = ["electricityMeterCount","electricityConsumption","electricityCost"];
-          displayMetrics = ["Zählerstand","Verbrauch","Kosten"];
+        metrics = [
+          "electricityMeterCount",
+          "electricityConsumption",
+          "electricityCost",
+        ];
+        displayMetrics = ["Zählerstand", "Verbrauch", "Kosten"];
 
-          for(let metric = 0; metric < metrics.length; metric++){
-            const data = getAllMetricsOfTableRow(apartment, year, section, metrics[metric]);
-            datasets.push(makeDatasetLayout(apartmentName, displayMetrics[metric], data));
-          }
+        for (let metric = 0; metric < metrics.length; metric++) {
+          const data = getAllMetricsOfTableRow(
+            apartment,
+            year,
+            section,
+            metrics[metric],
+          );
+          datasets.push(
+            makeDatasetLayout(apartmentName, displayMetrics[metric], data),
+          );
+        }
         break;
       case "water":
         metrics = [];
         displayMetrics = [];
 
-        for(let metric = 0; metric < metrics.length; metric++){
-            const data = getAllMetricsOfTableRow(apartment, year, section, metrics[metric]);
-            datasets.push(makeDatasetLayout(apartmentName, displayMetrics[metric], data));
-          }
+        for (let metric = 0; metric < metrics.length; metric++) {
+          const data = getAllMetricsOfTableRow(
+            apartment,
+            year,
+            section,
+            metrics[metric],
+          );
+          datasets.push(
+            makeDatasetLayout(apartmentName, displayMetrics[metric], data),
+          );
+        }
         break;
       case "heating":
         metrics = [];
         displayMetrics = [];
 
-        for(let metric = 0; metric < metrics.length; metric++){
-            const data = getAllMetricsOfTableRow(apartment, year, section, metrics[metric]);
-            datasets.push(makeDatasetLayout(apartmentName, displayMetrics[metric], data));
-          }
+        for (let metric = 0; metric < metrics.length; metric++) {
+          const data = getAllMetricsOfTableRow(
+            apartment,
+            year,
+            section,
+            metrics[metric],
+          );
+          datasets.push(
+            makeDatasetLayout(apartmentName, displayMetrics[metric], data),
+          );
+        }
         break;
     }
   }
@@ -226,15 +253,16 @@ export async function createGraphDatasets(section, year) {
   //===============================
 
   const filteredDatasets = datasets.filter(
-    (ds) => !ds.label.startsWith("Zählerstand")
+    (ds) => !ds.label.startsWith("Zählerstand"),
   );
 
+  console.log(filteredDatasets);
   return filteredDatasets;
 }
 
 const energyCharts = {};
 
-export function renderGraph(section, year, datesArray, datasets) {
+function renderGraph(section, year, datesArray, datasets) {
   const ctx = document.getElementById(`${year}_${section}Graph`);
 
   // Prüfen, ob für dieses Jahr bereits ein Chart existiert
@@ -246,6 +274,7 @@ export function renderGraph(section, year, datesArray, datasets) {
     chart.update();
   } else {
     // Neues Chart erstellen
+
     energyCharts[year] = new Chart(ctx, {
       type: "line",
       data: {
@@ -309,210 +338,102 @@ export async function createGraph(section, year) {
 }
 
 export async function createOverviewGraph(section) {
-  // Canvas einfügen, falls nicht vorhanden
-  if (!$("#${section}OverviewGraph").length) {
-    $("#overviewContainer h2").after(`
-            <div class="canvasWrapper">
-                <canvas id="${section}OverviewGraph" width="400" height="200"></canvas>
-            </div>
-        `);
+  // ==========================
+  // 1. Jahre aus DB holen
+  // ==========================
+  let years = await DB.getValueFromDB(`${section}Tables`);
+  if (!years || !years.length) return;
+
+  // Falls String → parsen
+  if (typeof years === "string") {
+    years = JSON.parse(years);
   }
 
-  const ctx = document.getElementById("${section}OverviewGraph");
-
-  // -------------------------------------------
-  // 1. Alle DB-Entries holen (key + value)
-  // -------------------------------------------
-  const allEntries = await DB.getAllKeysContaining("_${section}Table");
-
-  // -------------------------------------------
-  // 2. X-Achse bestimmen (alle Date12-Werte)
-  // -------------------------------------------
-  const rawDates = allEntries
-    .filter((entry) => entry.key.includes("_${section}TableDate12"))
-    .map((entry) => entry.value);
-
-  // Dubletten entfernen + sortieren
-  const xAxisDates = [...new Set(rawDates)].sort(
-    (a, b) => new Date(a) - new Date(b)
-  );
-
-  // -------------------------------------------
-  // 3. Overview-Datenstruktur vorbereiten
-  // -------------------------------------------
-  const apartmentCount = await DB.getValueFromDB("apartmentcount");
-  const overviewData = {};
-  for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-    overviewData[apartment] = {
-      MeterCount: [],
-      Consumption: [],
-      Cost: [],
-    };
+  // Canvas nur einmal erzeugen
+  if (!$(`#${section}_overviewGraph`).length) {
+    $(`#overviewContainer h2`).after(`
+      <div class="canvasWrapper">
+        <canvas id="${section}_overviewGraph" width="400" height="200"></canvas>
+      </div>
+    `);
   }
 
-  // -------------------------------------------
-  // 4. Für jedes Apartment: alle Werte für jedes Datum holen
-  // -------------------------------------------
-  for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-    const apartmentEntries = allEntries.filter((entry) =>
-      entry.key.includes(`_apartment${apartment}`)
-    );
+  let combinedValues = [];
 
-    const meterCountEntries = apartmentEntries.filter((entry) =>
-      entry.key.includes("MeterCount")
-    );
-    const consumptionEntries = apartmentEntries.filter((entry) =>
-      entry.key.includes("Consumption")
-    );
-    const costEntries = apartmentEntries.filter((entry) =>
-      entry.key.includes("Cost")
-    );
+  // ==========================
+  // 2. Alle Jahre durchlaufen
+  // ==========================
+  console.log("Years from DB:", years);
+  
+  const datesArray = ["Jan","Feb","Mrz","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  for (const year of years) {
+    console.log("Current year:", year);
 
-    // Für jedes Datum den passenden Key finden
-    for (const date of xAxisDates) {
-      const year = date.slice(-4); // letzte 4 Zeichen = Jahr
-
-      // MeterCount: nach Index sortieren, dann letzten Eintrag nehmen
-      const mcEntry = meterCountEntries
-        .filter((entry) =>
-          entry.key.startsWith(`${year}_${section}TableMeterCount`)
-        )
-        .sort((a, b) => {
-          const aIndex = Number(a.key.match(/MeterCount(\d+)_apartment/)[1]);
-          const bIndex = Number(b.key.match(/MeterCount(\d+)_apartment/)[1]);
-          return aIndex - bIndex;
-        })
-        .pop(); // letzter Eintrag
-
-      // Consumption: dasselbe
-      const consEntry = consumptionEntries
-        .filter((entry) =>
-          entry.key.startsWith(`${year}_${section}TableConsumption`)
-        )
-        .sort((a, b) => {
-          const aIndex = Number(a.key.match(/Consumption(\d+)_apartment/)[1]);
-          const bIndex = Number(b.key.match(/Consumption(\d+)_apartment/)[1]);
-          return aIndex - bIndex;
-        })
-        .pop();
-
-      // Cost: dasselbe
-      const costEntry = costEntries
-        .filter((entry) => entry.key.startsWith(`${year}_${section}TableCost`))
-        .sort((a, b) => {
-          const aIndex = Number(a.key.match(/Cost(\d+)_apartment/)[1]);
-          const bIndex = Number(b.key.match(/Cost(\d+)_apartment/)[1]);
-          return aIndex - bIndex;
-        })
-        .pop();
-
-      // Werte in Overview-Datenstruktur speichern
-      overviewData[apartment].MeterCount.push(
-        mcEntry ? Number(mcEntry.value) : 0
-      );
-      overviewData[apartment].Consumption.push(
-        consEntry ? Number(consEntry.value) : 0
-      );
-      overviewData[apartment].Cost.push(
-        costEntry ? Number(costEntry.value) : 0
-      );
+    let datasets = await createGraphDatasets(section, year);
+    for(const dataset of datasets){
+      dataset.label += ` ${year}`;
     }
+    combinedValues.push(...datasets);
   }
 
-  // -------------------------------------------
-  // 5. Datasets bauen
-  // -------------------------------------------
-  const datasets = [];
-  const typeLabels = {
-    MeterCount: "Zählerstand",
-    Consumption: "Verbrauch",
-    Cost: "Kosten",
-  };
 
-  for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-    const apartmentName =
-      (await DB.getValueFromDB(`apartment${apartment}name`)) ||
-      `Wohnung ${apartment}`;
+  // ==========================
+  // 3. Rendern
+  // ==========================
 
-    for (const type of ["MeterCount", "Consumption", "Cost"]) {
-      const values = overviewData[apartment][type];
-      const { minIndex, maxIndex } = getMinMax(values);
-      const color = stableColorFor(`Apartment${apartment}-${type}`);
+    const overviewCharts = {}; 
+   const ctx = document.getElementById(`${section}_overviewGraph`);
+    // Neues Chart erstellen
 
-      datasets.push({
-        label: `${typeLabels[type]} ${apartmentName}`,
-        data: values,
-        borderColor: color,
-        borderWidth: 2,
-        tension: 0,
-        pointRadius(ctx) {
-          const i = ctx.dataIndex;
-          return i === minIndex || i === maxIndex ? 6 : 3;
-        },
-        pointBorderWidth(ctx) {
-          const i = ctx.dataIndex;
-          return i === minIndex || i === maxIndex ? 3 : 1;
-        },
-        pointBackgroundColor(ctx) {
-          const i = ctx.dataIndex;
-          if (i === minIndex) return "blue";
-          if (i === maxIndex) return "red";
-          return color;
-        },
-      });
-    }
-  }
-
-  console.log("Overview Graph Datasets:", datasets);
-
-  //===============================
-  //=== Zählerstände ignorieren ===
-  //===============================
-
-  const filteredDatasets = datasets.filter(
-    (ds) => !ds.label.startsWith("Zählerstand")
-  );
-
-  // -------------------------------------------
-  // 6. Chart erstellen
-  // -------------------------------------------
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: xAxisDates,
-      datasets: filteredDatasets,
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: false },
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: datesArray,
+        datasets: combinedValues,
       },
-      interaction: {
-        mode: "nearest",
-        intersect: false,
-      },
-      plugins: {
-        tooltip: {
-          mode: "nearest",
+      options: {
+        responsive: true,
+        interaction: {
+          mode: "index",
           intersect: false,
         },
-        legend: {
-          labels: {
-            font: { size: 16 },
-            usePointStyle: true,
-            pointStyle: "line",
+        plugins: {
+          title: {
+            display: true,
+            text: `Die Jahre im Vergleich`,
           },
-          onHover(event) {
-            event.native.target.style.cursor = "pointer";
+          tooltip: {
+            mode: "nearest",
+            intersect: false,
+            position: "nearest",
           },
-          onLeave(event) {
-            event.native.target.style.cursor = "default";
+          legend: {
+            labels: {
+              font: {
+                size: 16,
+              },
+              usePointStyle: true,
+              pointStyle: "line",
+            },
+            onHover(event, item) {
+              event.native.target.style.cursor = "pointer";
+            },
+            onLeave(event, item) {
+              event.native.target.style.cursor = "default";
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
           },
         },
       },
-    },
-  });
+    });
+  
 }
+
+
 
 function getMinMax(data) {
   const minValue = Math.min(...data);
@@ -541,4 +462,13 @@ function stableColorFor(label) {
   const sat = 70;
   const light = 50;
   return `hsl(${hue}, ${sat}%, ${light}%)`;
+}
+
+
+export function hideLoader() {
+  document.getElementById("loadingOverlay").style.display = "none";
+}
+
+export function showLoader() {
+  document.getElementById("loadingOverlay").style.display = "flex";
 }

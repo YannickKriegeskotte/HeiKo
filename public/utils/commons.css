@@ -1,0 +1,14 @@
+#loadingOverlay {
+  position: fixed;
+  inset: 0;                     /* top:0; right:0; bottom:0; left:0 */
+  background: rgba(0, 0, 0, 0.4); /* leicht abgedunkelt */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;                /* über allem */
+}
+
+#loadingOverlay img {
+  width: 120px;
+  height: auto;
+}

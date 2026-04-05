@@ -23,6 +23,8 @@ $(document).ready(async function () {
     else {
         // Wenn Master Registry in DB vorhanden
         tables = tablesRaw ? JSON.parse(tablesRaw) : [];
+        tables.sort((a, b) => Number(a) - Number(b));
+await DB.saveValueToDB('heatingTables', JSON.stringify(tables));
         console.log("heatingTables:", tables);
 
         for (let year of tables) {

@@ -15,6 +15,7 @@ $(document).ready(async function () {
 
 
     let tablesRaw = await DB.getValueFromDB('energyTables');
+    
     let tables;
     if (tablesRaw === null) {
         // Wenn Master Registry nicht in DB, dann initial leeres Array in DB speichern
@@ -23,6 +24,8 @@ $(document).ready(async function () {
     else {
         // Wenn Master Registry in DB vorhanden
         tables = tablesRaw ? JSON.parse(tablesRaw) : [];
+        tables.sort((a, b) => Number(a) - Number(b));
+        await DB.saveValueToDB('energyTables', JSON.stringify(tables));
         console.log("energyTables:", tables);
 
         for (let year of tables) {

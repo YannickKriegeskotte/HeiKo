@@ -167,3 +167,8 @@ td:has(input:disabled){
 .tableCollapseIcon.rotated {
   transform: rotate(-90deg);
 }
+
+.input-error {
+  border: 2px solid red;
+  background-color: #ffe6e6;
+}

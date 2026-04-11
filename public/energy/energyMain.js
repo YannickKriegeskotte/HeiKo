@@ -28,6 +28,10 @@ $(document).ready(async function () {
         await DB.saveValueToDB('energyTables', JSON.stringify(tables));
         console.log("energyTables:", tables);
 
+        // dbFees initial erzeugen und sortieren
+        
+        
+
         for (let year of tables) {
             await Helper.createTable("energy",year);
             await Helper.createGraph("energy",year);

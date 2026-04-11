@@ -111,6 +111,30 @@ export function renderDatabaseTable(sortedDatabaseData) {
   }
 }
 
+export async function getDBFees(section) {
+  //...
+}
+
+function parseDBKey(key) {
+  // apartment extrahieren
+  const apartmentMatch = key.match(/^apartment(\d+)/);
+  const apartment = apartmentMatch ? Number(apartmentMatch[1]) : null;
+
+  // Typ bestimmen
+  let type = null;
+
+  if (key.includes("MeterFee")) {
+    type = "meterFee";
+  } else if (key.includes("Fee")) {
+    type = "fee";
+  }
+
+  return {
+    apartment,
+    type,
+  };
+}
+
 // ===========================================
 // ===== Energy / Heating / Water Helper =====
 // ===========================================
@@ -364,76 +388,85 @@ export async function createOverviewGraph(section) {
   // 2. Alle Jahre durchlaufen
   // ==========================
   console.log("Years from DB:", years);
-  
-  const datesArray = ["Jan","Feb","Mrz","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+
+  const datesArray = [
+    "Jan",
+    "Feb",
+    "Mrz",
+    "Apr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Dez",
+  ];
   for (const year of years) {
     console.log("Current year:", year);
 
     let datasets = await createGraphDatasets(section, year);
-    for(const dataset of datasets){
+    for (const dataset of datasets) {
       dataset.label += ` ${year}`;
     }
     combinedValues.push(...datasets);
   }
 
-
   // ==========================
   // 3. Rendern
   // ==========================
 
-    const overviewCharts = {}; 
-   const ctx = document.getElementById(`${section}_overviewGraph`);
-    // Neues Chart erstellen
+  const overviewCharts = {};
+  const ctx = document.getElementById(`${section}_overviewGraph`);
+  // Neues Chart erstellen
 
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: datesArray,
-        datasets: combinedValues,
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: datesArray,
+      datasets: combinedValues,
+    },
+    options: {
+      responsive: true,
+      interaction: {
+        mode: "index",
+        intersect: false,
       },
-      options: {
-        responsive: true,
-        interaction: {
-          mode: "index",
+      plugins: {
+        title: {
+          display: true,
+          text: `Die Jahre im Vergleich`,
+        },
+        tooltip: {
+          mode: "nearest",
           intersect: false,
+          position: "nearest",
         },
-        plugins: {
-          title: {
-            display: true,
-            text: `Die Jahre im Vergleich`,
-          },
-          tooltip: {
-            mode: "nearest",
-            intersect: false,
-            position: "nearest",
-          },
-          legend: {
-            labels: {
-              font: {
-                size: 16,
-              },
-              usePointStyle: true,
-              pointStyle: "line",
+        legend: {
+          labels: {
+            font: {
+              size: 16,
             },
-            onHover(event, item) {
-              event.native.target.style.cursor = "pointer";
-            },
-            onLeave(event, item) {
-              event.native.target.style.cursor = "default";
-            },
+            usePointStyle: true,
+            pointStyle: "line",
           },
-        },
-        scales: {
-          y: {
-            beginAtZero: false,
+          onHover(event, item) {
+            event.native.target.style.cursor = "pointer";
+          },
+          onLeave(event, item) {
+            event.native.target.style.cursor = "default";
           },
         },
       },
-    });
-  
+      scales: {
+        y: {
+          beginAtZero: false,
+        },
+      },
+    },
+  });
 }
-
-
 
 function getMinMax(data) {
   const minValue = Math.min(...data);
@@ -463,7 +496,6 @@ function stableColorFor(label) {
   const light = 50;
   return `hsl(${hue}, ${sat}%, ${light}%)`;
 }
-
 
 export function hideLoader() {
   document.getElementById("loadingOverlay").style.display = "none";

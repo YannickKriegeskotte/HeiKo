@@ -115,25 +115,7 @@ export async function getDBFees(section) {
   //...
 }
 
-function parseDBKey(key) {
-  // apartment extrahieren
-  const apartmentMatch = key.match(/^apartment(\d+)/);
-  const apartment = apartmentMatch ? Number(apartmentMatch[1]) : null;
 
-  // Typ bestimmen
-  let type = null;
-
-  if (key.includes("MeterFee")) {
-    type = "meterFee";
-  } else if (key.includes("Fee")) {
-    type = "fee";
-  }
-
-  return {
-    apartment,
-    type,
-  };
-}
 
 // ===========================================
 // ===== Energy / Heating / Water Helper =====
@@ -348,16 +330,39 @@ function renderGraph(section, year, datesArray, datasets) {
 }
 
 export async function createGraph(section, year) {
+  const container = $(`#${year}_${section}TableContainer`);
+
   // Canvas einfügen, falls noch nicht vorhanden
   if (!$(`#${year}_${section}Graph`).length) {
-    $(`#${year}_${section}TableContainer table`).after(`
-            <div class="canvasWrapper">
-            <canvas id="${year}_${section}Graph" width="400" height="200"></canvas>
-            </div>
-        `);
+    container.find("table").after(`
+      <div class="canvasWrapper">
+        <canvas id="${year}_${section}Graph" width="400" height="200"></canvas>
+      </div>
+    `);
   }
+
+  // DB STATE CHECK
+  let tableCollapsed = await DB.getValueFromDB(
+    `${year}_${section}TableCollapsed`
+  );
+
+  if (tableCollapsed === null) {
+    tableCollapsed = "false";
+    await DB.saveValueToDB(`${year}_${section}TableCollapsed`, "false");
+  }
+
+  const canvasWrapper = container.find(".canvasWrapper");
+
+  // State anwenden
+  if (tableCollapsed == "true") {
+    canvasWrapper.hide();
+  } else {
+    canvasWrapper.show();
+  }
+
   const datasets = await createGraphDatasets(section, year);
   const datesArray = createGraphDatesArray(section, year);
+
   renderGraph(section, year, datesArray, datasets);
 }
 

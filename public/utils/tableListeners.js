@@ -43,6 +43,8 @@ export function registerTableListeners() {
   $(document).on("click", "img.tableCollapseIcon", async function () {
     const container = $(this).closest(".annualTableContainer");
     const extractedYear = container.attr("id").match(/^[0-9]{4}/)[0];
+    const extractedSection = container.attr("id").match(/_(.*?)TableContainer/)[1];
+    console.log("extractedSection",extractedSection);
 
     // Tabelle und Canvas-Wrapper togglen
     container.find(".canvasWrapper").slideToggle(300);
@@ -51,7 +53,9 @@ export function registerTableListeners() {
     $(this).toggleClass("rotated");
 
     const isCollapsed = $(this).hasClass("rotated") ? "true" : "false";
-    await DB.saveValueToDB(`${extractedYear}_tableCollapsed`, isCollapsed);
+    await DB.saveValueToDB(`${extractedYear}_${extractedSection}TableCollapsed`, isCollapsed);
+
+    
   });
 
   // ===== TABLE DELETE ICON LISTENER =====

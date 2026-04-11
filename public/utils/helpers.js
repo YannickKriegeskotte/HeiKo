@@ -268,71 +268,118 @@ async function createGraphDatasets(section, year) {
 
 const energyCharts = {};
 
+function toBool(value) {
+  return value === true ||
+    value === "true" ||
+    value === 1 ||
+    value === "1";
+}
+
+async function restoreDatasetVisibility(chart) {
+  for (let i = 0; i < chart.data.datasets.length; i++) {
+    const saved = await DB.getValueFromDB(
+      `${chart.canvas.id}_dataset_${i}`
+    );
+    console.log(`restored ${chart.canvas.id}_dataset_${i}`, saved);
+
+    if (saved !== null) {
+      const visible = toBool(saved);
+      chart.setDatasetVisibility(i, visible);
+    }
+  }
+
+  chart.update();
+}
+
+
 function renderGraph(section, year, datesArray, datasets) {
   const ctx = document.getElementById(`${year}_${section}Graph`);
 
-  // Prüfen, ob für dieses Jahr bereits ein Chart existiert
+  // Chart existiert schon → nur updaten
   if (energyCharts[year]) {
-    // Bestehendes Chart updaten
     const chart = energyCharts[year];
+
     chart.data.labels = datesArray;
     chart.data.datasets = datasets;
-    chart.update();
-  } else {
-    // Neues Chart erstellen
 
-    energyCharts[year] = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: datesArray,
-        datasets: datasets,
-      },
-      options: {
-        responsive: true,
-        interaction: {
-          mode: "index",
-          intersect: false,
-        },
-        plugins: {
-          title: {
-            display: true,
-            text: `${year}`,
-          },
-          tooltip: {
-            mode: "nearest",
-            intersect: false,
-            position: "nearest",
-          },
-          legend: {
-            labels: {
-              font: {
-                size: 16,
-              },
-              usePointStyle: true,
-              pointStyle: "line",
-            },
-            onHover(event, item) {
-              event.native.target.style.cursor = "pointer";
-            },
-            onLeave(event, item) {
-              event.native.target.style.cursor = "default";
-            },
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: false,
-          },
-        },
-      },
-    });
+    chart.update();
+    return;
   }
+
+  // Neues Chart erstellen
+  const chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: datesArray,
+      datasets: datasets,
+    },
+    options: {
+      responsive: true,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: `${year}`,
+        },
+        tooltip: {
+          mode: "nearest",
+          intersect: false,
+          position: "nearest",
+        },
+        legend: {
+          labels: {
+            font: { size: 16 },
+            usePointStyle: true,
+            pointStyle: "line",
+          },
+
+          onHover(event) {
+            event.native.target.style.cursor = "pointer";
+          },
+
+          onLeave(event) {
+            event.native.target.style.cursor = "default";
+          },
+
+          onClick: async (e, legendItem, legend) => {
+            const chart = legend.chart;
+            const datasetIndex = legendItem.datasetIndex;
+
+            const visible = !chart.isDatasetVisible(datasetIndex);
+
+            chart.setDatasetVisibility(datasetIndex, visible);
+            chart.update();
+
+            // State speichern
+            await DB.saveValueToDB(
+              `${chart.canvas.id}_dataset_${datasetIndex}`,
+              visible
+            );
+            console.log(`saved ${chart.canvas.id}_dataset_${datasetIndex}`, visible);
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+        },
+      },
+    },
+  });
+
+  energyCharts[year] = chart;
+
+  // 🔥 State nach Erstellung wiederherstellen
+  restoreDatasetVisibility(chart);
 }
 
 export async function createGraph(section, year) {
   const container = $(`#${year}_${section}TableContainer`);
 
-  // Canvas einfügen, falls noch nicht vorhanden
+  // Canvas erstellen falls nötig
   if (!$(`#${year}_${section}Graph`).length) {
     container.find("table").after(`
       <div class="canvasWrapper">
@@ -341,28 +388,33 @@ export async function createGraph(section, year) {
     `);
   }
 
-  // DB STATE CHECK
+  // Collapse-State laden
   let tableCollapsed = await DB.getValueFromDB(
     `${year}_${section}TableCollapsed`
   );
 
   if (tableCollapsed === null) {
     tableCollapsed = "false";
-    await DB.saveValueToDB(`${year}_${section}TableCollapsed`, "false");
+    await DB.saveValueToDB(
+      `${year}_${section}TableCollapsed`,
+      "false"
+    );
   }
 
   const canvasWrapper = container.find(".canvasWrapper");
 
-  // State anwenden
-  if (tableCollapsed == "true") {
+  // UI State anwenden
+  if (tableCollapsed === "true") {
     canvasWrapper.hide();
   } else {
     canvasWrapper.show();
   }
 
+  // Daten vorbereiten
   const datasets = await createGraphDatasets(section, year);
   const datesArray = createGraphDatesArray(section, year);
 
+  // Render
   renderGraph(section, year, datesArray, datasets);
 }
 

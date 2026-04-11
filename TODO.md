@@ -4,7 +4,6 @@
 
 WICHTIG für Energy deploy version:
 
-- Graph Einstellungen (welche datensets ausgeblendet sind) irgendwie speichern und verwenden
 - bei neuen inputeingaben soll sich der der jahresgraph sowie der gesamtgraph aktuallisieren
 
 

@@ -569,13 +569,11 @@ function parseInputId(id) {
 //===== TABLE COLLAPSE =====
 //==========================
 async function toggleTableCollapsed(section, year) {
-  console.log("tablecollapse function");
+
   // prüfen, ob collaped DB eintrag, wenn ja
   const tableCollapsed = await DB.getValueFromDB(
     `${year}_${section}TableCollapsed`,
   );
-
-  console.log(year, section, tableCollapsed);
 
   const container = $(`#${year}_${section}TableContainer`);
   const icon = container.find(".tableCollapseIcon");
@@ -592,8 +590,6 @@ async function toggleTableCollapsed(section, year) {
     container.find(".canvasWrapper").show();
     icon.removeClass("rotated");
   }
-
-  console.log(container.find("canvas").attr("style"));
 }
 
 function calculateConsumption(oldLevel, newLevel) {

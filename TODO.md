@@ -4,8 +4,6 @@
 
 WICHTIG für Energy deploy version:
 
-- bei neuen inputeingaben soll sich der der jahresgraph sowie der gesamtgraph aktuallisieren
-
 
 
 Nice to have, aber nicht relevant:

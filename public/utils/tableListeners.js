@@ -44,7 +44,6 @@ export function registerTableListeners() {
     const container = $(this).closest(".annualTableContainer");
     const extractedYear = container.attr("id").match(/^[0-9]{4}/)[0];
     const extractedSection = container.attr("id").match(/_(.*?)TableContainer/)[1];
-    console.log("extractedSection",extractedSection);
 
     // Tabelle und Canvas-Wrapper togglen
     container.find(".canvasWrapper").slideToggle(300);
@@ -108,7 +107,6 @@ export function registerTableListeners() {
     const id = $(this).attr("id");
 
     if (!id.includes("TableHeaderH2")) {
-      console.log("Anderer Input - ignored");
       return;
     }
     console.log("Focusout H2 Listener");
@@ -220,20 +218,28 @@ export function registerTableListeners() {
 
     const value = $(this).val();
 
-    if (value === "") return;
+    const dbVal = await DB.getValueFromDB(id);
+    if( value === dbVal){
+      console.log("same val, ignore");
+      return;
+    }
 
-    if ($(this).hasClass("tableHeaderInput")) {
-      //... input value = db wert?
-    } else {
+    if (value === ""){
+      if (dbVal === null){
+        console.log("no val, no dbVal, ignore");
+        return;
+      }
+      else{
+        console.log("no val, dbVal:",dbVal,"delete!");
+      await DB.deleteKeyInDB(id);  
+      }
+      
+      } 
+
+
       await DB.saveValueToDB(id, value);
 
-      /*
-            const year = id.substring(0, 4); // z.B. '2024_energyTableMeterCount1_apartment1'
-            const datasets = await Helper.createEnergyGraphDatasets("energy",year);
-            const datesArray = Helper.createEnergyGraphDatesArray("energy",year);
-
-            Helper.renderEnergyGraph("energy",year, datesArray, datasets);
-            */
-    }
+      Helper.updateGraph(id);
+      Helper.updateOverviewGraph(id);
   });
 }

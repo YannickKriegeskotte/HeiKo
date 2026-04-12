@@ -268,19 +268,13 @@ async function createGraphDatasets(section, year) {
 
 const energyCharts = {};
 
-function toBool(value) {
-  return value === true ||
-    value === "true" ||
-    value === 1 ||
-    value === "1";
-}
+
 
 async function restoreDatasetVisibility(chart) {
   for (let i = 0; i < chart.data.datasets.length; i++) {
     const saved = await DB.getValueFromDB(
       `${chart.canvas.id}_dataset_${i}`
     );
-    console.log(`restored ${chart.canvas.id}_dataset_${i}`, saved);
 
     if (saved !== null) {
       const visible = toBool(saved);
@@ -372,7 +366,7 @@ function renderGraph(section, year, datesArray, datasets) {
 
   energyCharts[year] = chart;
 
-  // 🔥 State nach Erstellung wiederherstellen
+  // State nach Erstellung wiederherstellen
   restoreDatasetVisibility(chart);
 }
 
@@ -383,7 +377,7 @@ export async function createGraph(section, year) {
   if (!$(`#${year}_${section}Graph`).length) {
     container.find("table").after(`
       <div class="canvasWrapper">
-        <canvas id="${year}_${section}Graph" width="400" height="200"></canvas>
+        <canvas id="${year}_${section}Graph" width="400" height="100"></canvas>
       </div>
     `);
   }
@@ -418,6 +412,85 @@ export async function createGraph(section, year) {
   renderGraph(section, year, datesArray, datasets);
 }
 
+
+
+export async function updateGraph(id) {
+  const { apartment, year, section, metric, col } = parseInputId(id);
+  if (metric !== "date") {
+    let $input;
+    let $total;
+    let totalVar;
+    switch (section) {
+      case "energy":
+
+        // tabelle verbrauch:
+        $input = $(`#apartment${apartment}_${year}_energyTable_electricityConsumption${col}`);
+        const consumption = await calculateConsumptionForInput(id)
+        $input.val(consumption);
+
+        // verbrauch total:
+        $total = $(`#apartment${apartment}_${year}_energyTable_electricityConsumption13`);
+        totalVar = 0;
+        for(let i=1;i<13;i++){
+          totalVar += parseFloat($(`#apartment${apartment}_${year}_energyTable_electricityConsumption${i}`).val()) || 0;
+        }
+        $total.text(`${totalVar.toFixed(2)}${getMeasuringUnit(section)}`);
+
+
+        // tabelle kosten:
+        $input = $(`#apartment${apartment}_${year}_energyTable_electricityCost${col}`);
+        const cost = await calculateCostForInput(id);
+        $input.val(cost);
+
+        // kosten total:
+        $total = $(`#apartment${apartment}_${year}_energyTable_electricityCost13`);
+        totalVar = 0;
+        for(let i=1;i<13;i++){
+          totalVar += parseFloat($(`#apartment${apartment}_${year}_energyTable_electricityCost${i}`).val()) || 0;
+        }
+        $total.text(`${totalVar.toFixed(2)}€`);
+
+
+
+        break;
+      case "water":
+        break;
+      case "heating":
+        break;
+    }
+  }
+
+  const datasets = await createGraphDatasets(section, year);
+  console.log("datasets:", datasets);
+  const datesArray = createGraphDatesArray(section, year);
+  console.log("datesArray:", datesArray);
+
+  renderGraph(section, year, datesArray, datasets);
+}
+
+export async function updateOverviewGraph(id) {
+  const { section, year } = parseInputId(id);
+
+  const chart = window.overviewCharts?.[section];
+  if (!chart) return;
+
+  // komplett neu berechnen für das Jahr
+  const newDatasets = await createGraphDatasets(section, year);
+
+  // altes Jahr entfernen
+  chart.data.datasets = chart.data.datasets.filter(d =>
+    !d.label.includes(year)
+  );
+
+  // neues Jahr hinzufügen
+  newDatasets.forEach(d => {
+    d.label += ` ${year}`;
+    chart.data.datasets.push(d);
+  });
+
+  chart.update();
+}
+
 export async function createOverviewGraph(section) {
   // ==========================
   // 1. Jahre aus DB holen
@@ -444,7 +517,7 @@ export async function createOverviewGraph(section) {
   // ==========================
   // 2. Alle Jahre durchlaufen
   // ==========================
-  console.log("Years from DB:", years);
+  // console.log("Years from DB:", years);
 
   const datesArray = [
     "Jan",
@@ -461,7 +534,7 @@ export async function createOverviewGraph(section) {
     "Dez",
   ];
   for (const year of years) {
-    console.log("Current year:", year);
+    //console.log("Current year:", year);
 
     let datasets = await createGraphDatasets(section, year);
     for (const dataset of datasets) {
@@ -474,11 +547,11 @@ export async function createOverviewGraph(section) {
   // 3. Rendern
   // ==========================
 
-  const overviewCharts = {};
+  window.overviewCharts = window.overviewCharts || {};
   const ctx = document.getElementById(`${section}_overviewGraph`);
   // Neues Chart erstellen
 
-  new Chart(ctx, {
+  window.overviewCharts[section] = new Chart(ctx, {
     type: "line",
     data: {
       labels: datesArray,
@@ -525,6 +598,116 @@ export async function createOverviewGraph(section) {
   });
 }
 
+export async function calculateConsumptionForInput(id) {
+  const { apartment, year, section, metric, col } =
+    parseInputId(id);
+
+  let currentMeterCountInputID = id.replace("Consumption", "MeterCount");
+  const currentMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
+
+  let oldMeterCountInputID;
+  if (col == 1) {
+    oldMeterCountInputID = currentMeterCountInputID
+      .replace(year, year - 1)
+      .replace(/[0-9]{1,2}$/, 12);
+  } else {
+    oldMeterCountInputID = currentMeterCountInputID.replace(
+      /[0-9]{1,2}$/,
+      col - 1
+    );
+  }
+
+  const oldMeterCount = await DB.getValueFromDB(oldMeterCountInputID);
+
+  return calculateConsumption(oldMeterCount, currentMeterCount) || 0;
+}
+
+export function getMeasuringUnit(section) {
+  switch (section) {
+    case "energy":
+      return " kWh";
+    case "water":
+    case "heating":
+      return "L";
+    default:
+      return "";
+  }
+}
+
+export async function calculateCostForInput(id) {
+  const { apartment, year, section, col } =
+    parseInputId(id);
+
+  switch (section) {
+    case "energy":
+      return await calculateEnergyCost(apartment, year, col);
+
+    case "water":
+      return 0;
+
+    case "heating":
+      return 0;
+
+    default:
+      return 0;
+  }
+}
+
+export async function calculateEnergyCost(apartment, year, col) {
+  let dbFees = [
+    ...(await DB.getAllKeysContaining(`apartment${apartment}electricityFee`)),
+    ...(await DB.getAllKeysContaining(`apartment${apartment}electricityMeterFee`)),
+  ]
+    .map(obj => {
+      const isMeterFee = obj.key.includes("MeterFee");
+      return {
+        ...obj,
+        date: extractDate(obj.key),
+        type: isMeterFee ? "meterFee" : "fee",
+      };
+    })
+    .filter(obj => obj.date)
+    .sort((a, b) => a.date - b.date);
+
+  let inputDateRaw = await DB.getValueFromDB(
+    `${year}_energyTable_date${col}`
+  );
+
+  let inputDate = null;
+  if (inputDateRaw) {
+    const [day, month, yearVal] = inputDateRaw.split(".").map(Number);
+    inputDate = new Date(yearVal, month - 1, day);
+  }
+
+  const getValueForDate = (arr) => {
+    let val = arr[0]?.value || 0;
+
+    for (const entry of arr) {
+      if (entry.date <= inputDate) {
+        val = entry.value;
+      } else break;
+    }
+
+    return parseFloat(val) || 0;
+  };
+
+  const electricityFees = dbFees.filter(e => e.type === "fee");
+  const meterFees = dbFees.filter(e => e.type === "meterFee");
+
+  const costPerKwh = getValueForDate(electricityFees);
+  const metercountFee = getValueForDate(meterFees);
+
+  let consumption = $(
+    `#apartment${apartment}_${year}_energyTable_electricityConsumption${col}`
+  ).val();
+
+  consumption = parseFloat(consumption) || 0;
+
+  let cost = consumption * costPerKwh + metercountFee / 12;
+
+  return parseFloat(cost.toFixed(2));
+}
+
 function getMinMax(data) {
   const minValue = Math.min(...data);
   const maxValue = Math.max(...data);
@@ -554,10 +737,57 @@ function stableColorFor(label) {
   return `hsl(${hue}, ${sat}%, ${light}%)`;
 }
 
+export function parseInputId(id) {
+  // Beispiele für IDs:
+  // apartment2_2019_energyTable_electricityCost12
+  // 2019_energyTable_date3
+  // 2021_waterTable_mainWaterCost7
+
+  const colMatch = id.match(/[0-9]{1,2}$/);
+  const col = colMatch ? Number(colMatch[0]) : null;
+
+  const parts = id.split("_");
+
+  let apartment = null;
+  let idx = 0;
+
+  // Apartment?
+  if (parts[0].startsWith("apartment")) {
+    apartment = Number(parts[0].replace("apartment", ""));
+    idx = 1;
+  }
+
+  const year = Number(parts[idx]);
+  const section = parts[idx + 1].replace("Table", "");
+  const rawMetric = parts[idx + 2]; // z.B. electricityCost12
+
+  const metric = rawMetric.replace(/[0-9]{1,2}$/, "");
+
+  return {
+    apartment,
+    year,
+    section,
+    metric,
+    col,
+  };
+}
+
+function toBool(value) {
+  return value === true ||
+    value === "true" ||
+    value === 1 ||
+    value === "1";
+}
+
 export function hideLoader() {
   document.getElementById("loadingOverlay").style.display = "none";
 }
 
 export function showLoader() {
   document.getElementById("loadingOverlay").style.display = "flex";
+}
+
+export function calculateConsumption(oldLevel, newLevel) {
+  if (newLevel === null || oldLevel === null) return 0;
+  return Math.abs(newLevel - oldLevel);
 }

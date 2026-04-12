@@ -356,7 +356,9 @@ async function fillTableWithData(section, year) {
   const $tbody = $(`#${year}_${section}TableContainer tbody`);
   const allInputs = $tbody.find("input");
 
-  // DB values
+  // -----------------------------
+  // 1. DB VALUES LADEN
+  // -----------------------------
   for (const element of allInputs.toArray()) {
     const $input = $(element);
     const id = $input.attr("id");
@@ -373,154 +375,52 @@ async function fillTableWithData(section, year) {
     if (data) $input.val(data);
   }
 
-  // Consumption calculations
-  let filteredInputs = allInputs.filter(function () {
+  // -----------------------------
+  // 2. VERBRAUCH BERECHNEN
+  // -----------------------------
+  const consumptionInputs = allInputs.filter(function () {
     return this.id.toLowerCase().includes("consumption");
   });
 
-  for (const element of filteredInputs.toArray()) {
+  for (const element of consumptionInputs.toArray()) {
     const $input = $(element);
     const id = $input.attr("id");
 
-    const { apartment, year, section, metric, col } = parseInputId(id);
+    const { section } = Helper.parseInputId(id);
 
     const totalID = id.replace(/\d+$/, 13);
     const $total = $(`#${totalID}`);
 
-    // IMMER aktuellen Wert aus DOM lesen
     let totalVar = parseFloat($total.text()) || 0;
 
-    let currentMeterCountInputID = id.replace("Consumption", "MeterCount");
-    const currentMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
-
-    let oldMeterCountInputID;
-    if (col == 1) {
-      oldMeterCountInputID = currentMeterCountInputID
-        .replace(year, year - 1)
-        .replace(/[0-9]{1,2}$/, 12);
-    } else {
-      oldMeterCountInputID = currentMeterCountInputID.replace(
-        /[0-9]{1,2}$/,
-        col - 1,
-      );
-    }
-
-    const oldMeterCount = await DB.getValueFromDB(oldMeterCountInputID);
-
-    const consumption =
-      calculateConsumption(oldMeterCount, currentMeterCount) || 0;
+    // ausgelagerte Funktion
+    const consumption = await Helper.calculateConsumptionForInput(id);
 
     totalVar += consumption;
 
     $input.val(consumption);
-    let measuringUnit;
-    switch (section) {
-      case "energy":
-        measuringUnit = " kWh";
-        break;
-      case "water":
-        measuringUnit = "L";
-        break;
-      case "heating":
-        measuringUnit = "L";
-        break;
-    }
-    $total.text(`${totalVar.toFixed(2)}${measuringUnit}`);
+    $total.text(`${totalVar.toFixed(2)}${Helper.getMeasuringUnit(section)}`);
   }
 
-  // Cost calculations
-  filteredInputs = allInputs.filter(function () {
+  // -----------------------------
+  // 3. KOSTEN BERECHNEN
+  // -----------------------------
+  const costInputs = allInputs.filter(function () {
     return this.id.toLowerCase().includes("cost");
   });
 
-
-  for (const element of filteredInputs.toArray()) {
+  for (const element of costInputs.toArray()) {
     const $input = $(element);
     const id = $input.attr("id");
-
-    const { apartment, year, section, metric, col } = parseInputId(id);
 
     const totalID = id.replace(/\d+$/, 13);
     const $total = $(`#${totalID}`);
 
     let totalVar = parseFloat($total.text()) || 0;
 
-    let cost = 0;
+    // ausgelagerte Funktion
+    const cost = await Helper.calculateCostForInput(id);
 
-    switch (section) {
-      case "energy": {
-        // --- DB FEES LADEN ---
-        let dbFees = [
-          ...(await DB.getAllKeysContaining(`apartment${apartment}electricityFee`)),
-          ...(await DB.getAllKeysContaining(`apartment${apartment}electricityMeterFee`)),
-        ]
-          .map(obj => {
-            const isMeterFee = obj.key.includes("MeterFee");
-            return {
-              ...obj,
-              date: Helper.extractDate(obj.key),
-              type: isMeterFee ? "meterFee" : "fee"
-            };
-          })
-          .filter(obj => obj.date)
-          .sort((a, b) => a.date - b.date);
-
-        // --- DATUM HOLEN ---
-        let inputDateRaw = await DB.getValueFromDB(`${year}_${section}Table_date${col}`);
-
-        let inputDate = null;
-        if (inputDateRaw) {
-          const [day, month, year] = inputDateRaw.split(".").map(Number);
-          inputDate = new Date(year, month - 1, day);
-        }
-
-        // --- passenden Wert holen ---
-        const getValueForDate = (arr) => {
-          let val = arr[0]?.value || 0;
-
-          for (const entry of arr) {
-            if (entry.date <= inputDate) {
-              val = entry.value;
-            } else {
-              break;
-            }
-          }
-          return parseFloat(val) || 0;
-        };
-
-        // --- FEES TRENNEN ---
-        const electricityFees = dbFees.filter(e => e.type === "fee");
-        const meterFees = dbFees.filter(e => e.type === "meterFee");
-
-        const costPerKwh = getValueForDate(electricityFees);
-        const metercountFee = getValueForDate(meterFees);
-
-        // --- VERBRAUCH ---
-        let consumption = $(
-          `#apartment${apartment}_${year}_${section}Table_electricityConsumption${col}`
-        ).val();
-
-        consumption = parseFloat(consumption) || 0;
-
-        // --- KOSTEN ---
-        cost = consumption * costPerKwh + metercountFee / 12;
-        cost = parseFloat(cost.toFixed(2));
-
-        break;
-      }
-
-      case "water":
-        // kommt später
-        cost = 0;
-        break;
-
-      case "heating":
-        // kommt später
-        cost = 0;
-        break;
-    }
-
-    // --- GEMEINSAMER TEIL ---
     totalVar += cost;
 
     $input.val(cost);
@@ -528,40 +428,7 @@ async function fillTableWithData(section, year) {
   }
 }
 
-function parseInputId(id) {
-  // Beispiele für IDs:
-  // apartment2_2019_energyTable_electricityCost12
-  // 2019_energyTable_date3
-  // 2021_waterTable_mainWaterCost7
 
-  const colMatch = id.match(/[0-9]{1,2}$/);
-  const col = colMatch ? Number(colMatch[0]) : null;
-
-  const parts = id.split("_");
-
-  let apartment = null;
-  let idx = 0;
-
-  // Apartment?
-  if (parts[0].startsWith("apartment")) {
-    apartment = Number(parts[0].replace("apartment", ""));
-    idx = 1;
-  }
-
-  const year = Number(parts[idx]);
-  const section = parts[idx + 1].replace("Table", "");
-  const rawMetric = parts[idx + 2]; // z.B. electricityCost12
-
-  const metric = rawMetric.replace(/[0-9]{1,2}$/, "");
-
-  return {
-    apartment,
-    year,
-    section,
-    metric,
-    col,
-  };
-}
 
 
 // 4.
@@ -590,9 +457,4 @@ async function toggleTableCollapsed(section, year) {
     container.find(".canvasWrapper").show();
     icon.removeClass("rotated");
   }
-}
-
-function calculateConsumption(oldLevel, newLevel) {
-  if (newLevel === null || oldLevel === null) return 0;
-  return Math.abs(newLevel - oldLevel);
 }

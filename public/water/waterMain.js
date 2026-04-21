@@ -24,21 +24,20 @@ $(document).ready(async function () {
         // Wenn Master Registry in DB vorhanden
         tables = tablesRaw ? JSON.parse(tablesRaw) : [];
         tables.sort((a, b) => Number(a) - Number(b));
-await DB.saveValueToDB('waterTables', JSON.stringify(tables));
+        await DB.saveValueToDB('waterTables', JSON.stringify(tables));
         console.log("waterTables:", tables);
 
         for (let year of tables) {
-            await Helper.createTable("water",year);
-            // await Helper.createHeatingGraph(year);
+            await Helper.createTable("water", year);
+            //await Helper.createGraph("water", year);
         }
 
         // Overview graph erzeugen
-        // await Helper.createHeatingOverviewGraph();
-
+       // await Helper.createOverviewGraph("water");
+        Helper.hideLoader();
 
     }
 
     registerListeners();
     registerTableListeners();
-    Helper.hideLoader();
 });

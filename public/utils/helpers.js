@@ -431,7 +431,7 @@ export async function updateGraph(id) {
         // verbrauch total:
         $total = $(`#apartment${apartment}_${year}_energyTable_electricityConsumption13`);
         totalVar = 0;
-        for(let i=1;i<13;i++){
+        for (let i = 1; i < 13; i++) {
           totalVar += parseFloat($(`#apartment${apartment}_${year}_energyTable_electricityConsumption${i}`).val()) || 0;
         }
         $total.text(`${totalVar.toFixed(2)}${getMeasuringUnit(section)}`);
@@ -445,7 +445,7 @@ export async function updateGraph(id) {
         // kosten total:
         $total = $(`#apartment${apartment}_${year}_energyTable_electricityCost13`);
         totalVar = 0;
-        for(let i=1;i<13;i++){
+        for (let i = 1; i < 13; i++) {
           totalVar += parseFloat($(`#apartment${apartment}_${year}_energyTable_electricityCost${i}`).val()) || 0;
         }
         $total.text(`${totalVar.toFixed(2)}€`);
@@ -602,6 +602,62 @@ export async function calculateConsumptionForInput(id) {
   const { apartment, year, section, metric, col } =
     parseInputId(id);
 
+  // -----------------------------
+  // WATER: TOTAL CONSUMPTION
+  // -----------------------------
+  if (section === "water" && metric === "totalWaterConsumption") {
+
+    const hasWarm =
+      (await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`)) === "checked";
+
+    const hasCold =
+      (await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`)) === "checked";
+
+    // 👉 hat eigene Zähler
+    if (hasWarm || hasCold) {
+      let warm = 0;
+      let cold = 0;
+
+      if (hasWarm) {
+        warm = await calculateConsumptionForInput(
+          `apartment${apartment}_${year}_waterTable_warmWaterConsumption${col}`
+        );
+      }
+
+      if (hasCold) {
+        cold = await calculateConsumptionForInput(
+          `apartment${apartment}_${year}_waterTable_coldWaterConsumption${col}`
+        );
+      }
+
+      return warm + cold;
+    }
+
+    // 👉 KEINE Zähler → Rest berechnen
+    let mainTotal = await calculateConsumptionForInput(
+      `${year}_waterTable_mainWaterConsumption${col}`
+    );
+
+    let apartmentCount = await DB.getValueFromDB("apartmentcount");
+
+    let otherSum = 0;
+
+    for (let i = 1; i <= apartmentCount; i++) {
+      if (i === apartment) continue;
+
+      let val = await calculateConsumptionForInput(
+        `apartment${i}_${year}_waterTable_totalWaterConsumption${col}`
+      );
+
+      otherSum += val;
+    }
+
+    return Math.max(mainTotal - otherSum, 0);
+  }
+
+  // -----------------------------
+  // STANDARD (bestehende Logik)
+  // -----------------------------
   let currentMeterCountInputID = id.replace("Consumption", "MeterCount");
   const currentMeterCount = await DB.getValueFromDB(currentMeterCountInputID);
 
@@ -635,7 +691,7 @@ export function getMeasuringUnit(section) {
 }
 
 export async function calculateCostForInput(id) {
-  const { apartment, year, section, col } =
+  const { apartment, year, section, col, metric } =
     parseInputId(id);
 
   switch (section) {
@@ -643,7 +699,7 @@ export async function calculateCostForInput(id) {
       return await calculateEnergyCost(apartment, year, col);
 
     case "water":
-      return 0;
+      return await calculateWaterCost(id);
 
     case "heating":
       return 0;
@@ -651,6 +707,114 @@ export async function calculateCostForInput(id) {
     default:
       return 0;
   }
+}
+
+export async function calculateWaterCost(id) {
+  const { apartment, year, col, metric } = parseInputId(id);
+
+  // -----------------------------
+  // PREISE HOLEN
+  // -----------------------------
+  let dbFees = [
+    ...(await DB.getAllKeysContaining(`mainWaterMeterFee`)),
+    ...(await DB.getAllKeysContaining(`precipitationFee`)),
+  ]
+    .map(obj => ({
+      ...obj,
+      date: extractDate(obj.key),
+    }))
+    .filter(obj => obj.date)
+    .sort((a, b) => a.date - b.date);
+
+  let inputDateRaw = await DB.getValueFromDB(
+    `${year}_waterTable_date${col}`
+  );
+
+  let inputDate = null;
+  if (inputDateRaw) {
+    const [day, month, yearVal] = inputDateRaw.split(".").map(Number);
+    inputDate = new Date(yearVal, month - 1, day);
+  }
+
+  const getValueForDate = (arr) => {
+    let val = arr[0]?.value || 0;
+
+    for (const entry of arr) {
+      if (entry.date <= inputDate) {
+        val = entry.value;
+      } else break;
+    }
+
+    return parseFloat(val) || 0;
+  };
+
+  const waterPrice = getValueForDate(
+    dbFees.filter(e => e.key.includes("mainWaterMeterFee"))
+  );
+
+  const sewagePrice = getValueForDate(
+    dbFees.filter(e => e.key.includes("precipitationFee"))
+  );
+
+  // -----------------------------
+  // CONSUMPTION
+  // -----------------------------
+  let consumption;
+
+  if (apartment) {
+    consumption = parseFloat(
+      $(`#apartment${apartment}_${year}_waterTable_totalWaterConsumption${col}`).val()
+    ) || 0;
+  } else {
+    consumption = parseFloat(
+      $(`#${year}_waterTable_mainWaterConsumption${col}`).val()
+    ) || 0;
+  }
+
+  // -----------------------------
+  // COST
+  // -----------------------------
+  if (metric.toLowerCase().includes("sewage")) {
+    return parseFloat((consumption * sewagePrice).toFixed(2));
+  }
+
+  return parseFloat((consumption * waterPrice).toFixed(2));
+}
+
+export function parseInputId(id) {
+  // Beispiele für IDs:
+  // apartment2_2019_energyTable_electricityCost12
+  // 2019_energyTable_date3
+  // 2021_waterTable_mainWaterCost7
+  //console.log(id);
+
+  const colMatch = id.match(/[0-9]{1,2}$/);
+  const col = colMatch ? Number(colMatch[0]) : null;
+
+  const parts = id.split("_");
+
+  let apartment = null;
+  let idx = 0;
+
+  // Apartment?
+  if (parts[0].startsWith("apartment")) {
+    apartment = Number(parts[0].replace("apartment", ""));
+    idx = 1;
+  }
+
+  const year = Number(parts[idx]);
+  const section = parts[idx + 1].replace("Table", "");
+  const rawMetric = parts[idx + 2]; // z.B. electricityCost12
+
+  const metric = rawMetric.replace(/[0-9]{1,2}$/, "");
+
+  return {
+    apartment,
+    year,
+    section,
+    metric,
+    col,
+  };
 }
 
 export async function calculateEnergyCost(apartment, year, col) {
@@ -708,6 +872,8 @@ export async function calculateEnergyCost(apartment, year, col) {
   return parseFloat(cost.toFixed(2));
 }
 
+
+
 function getMinMax(data) {
   const minValue = Math.min(...data);
   const maxValue = Math.max(...data);
@@ -737,40 +903,7 @@ function stableColorFor(label) {
   return `hsl(${hue}, ${sat}%, ${light}%)`;
 }
 
-export function parseInputId(id) {
-  // Beispiele für IDs:
-  // apartment2_2019_energyTable_electricityCost12
-  // 2019_energyTable_date3
-  // 2021_waterTable_mainWaterCost7
 
-  const colMatch = id.match(/[0-9]{1,2}$/);
-  const col = colMatch ? Number(colMatch[0]) : null;
-
-  const parts = id.split("_");
-
-  let apartment = null;
-  let idx = 0;
-
-  // Apartment?
-  if (parts[0].startsWith("apartment")) {
-    apartment = Number(parts[0].replace("apartment", ""));
-    idx = 1;
-  }
-
-  const year = Number(parts[idx]);
-  const section = parts[idx + 1].replace("Table", "");
-  const rawMetric = parts[idx + 2]; // z.B. electricityCost12
-
-  const metric = rawMetric.replace(/[0-9]{1,2}$/, "");
-
-  return {
-    apartment,
-    year,
-    section,
-    metric,
-    col,
-  };
-}
 
 function toBool(value) {
   return value === true ||
@@ -790,4 +923,58 @@ export function showLoader() {
 export function calculateConsumption(oldLevel, newLevel) {
   if (newLevel === null || oldLevel === null) return 0;
   return Math.abs(newLevel - oldLevel);
+}
+
+export async function calculateTotalWaterConsumptionForApartment(apartment, year, col) {
+
+  const hasWarm =
+    (await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`)) === "checked";
+
+  const hasCold =
+    (await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`)) === "checked";
+
+  // -----------------------------
+  // FALL 1: hat eigene Zähler
+  // -----------------------------
+  if (hasWarm || hasCold) {
+    let warm = 0;
+    let cold = 0;
+
+    if (hasWarm) {
+      warm = parseFloat(
+        $(`#apartment${apartment}_${year}_waterTable_warmWaterConsumption${col}`).val()
+      ) || 0;
+    }
+
+    if (hasCold) {
+      cold = parseFloat(
+        $(`#apartment${apartment}_${year}_waterTable_coldWaterConsumption${col}`).val()
+      ) || 0;
+    }
+
+    return warm + cold;
+  }
+
+  // -----------------------------
+  // FALL 2: KEINE Zähler → Rest berechnen
+  // -----------------------------
+  let mainTotal = parseFloat(
+    $(`#${year}_waterTable_mainWaterConsumption${col}`).val()
+  ) || 0;
+
+  let otherSum = 0;
+
+  let apartmentCount = await DB.getValueFromDB("apartmentcount");
+
+  for (let i = 1; i <= apartmentCount; i++) {
+    if (i === apartment) continue;
+
+    let val = parseFloat(
+      $(`#apartment${i}_${year}_waterTable_totalWaterConsumption${col}`).val()
+    ) || 0;
+
+    otherSum += val;
+  }
+
+  return Math.max(mainTotal - otherSum, 0);
 }

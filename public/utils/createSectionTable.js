@@ -150,89 +150,61 @@ async function makeTableBody(section, year) {
       tableRows += makeMainRow(section, year, "mainSewageCost");
       tableRows += "</tr>";
 
-      for (let apartment = 1; apartment <= apartmentCount; apartment++) {
-        const apartmentName =
-          (await DB.getValueFromDB(`apartment${apartment}name`)) ||
-          `Wohnung ${apartment}`;
+for (let apartment = 1; apartment <= apartmentCount; apartment++) {
+  const apartmentName =
+    (await DB.getValueFromDB(`apartment${apartment}name`)) ||
+    `Wohnung ${apartment}`;
 
-        // Berechne wie viele Spalten pro Wohnung benötigt werden
-        let rowSpan = 2; // default Verbrauch + Kosten
-        let hasWarm =
-          (await DB.getValueFromDB(
-            `apartment${apartment}IsWarmWaterMeterExisting`,
-          )) === "checked";
-        let hasCold =
-          (await DB.getValueFromDB(
-            `apartment${apartment}IsColdWaterMeterExisting`,
-          )) === "checked";
+  const rows = [];
 
-        if (hasWarm) rowSpan += 2;
-        if (hasCold) rowSpan += 2;
-        // rowSpan += 2; // Kosten Wasser + Kosten Abwasser
+const hasWarm =
+  (await DB.getValueFromDB(`apartment${apartment}IsWarmWaterMeterExisting`)) === "checked";
 
-        tableRows += `
-                <tr>
-                    <td rowspan="6">${apartmentName}</td>
-                    <td>Zählerstand Warm</td>
-                `;
-        tableRows += makeApartmentRow(
-          section,
-          year,
-          apartment,
-          "warmWaterMeterCount",
-        );
-        tableRows += "</tr>";
+const hasCold =
+  (await DB.getValueFromDB(`apartment${apartment}IsColdWaterMeterExisting`)) === "checked";
 
-        tableRows += `
-                <tr>
-                    <td>Zählerstand Kalt</td>
-                `;
-        tableRows += makeApartmentRow(
-          section,
-          year,
-          apartment,
-          "coldWaterMeterCount",
-        );
-        tableRows += "</tr>";
+// Basis-Zeilen (immer da)
+rows.push({ label: "Verbrauch Gesamt", metric: "totalWaterConsumption" });
+rows.push({ label: "Kosten Wasser", metric: "waterCost" });
+rows.push({ label: "Kosten Abwasser", metric: "sewageCost" });
 
-        tableRows += `
-                <tr>
-                    <td>Verbrauch Warm</td>
-                `;
-        tableRows += makeApartmentRow(
-          section,
-          year,
-          apartment,
-          "warmWaterConsumption",
-        );
-        tableRows += "</tr>";
+// optional warm
+if (hasWarm) {
+  rows.unshift(
+    { label: "Zählerstand Warm", metric: "warmWaterMeterCount" },
+    { label: "Verbrauch Warm", metric: "warmWaterConsumption" }
+  );
+}
 
-        tableRows += `
-                <tr>
-                    <td>Verbrauch Kalt</td>
-                `;
-        tableRows += makeApartmentRow(
-          section,
-          year,
-          apartment,
-          "coldWaterConsumption",
-        );
-        tableRows += "</tr>";
+// optional cold
+if (hasCold) {
+  rows.unshift(
+    { label: "Zählerstand Kalt", metric: "coldWaterMeterCount" },
+    { label: "Verbrauch Kalt", metric: "coldWaterConsumption" }
+  );
+}
 
-        tableRows += `
-                <tr>
-                    <td>Kosten Wasser</td>
-                `;
-        tableRows += makeApartmentRow(section, year, apartment, "waterCost");
-        tableRows += "</tr>";
+const rowSpan = rows.length;
 
-        tableRows += `
-                <tr>
-                    <td>Kosten Abwasser</td>
-                `;
-        tableRows += makeApartmentRow(section, year, apartment, "sewageCost");
-        tableRows += "</tr>";
-      }
+tableRows += `
+<tr>
+  <td rowspan="${rowSpan}">${apartmentName}</td>
+  <td>${rows[0].label}</td>
+  ${makeApartmentRow(section, year, apartment, rows[0].metric)}
+</tr>
+`;
+
+for (let i = 1; i < rows.length; i++) {
+  tableRows += `
+    <tr>
+      <td>${rows[i].label}</td>
+      ${makeApartmentRow(section, year, apartment, rows[i].metric)}
+    </tr>
+  `;
+}
+}
+
+
       break;
 
     case "heating":
@@ -379,28 +351,62 @@ async function fillTableWithData(section, year) {
   // 2. VERBRAUCH BERECHNEN
   // -----------------------------
   const consumptionInputs = allInputs.filter(function () {
-    return this.id.toLowerCase().includes("consumption");
-  });
+  return this.id.toLowerCase().includes("consumption");
+});
 
-  for (const element of consumptionInputs.toArray()) {
-    const $input = $(element);
-    const id = $input.attr("id");
+// -----------------------------
+// 2.1 NORMAL CONSUMPTION (ohne total)
+// -----------------------------
+const normalConsumption = consumptionInputs.filter(function () {
+  return !this.id.toLowerCase().includes("totalwaterconsumption");
+});
 
-    const { section } = Helper.parseInputId(id);
+// -----------------------------
+// 2.2 TOTAL CONSUMPTION
+// -----------------------------
+const totalConsumption = consumptionInputs.filter(function () {
+  return this.id.toLowerCase().includes("totalwaterconsumption");
+});
 
-    const totalID = id.replace(/\d+$/, 13);
-    const $total = $(`#${totalID}`);
+for (const element of normalConsumption.toArray()) {
+  const $input = $(element);
+  const id = $input.attr("id");
 
-    let totalVar = parseFloat($total.text()) || 0;
+  const { section } = Helper.parseInputId(id);
 
-    // ausgelagerte Funktion
-    const consumption = await Helper.calculateConsumptionForInput(id);
+  const totalID = id.replace(/\d+$/, 13);
+  const $total = $(`#${totalID}`);
 
-    totalVar += consumption;
+  let totalVar = parseFloat($total.text()) || 0;
 
-    $input.val(consumption);
-    $total.text(`${totalVar.toFixed(2)}${Helper.getMeasuringUnit(section)}`);
-  }
+  const consumption = await Helper.calculateConsumptionForInput(id);
+
+  totalVar += consumption;
+
+  $input.val(consumption);
+  $total.text(`${totalVar.toFixed(2)}${Helper.getMeasuringUnit(section)}`);
+}
+
+
+
+ for (const element of totalConsumption.toArray()) {
+  const $input = $(element);
+  const id = $input.attr("id");
+
+  const { section } = Helper.parseInputId(id);
+
+  const totalID = id.replace(/\d+$/, 13);
+  const $total = $(`#${totalID}`);
+
+  let totalVar = parseFloat($total.text()) || 0;
+
+  const consumption = await Helper.calculateConsumptionForInput(id);
+
+  totalVar += consumption;
+
+  $input.val(consumption);
+  $total.text(`${totalVar.toFixed(2)}${Helper.getMeasuringUnit(section)}`);
+}
 
   // -----------------------------
   // 3. KOSTEN BERECHNEN
@@ -412,6 +418,7 @@ async function fillTableWithData(section, year) {
   for (const element of costInputs.toArray()) {
     const $input = $(element);
     const id = $input.attr("id");
+    
 
     const totalID = id.replace(/\d+$/, 13);
     const $total = $(`#${totalID}`);

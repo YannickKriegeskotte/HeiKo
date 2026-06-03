@@ -31,7 +31,6 @@ Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 15 Stunden
 04.12.25:   00-01 Uhr 12-14 Uhr 15-22 Uhr
 09.12.25:   17-18 Uhr 20-22 Uhr
 10.12.25:   13-21 Uhr
-
 05.01.26:   01-02 Uhr
 14.02.26:   19-20 Uhr
 15.02.26:   11-15 Uhr 23-02 Uhr
@@ -42,10 +41,13 @@ Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 15 Stunden
 12.04.26:   11:30- 15:00 Uhr
 18.04.26:   14-15 Uhr
 21.04.26:   20:30-00 Uhr
+
+========Neues Frontend + Neue DB Struktur========
 30.05.26:   12-15 Uhr
 01.06.26:   16-23 Uhr
 02.06.26:   16-18 Uhr
-03.06.26:   15-23 Uhr
+03.06.26:   15-00 Uhr
+04.06.26:   00-02 Uhr
 
 
 

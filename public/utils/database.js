@@ -1,251 +1,175 @@
 import * as Helper from "./helpers.js";
 
-const debug = false;
-/**
- * 
- * @param {String} url 
- * @returns {Boolean}
- */
-export async function checkServerAvailability(url) {
-    try {
-        const response = await fetch(url, { method: "GET" });
-        return response.ok; // true, wenn HTTP-Status 200–299
-    } catch (error) {
-        return false; // Netzwerkfehler oder Server offline
-    }
-}
+const debug = true;
 
+// =========================
+// API BASE
+// =========================
+const API = {
+  time: "/time",
+  settings: "/settings",
+  ui: "/ui"
+};
 
+// =====================================================
+// TIME SERIES API (READINGS / FEES / UI)
+// =====================================================
 
-/**
- * 
- * @param {String} key
- * @param {String} value
- */
-export async function saveValueToDB(key, value) {
-    if(debug) console.log("saveValueToDB:", key, value);
-    const response = await fetch("/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, value }),
-    });
-    if (!response.ok){
-        if(debug) console.error("saveValueToDB failed", response.status);
-    }
-    else{
-    $('#databaseTable tbody').append(`
-         <tr>
-            <td class="keyTd">${key}</td>
-            <td>${value}</td>
-            <td><input type="text" class="newKeyInput"></td>
-            <td><input type="text" class=newValueInput"></td>
-            <td><button class=deleteButton id="${key}_button">Löschen</button></td>
-        </tr>
-    `);
-    }
-}
+export async function saveTimeEntry({
+  type,
+  apartment_id = null,
+  metric,
+  value = null,
+  state = null,
+  date
+}) {
+  if (debug) console.log("saveTimeEntry", { type, apartment_id, metric, value, state, date });
 
-
-
-
-/**
- * @param {String} key 
- * @returns {} String or null
- */
-export async function getValueFromDB(key) {
-    if(debug) console.log("getValueFromDB key", key);
-    let response;
-    let data;
-    response = await fetch(`/get?key=${key}`);
-    if (!response.ok) return null;
-    data = await response.json();
-    return data.value;
-}
-
-
-
-
-/** 
- * @returns {Array} 
- */
-export async function getAllValuesFromDB() {
-    if(debug) console.log("getAllValuesFromDB");
-    let response;
-    let data;
-    response = await fetch(`/getAll`);
-    data = await response.json();
-    if (!response.ok) return [];
-    return data;
-}
-
-
-
-
-/**
- * @param {String} key 
- * @param {String} value 
- */
-export async function updateValueInDB(key, value) {
-    const response = await fetch("/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, value }),
-    });
-    if (!response.ok) if(debug) console.error("updateValueInDB failed", response.status);
-    if (response.ok) if(debug) console.log("updatedValueInDB:", key, "=>", value);
-
-    const row = $(`tbody tr`).filter(function () {
-        return $(this).find("td:first").text() === key;
-    });
-    row.find("td:nth-child(2)").text(value);
-
-    // Klasse kurz hinzufügen, dann wieder entfernen
-    row.addClass("highlightFade");
-    setTimeout(() => row.removeClass("highlightFade"), 1300);
-}
-
-
-
-
-export async function renameKeyInDB(oldKey, newKey) {
-  const response = await fetch("/rename", {
+  const response = await fetch(`${API.time}/save`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ oldKey, newKey }),
+    body: JSON.stringify({
+      type,
+      apartment_id,
+      metric,
+      value,
+      state,
+      date
+    })
   });
 
-  const data = await response.json();
-
-  if (data.success) {
-    await Helper.updateDatabaseTable();
-  } else {
-    if(debug) console.error("Fehler beim Rename:", data.error);
-  }
+  return response.ok;
 }
 
+export async function getLatestTimeEntry(type, apartment_id, metric) {
+  const response = await fetch(
+    `${API.time}/latest?type=${type}&apartment_id=${apartment_id}&metric=${metric}`
+  );
 
-
-
-/**
- * @param {String} KeyPattern 
- * @returns {String} String oder Null
- */
-export async function getNewestValueFromDB(key) {
-    // Finde alle Einträge, die key enthalten
-    let matches = await getAllKeysContaining(key);
-    
-    if (matches.length == 0) {
-        // if(debug) console.log("getNewestValueFromDB", key, ": no matches");
-        return null;
-    }
-    // Wenn Array nur länge 1, dann nimm die value
-    if (matches.length == 1) {
-       // if(debug) console.log("getNewestValueFromDB", key, ": one match:", matches[0]);
-        return matches[0].value;
-    }
-    // Sonst sortiere array, sodass neustes Datum vorne und nimm die value des ersten Eintrags
-    if(debug) console.log("getNewestValueFromDB", key, ": matches:", matches);
-    const sorted = matches
-        .filter(item => extractDate(item.key))
-        .sort((a, b) => extractDate(b.key) - extractDate(a.key));
-    if(debug) console.log("sorted[0]", sorted[0]);
-    return sorted[0].value;
+  if (!response.ok) return null;
+  return await response.json();
 }
 
+export async function getTimeRange(type, apartment_id, metric, from, to) {
+  const response = await fetch(
+    `${API.time}/range?type=${type}&apartment_id=${apartment_id}&metric=${metric}&from=${from}&to=${to}`
+  );
 
-/**
- * @param {String} pattern 
- * @returns {Array}
- */
-export async function getAllKeysContaining(pattern) {
-    if(debug) console.log("getAllKeysContaining", pattern);
-    const response = await fetch(`/getAllContaining?pattern=${pattern}`);
-    if (!response.ok) return [];
+  if (!response.ok) return [];
+  return await response.json();
+}
+
+export async function getLatestTimeByType(type) {
+  const response = await fetch(
+    `${API.time}/latestByType?type=${type}`
+  );
+
+  if (!response.ok) return [];
+
+  return await response.json();
+}
+
+export async function getLatestTimeEntryByYear(
+    type,
+    apartment_id,
+    metric,
+    year
+) {
+    const response = await fetch(
+        `${API.time}/latestByYear?type=${type}&apartment_id=${apartment_id}&metric=${metric}&year=${year}`
+    );
+
+    if (!response.ok) return null;
+
     return await response.json();
 }
 
-/**
- * @param {String} apartmendID 
- */
-export async function deleteAllValuesFromApartmentInDB(apartmendID) {
-    if(debug) console.log("deleteAllValuesFromApartmendInDB", apartmendID);
-    const response = await fetch(`/removeApartmentEntries?apartmentID=${apartmendID}`, { method: "DELETE" });
-    const result = await response.json();
-    if (result.success) {
-        if(debug) console.log("Gelöscht!");
-    }
+// =====================================================
+// DELETE TIME DATA
+// =====================================================
+
+export async function deleteTimeEntry(id) {
+  const response = await fetch(`${API.time}/delete`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  });
+
+  return response.ok;
 }
 
+export async function deleteTimeByMetric(type, apartment_id, metric) {
+  const response = await fetch(`${API.time}/deleteByMetric`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, apartment_id, metric })
+  });
 
-export async function deleteKeyInDB(key) {
-    if(debug) console.log("deleteKeyInDB", key);
-    const response = await fetch("/delete", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key })
-    });
-    const result = await response.json();
-    if (result.success) {
-        if(debug) console.log("Gelöscht!");
-
-        // Finde html datenbank zeile und lösche
-        $(`${key}_row`).remove();
-    }
+  return response.ok;
 }
 
+export async function deleteTimeRange(type, apartment_id, metric, from, to) {
+  const response = await fetch(`${API.time}/deleteRange`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, apartment_id, metric, from, to })
+  });
 
-
-
-/**
- * 
- * @param {String} key 
- * @returns {String}
- */
-export async function getNewestKey(key) {
-    if(debug) console.log("getNewestKey", key);
-    const response = await fetch(`/getAllContaining?pattern=${key}`);
-    const data = await response.json();
-
-    if (!Array.isArray(data) || data.length === 0) return null;
-
-    const sorted = data
-        .filter(item => extractDate(item.key))
-        .sort((a, b) => extractDate(b.key) - extractDate(a.key));
-
-    return sorted[0]?.key || null;
+  return response.ok;
 }
 
+// =====================================================
+// SETTINGS API (Miete, Preise, kWh etc.)
+// =====================================================
 
-/**
- * 
- * @param {String} key 
- * @returns {Date}
- */
-export async function getTimestampOfNewestKey(key) {
-    if(debug) console.log("getTimestampOfNewestKey", key);
-    const newestKey = await getNewestKey(key);
-    if (!newestKey) return null;
+export async function saveSetting(key, value) {
+  const response = await fetch(`${API.settings}/save`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key, value })
+  });
 
-    const match = newestKey.match(/(\d{1,2})-(\d{1,2})-(\d{4})$/);
-    if (!match) return null;
-
-    const [_, day, month, year] = match;
-    return `${day}-${month}-${year}`;
+  return response.ok;
 }
 
+export async function getSetting(key) {
+  const response = await fetch(`${API.settings}/get?key=${key}`);
 
+  if (!response.ok) return null;
 
+  const data = await response.json();
+  return data.value;
+}
 
+export async function deleteSetting(key) {
+  const response = await fetch(`${API.settings}/delete`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key })
+  });
 
+  return response.ok;
+}
 
-/**
- * @param {String} key 
- * @returns {String}
- */
-function extractDate(key) {
-    if(debug) console.log("extractDate", key);
-    const match = key.match(/(\d{1,2}-\d{1,2}-\d{4})$/);
-    if (!match) { return null }
-    const [day, month, year] = match[1].split('-').map(Number);
-    return new Date(year, month - 1, day);
+// =====================================================
+// UI STATE API (Checkboxes etc.)
+// =====================================================
+
+export async function saveUIState(element_id, state, date) {
+  const response = await fetch(`${API.ui}/save`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ element_id, state, date })
+  });
+
+  return response.ok;
+}
+
+export async function getUIState(element_id) {
+  const response = await fetch(`${API.ui}/get?element_id=${element_id}`);
+
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  return data.state;
 }

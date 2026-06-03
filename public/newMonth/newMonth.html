@@ -8,12 +8,12 @@
     <link rel="icon" type="image/x-icon" href="../assets/HeiKoFavicon.png" />
     <!-- <link rel="stylesheet" href="../utils/commons.css" /> -->
 
-
     <script src="../lib/jquery-3.7.1.min.js"></script>
     <script type="module" src="newMonthMain.js"></script>
 
     <title>HeiKo</title>
   </head>
+
   <body>
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -37,11 +37,7 @@
         </a>
 
         <a class="sidebar-link" href="../water/water.html">
-          <img
-            class="droplet-icon"
-            src="../assets/droplet-solid-full.svg"
-            alt=""
-          />
+          <img class="droplet-icon" src="../assets/droplet-solid-full.svg" alt="" />
           Wasser
         </a>
 
@@ -73,27 +69,20 @@
           <button class="secondary-btn" id="reset-button">
             <img src="../assets/reset-icon.svg" alt="" />Zurücksetzen
           </button>
+
           <input class="date-input" type="date" id="date-input" />
+
           <button class="primary-btn" id="save-button">
-            <img
-              class="save-icon"
-              src="../assets/save-icon.svg"
-              alt=""
-            />Speichern
+            <img class="save-icon" src="../assets/save-icon.svg" alt="" />
+            Speichern
           </button>
         </div>
       </div>
 
       <!-- Wasser -->
-
       <section class="measurement-card water-card">
         <div class="measurement-header">
-          <img
-            class="droplet-icon"
-            src="../assets/droplet-solid-full.svg"
-            alt=""
-          />
-
+          <img class="droplet-icon" src="../assets/droplet-solid-full.svg" />
           <div>
             <h2>Wasser</h2>
             <p>Wasserbezogene Werte erfassen</p>
@@ -104,7 +93,7 @@
           <div class="input-group">
             <label>Warmwasser</label>
             <div class="input-wrapper">
-              <input type="number" id="warmwasser-input" />
+              <input type="number" id="warmwasser" />
               <span class="unit">L</span>
             </div>
           </div>
@@ -112,7 +101,7 @@
           <div class="input-group">
             <label>Kaltwasser</label>
             <div class="input-wrapper">
-              <input type="number" id="kaltwasser-input" />
+              <input type="number" id="kaltwasser" />
               <span class="unit">L</span>
             </div>
           </div>
@@ -120,7 +109,7 @@
           <div class="input-group">
             <label>Gesamtwasser</label>
             <div class="input-wrapper">
-              <input type="number" id="gesamtwasser-input" />
+              <input type="number" id="gesamtwasser" />
               <span class="unit">L</span>
             </div>
           </div>
@@ -128,7 +117,7 @@
           <div class="input-group">
             <label>Druck Enthärtungsanlage</label>
             <div class="input-wrapper">
-              <input type="number" id="enthärtungsanlage-druck-input" />
+              <input type="number" id="enthaertungsanlage-druck" />
               <span class="unit">Bar</span>
             </div>
           </div>
@@ -136,11 +125,9 @@
       </section>
 
       <!-- Heizung -->
-
       <section class="measurement-card heating-card">
         <div class="measurement-header">
-          <img class="fire-icon" src="../assets/fire-solid-full.svg" alt="" />
-
+          <img class="fire-icon" src="../assets/fire-solid-full.svg" />
           <div>
             <h2>Heizung</h2>
             <p>Heizungsbezogene Werte erfassen</p>
@@ -151,7 +138,7 @@
           <div class="input-group">
             <label>Betriebsstunden</label>
             <div class="input-wrapper">
-              <input type="number" id="heizung-betriebsstunden-input" />
+              <input type="number" id="heizung-betriebsstunden" />
               <span class="unit">Std</span>
             </div>
           </div>
@@ -159,7 +146,7 @@
           <div class="input-group">
             <label>Verbrauch</label>
             <div class="input-wrapper">
-              <input type="number" id="heizung-verbrauch-input" />
+              <input type="number" id="heizung-verbrauch" />
               <span class="unit">L</span>
             </div>
           </div>
@@ -167,7 +154,7 @@
           <div class="input-group">
             <label>Druck</label>
             <div class="input-wrapper">
-              <input type="number" id="heizung-druck-input" />
+              <input type="number" id="heizung-druck" />
               <span class="unit">Bar</span>
             </div>
           </div>
@@ -175,11 +162,9 @@
       </section>
 
       <!-- Öl -->
-
       <section class="measurement-card oil-card">
         <div class="measurement-header">
-          <img class="oil-icon" src="../assets/droplet-solid-full.svg" alt="" />
-
+          <img class="oil-icon" src="../assets/droplet-solid-full.svg" />
           <div>
             <h2>Öl</h2>
             <p>Ölstand erfassen</p>
@@ -190,7 +175,7 @@
           <div class="input-group">
             <label>Öl Zeiger</label>
             <div class="input-wrapper">
-              <input type="number" id="öl-zeiger-input" />
+              <input type="number" id="oel-zeiger" />
               <span class="unit">L</span>
             </div>
           </div>
@@ -198,7 +183,7 @@
           <div class="input-group">
             <label>Öl Meter</label>
             <div class="input-wrapper">
-              <input type="number" id="öl-meter-input" />
+              <input type="number" id="oel-meter" />
               <span class="unit">cm</span>
             </div>
           </div>
@@ -206,11 +191,9 @@
       </section>
 
       <!-- Strom -->
-
       <section class="measurement-card energy-card">
         <div class="measurement-header">
-          <img class="bolt-icon" src="../assets/bolt-solid-full.svg" alt="" />
-
+          <img class="bolt-icon" src="../assets/bolt-solid-full.svg" />
           <div>
             <h2>Strom</h2>
             <p>Strombezogene Werte erfassen</p>
@@ -221,7 +204,7 @@
           <div class="input-group">
             <label>Zählerstand UG</label>
             <div class="input-wrapper">
-              <input type="number" id="ug-stromzähler-input" />
+              <input type="number" id="stromzaehler-ug" />
               <span class="unit"></span>
             </div>
           </div>
@@ -229,7 +212,7 @@
           <div class="input-group">
             <label>Zählerstand OG</label>
             <div class="input-wrapper">
-              <input type="number" id="og-stromzähler-input" />
+              <input type="number" id="stromzaehler-og" />
               <span class="unit"></span>
             </div>
           </div>
@@ -237,7 +220,7 @@
           <div class="input-group">
             <label>Solarstrom</label>
             <div class="input-wrapper">
-              <input type="number" id="solarstrom-input" />
+              <input type="number" id="solarstrom" />
               <span class="unit"></span>
             </div>
           </div>
@@ -245,11 +228,9 @@
       </section>
 
       <!-- Solarthermie -->
-
       <section class="measurement-card solar-card">
         <div class="measurement-header">
-          <img class="sun-icon" src="../assets/sun-solid-full.svg" alt="" />
-
+          <img class="sun-icon" src="../assets/sun-solid-full.svg" />
           <div>
             <h2>Solarthermie</h2>
             <p>Solarthermiebezogene Werte erfassen</p>
@@ -260,7 +241,7 @@
           <div class="input-group">
             <label>Laufzeit Solarpumpe</label>
             <div class="input-wrapper">
-              <input type="number" id="laufzeit-solarpumpe-input" />
+              <input type="number" id="solarpumpe-laufzeit" />
               <span class="unit">Std</span>
             </div>
           </div>
@@ -268,7 +249,7 @@
           <div class="input-group">
             <label>Solarenergie</label>
             <div class="input-wrapper">
-              <input type="number" id="solarenergie-input" />
+              <input type="number" id="solarenergie" />
               <span class="unit">kWh</span>
             </div>
           </div>
@@ -276,19 +257,18 @@
           <div class="input-group">
             <label>Solardruck</label>
             <div class="input-wrapper">
-              <input type="number" id="solarpumpe-druck-input" />
+              <input type="number" id="solarpumpe-druck" />
               <span class="unit">Bar</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Sonstiges Matrix -->
-
+      <!-- Sonstiges -->
       <section class="pricing-table">
+
         <div class="pricing-header">
           <h2>Sonstige Werte</h2>
-            
 
           <div class="col-title">
             <span>gleich wie vorher?</span>
@@ -301,107 +281,87 @@
           </div>
         </div>
 
-        <!-- Zählergebühren Strom -->
         <div class="pricing-row">
           <label>Zählergebühren Strom</label>
-
           <div class="cell">
             <input type="checkbox" id="zaehlergebuehren-strom-og-lock" />
-            <input type="number" id="zaehlergebuehren-strom-og-value" />
+            <input type="number" id="zaehlergebuehren-strom-og" />
           </div>
-
           <div class="cell">
             <input type="checkbox" id="zaehlergebuehren-strom-ug-lock" />
-            <input type="number" id="zaehlergebuehren-strom-ug-value" />
+            <input type="number" id="zaehlergebuehren-strom-ug" />
           </div>
         </div>
 
-        <!-- Zählergebühren Wasser -->
         <div class="pricing-row">
           <label>Zählergebühren Wasser</label>
-
           <div class="cell">
             <input type="checkbox" id="zaehlergebuehren-wasser-og-lock" />
-            <input type="number" id="zaehlergebuehren-wasser-og-value" />
+            <input type="number" id="zaehlergebuehren-wasser-og" />
           </div>
-
           <div class="cell">
             <input type="checkbox" id="zaehlergebuehren-wasser-ug-lock" />
-            <input type="number" id="zaehlergebuehren-wasser-ug-value" />
+            <input type="number" id="zaehlergebuehren-wasser-ug" />
           </div>
         </div>
 
-        <!-- Kilowatt Preis -->
         <div class="pricing-row">
           <label>Kilowatt Preis</label>
-
           <div class="cell">
             <input type="checkbox" id="kilowatt-preis-og-lock" />
-            <input type="number" id="kilowatt-preis-og-value" />
+            <input type="number" id="kilowatt-preis-og" />
           </div>
-
           <div class="cell">
             <input type="checkbox" id="kilowatt-preis-ug-lock" />
-            <input type="number" id="kilowatt-preis-ug-value" />
+            <input type="number" id="kilowatt-preis-ug" />
           </div>
         </div>
 
-        <!-- Wasser Preis -->
         <div class="pricing-row">
           <label>Wasser Preis</label>
-
           <div class="cell">
             <input type="checkbox" id="wasser-preis-og-lock" />
-            <input type="number" id="wasser-preis-og-value" />
+            <input type="number" id="wasser-preis-og" />
           </div>
-
           <div class="cell">
             <input type="checkbox" id="wasser-preis-ug-lock" />
-            <input type="number" id="wasser-preis-ug-value" />
+            <input type="number" id="wasser-preis-ug" />
           </div>
         </div>
 
-        <!-- Abwasser Preis -->
         <div class="pricing-row">
           <label>Abwasser Preis</label>
-
           <div class="cell">
             <input type="checkbox" id="abwasser-preis-og-lock" />
-            <input type="number" id="abwasser-preis-og-value" />
+            <input type="number" id="abwasser-preis-og" />
           </div>
-
           <div class="cell">
             <input type="checkbox" id="abwasser-preis-ug-lock" />
-            <input type="number" id="abwasser-preis-ug-value" />
+            <input type="number" id="abwasser-preis-ug" />
           </div>
         </div>
 
-        <!-- Öl Preis -->
         <div class="pricing-row">
           <label>Öl Preis</label>
-
           <div class="cell">
             <input type="checkbox" id="oel-preis-og-lock" />
-            <input type="number" id="oel-preis-og-value" />
+            <input type="number" id="oel-preis-og" />
           </div>
-
           <div class="cell">
             <input type="checkbox" id="oel-preis-ug-lock" />
-            <input type="number" id="oel-preis-ug-value" />
+            <input type="number" id="oel-preis-ug" />
           </div>
         </div>
 
-        <!-- Miete (nur UG) -->
         <div class="pricing-row">
           <label>Miete</label>
-
           <div class="cell empty"></div>
-
           <div class="cell">
             <input type="checkbox" id="miete-ug-lock" />
-            <input type="number" id="miete-ug-value" />
+            <input type="number" id="miete-ug" />
           </div>
         </div>
+
       </section>
     </main>
   </body>

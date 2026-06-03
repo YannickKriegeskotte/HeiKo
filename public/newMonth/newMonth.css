@@ -1,0 +1,546 @@
+/* ==================================================
+   RESET & GLOBAL
+================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #f5f7fb;
+}
+
+/* ==================================================
+   LAYOUT
+================================================== */
+
+.content {
+    margin-left: 260px;
+    padding: 32px;
+}
+
+/* ==================================================
+   SIDEBAR
+================================================== */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 260px;
+    height: 100vh;
+
+    background: white;
+    border-right: 1px solid #e5e7eb;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-logo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.sidebar-nav {
+    padding-top: 12px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    width: 100%;
+    height: 52px;
+
+    padding: 0 20px;
+
+    text-decoration: none;
+    font-size: 15px;
+    color: #374151;
+
+    background: transparent;
+    border: none;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sidebar a img {
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar a:hover {
+    background: #f3f6fb;
+}
+
+.sidebar a.active {
+    background: #eef4ff;
+    color: #2563eb;
+    font-weight: 600;
+
+    border-left: 4px solid #2563eb;
+}
+
+/* ==================================================
+   PAGE HEADER
+================================================== */
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.content-header h1 {
+    font-size: 2rem;
+    color: #111827;
+}
+
+.content-header p {
+    margin-top: 6px;
+    color: #6b7280;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.date-input {
+    height: 48px;
+
+    padding: 0 14px;
+
+    background: white;
+
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.date-input:focus {
+    outline: none;
+
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px #2563eb26;
+}
+
+/* ==================================================
+   BUTTONS
+================================================== */
+
+.secondary-btn,
+.primary-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+
+    border: none;
+    border-radius: 10px;
+
+    font-size: 15px;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.secondary-btn {
+    background: white;
+    border: 1px solid #d1d5db;
+}
+
+.secondary-btn:hover {
+    background: #f3f4f6;
+}
+
+.primary-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+}
+
+.header-actions button img {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+/* ==================================================
+   CARDS
+================================================== */
+
+.measurement-card {
+    background: white;
+
+    margin-bottom: 24px;
+    padding: 24px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+}
+
+.water-card {
+    background: #f6fbff;
+    border-color: #bfdcff;
+}
+
+.heating-card {
+    background: #fff8f2;
+    border-color: #ffd6b3;
+}
+
+.energy-card {
+    background: #fffdf2;
+    border-color: #f7e59a;
+}
+
+.solar-card {
+    background: #fffdf2;
+    border-color: #f7e59a;
+}
+
+.oil-card {
+    background: #fafafa;
+    border-color: #d8d8d8;
+}
+
+/* ==================================================
+   CARD HEADER
+================================================== */
+
+.measurement-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    margin-bottom: 24px;
+}
+
+.measurement-header img {
+    width: 28px;
+    height: 28px;
+}
+
+.measurement-header h2 {
+    font-size: 1.4rem;
+    color: #111827;
+}
+
+.measurement-header p {
+    margin-top: 4px;
+    color: #6b7280;
+}
+
+/* ==================================================
+   GRID
+================================================== */
+
+.measurement-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+/* ==================================================
+   FORM ELEMENTS
+================================================== */
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.input-group input,
+.input-group select {
+    height: 48px;
+
+    padding: 0 14px;
+
+    font-size: 15px;
+
+    background: white;
+
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px #2563eb26;
+}
+
+/* ==================================================
+   INPUT WITH UNIT
+================================================== */
+
+.input-wrapper {
+    display: flex;
+    align-items: stretch;
+
+    width: 100%;
+    height: 48px;
+
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.input-wrapper input {
+    flex: 1;
+
+    height: 100%;
+
+    border: 1px solid #d1d5db;
+    border-right: none;
+
+    border-radius: 10px 0 0 10px;
+}
+
+.unit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 12px;
+
+    background: #e5e7eb;
+    color: #000;
+
+    font-size: 0.85rem;
+    white-space: nowrap;
+
+    border: 1px solid #d1d5db;
+    border-left: none;
+
+    border-radius: 0 10px 10px 0;
+}
+
+/* ==================================================
+   NUMBER INPUT FIXES
+================================================== */
+
+/* Chrome, Edge, Safari */
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* ==================================================
+   ICON FILTERS
+================================================== */
+
+.bolt-icon {
+    filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1500%) hue-rotate(2deg);
+}
+
+.droplet-icon {
+    filter: brightness(0) saturate(100%) invert(38%) sepia(98%) saturate(748%) hue-rotate(175deg);
+}
+
+.fire-icon {
+    filter: brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(1200%) hue-rotate(330deg);
+}
+
+.euro-icon {
+    filter: brightness(0) saturate(100%) invert(48%) sepia(93%) saturate(420%) hue-rotate(85deg);
+}
+
+.home-icon {
+    filter: brightness(0) saturate(100%) invert(39%) sepia(93%) saturate(2200%) hue-rotate(214deg);
+}
+
+.oil-icon {
+    filter: brightness(0.35) contrast(1.2) saturate(0%);
+}
+
+.sun-icon {
+    filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1500%) hue-rotate(2deg);
+}
+
+.save-icon{
+    filter: brightness(0) invert(1);
+}
+
+/* ==================================================
+   Sonstiges Matrix
+================================================== */
+
+.pricing-table {
+    margin-top: 32px;
+
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+
+    padding: 24px;
+}
+
+.pricing-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    align-items: center;
+
+    text-align: center;
+
+    margin-bottom: 12px;
+}
+
+.col-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    font-weight: 600;
+}
+
+.pricing-row > .cell:nth-child(2) {
+    border-right: 2px solid #eef2f7;
+    padding-right: 16px;
+}
+
+.pricing-header > .col-title:nth-child(2) {
+    border-right: 2px solid #eef2f7;
+    padding-right: 16px;
+}
+
+.pricing-row > .cell,
+.pricing-header > .col-title {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.pricing-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    align-items: center;
+
+    padding: 10px 0;
+
+    border-top: 1px solid #f1f5f9;
+}
+
+.pricing-row label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cell input[type="number"] {
+    height: 38px;
+    width: 120px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    padding: 0 10px;
+}
+
+.cell input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.cell.empty {
+    pointer-events: none;
+}
+
+
+/* ==================================================
+   Animation
+================================================== */
+
+
+.input-error-animation {
+    animation: errorAttention 1.2s ease;
+}
+
+@keyframes errorAttention {
+
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 0, 0, 0);
+    }
+
+    20% {
+        transform: scale(1.12);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+    }
+
+    30% {
+        transform: scale(1.12) rotate(-8deg);
+    }
+
+    40% {
+        transform: scale(1.12) rotate(8deg);
+    }
+
+    50% {
+        transform: scale(1.12) rotate(-6deg);
+    }
+
+    60% {
+        transform: scale(1.12) rotate(6deg);
+    }
+
+    70% {
+        transform: scale(1.08);
+        box-shadow: 0 0 25px rgba(255, 0, 0, 1);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 0, 0, 0);
+    }
+}

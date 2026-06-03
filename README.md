@@ -176,4 +176,4 @@ Das Projekt besteht aus **drei technologischen Entwicklungsphasen**:
 ---
 
 # Aktuelle Version
-**2.15.0-a4**
+**2.15.0-a16**

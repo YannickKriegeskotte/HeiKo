@@ -1,118 +1,327 @@
-<!DOCTYPE html>
-<html lang="de">
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>HeiKo</title>
-
-    <script>
-      // Beim allerersten Rendern theme speichern
-      const localTheme = localStorage.getItem('theme');
-      if (localTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.documentElement.style.backgroundColor = '#1a2420'; // dunkler Fallback-Hintergrund
-      } else {
-        document.documentElement.style.backgroundColor = '#ceffe8'; // heller Fallback-Hintergrund
-      }
-    </script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="index.css" />
-    <link rel="stylesheet" href="../utils/commons.css" />
+    <link rel="icon" type="image/x-icon" href="../assets/HeiKoFavicon.png" />
+    <!-- <link rel="stylesheet" href="../utils/commons.css" /> -->
+
     <script src="../lib/jquery-3.7.1.min.js"></script>
-    <script type="module" src="indexMain.js"></script>
+    <!-- <script type="module" src="indexMain.js"></script> -->
+
+    <title>HeiKo</title>
   </head>
   <body>
-        <!-- LOADER OVERLAY -->
-    <div id="loadingOverlay">
-      <img src="../assets/loading.gif" alt="Loading..." />
-    </div>
-    
-  <!--
-  <div class="appearanceToggle">
-      <input
-        type="checkbox"
-        id="appearanceToggleInput"
-        class="appearanceToggleCheckbox"
-      />
-      <label for="appearanceToggleInput">
-        <img class="dark-white-toggle-icon" src="./assets/circle-half-stroke-solid-full.svg" alt="Toggle Theme" />
-      </label>
-    </div>
-    -->
-
-    <h1>HEIKO</h1>
-    <h2>Heimkosten</h2>
-
-    <div id="sectionSelection">
-      <a href="../energy/energy.html" class="energySelection">
-        <div class="sectionSelectionIcon" id="energyTab"></div>
-      </a>
-      <a href="../water/water.html" class="waterSelection"> 
-        <div class="sectionSelectionIcon" id="waterTab"></div>
-      </a>
-      <a href="../heating/heating.html" class="heatingSelection"> 
-        <div class="sectionSelectionIcon" id="heatingTab"></div>
-      </a>
-    </div>
-
-    <div id="general">
-      <h2 class="sectionHeader">Allgemein</h2>
-      <div class="apartmentContainer">
-        <label class="preInputLabel" for="apartmentcount"
-          >Wieviele Wohnungen sind im Haus?</label
-        >
-        <input
-          type="number"
-          id="apartmentcount"
-          name="apartmentcount"
-          min="1"
-          value="1"
-          disabled
-        />
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img class="sidebar-logo" src="../assets/HeiKo Logo.png" alt="HeiKo" />
       </div>
-    </div>
 
-    <div id="energy">
-      <h2 class="sectionHeader">Strom</h2>
-    </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link active" href="../index/index.html">
+          <img class="home-icon" src="../assets/home.svg" alt="" />
+          Übersicht
+        </a>
 
-    <div id="water">
-      <h2 class="sectionHeader">Wasser</h2>
-    </div>
+        <a class="sidebar-link" href="../newMonth/newMonth.html">
+          <img class="euro-icon" src="../assets/plus-solid-full.svg" alt="" />
+          Neuer Monat
+        </a>
 
-    <div id="heating">
-      <h2 class="sectionHeader">Heizung</h2>
-    </div>
+        <a class="sidebar-link" href="../energy/energy.html">
+          <img class="bolt-icon" src="../assets/bolt-solid-full.svg" alt="" />
+          Strom
+        </a>
 
-    <div id="database">
-      <div class="databaseHeader">
-      <h2 class="sectionHeader">Datenbank Einblick</h2>
-      <input id="searchInput" placeholder="Suchen">
+        <a class="sidebar-link" href="../water/water.html">
+          <img
+            class="droplet-icon"
+            src="../assets/droplet-solid-full.svg"
+            alt=""
+          />
+          Wasser
+        </a>
+
+        <a class="sidebar-link" href="../heating/heating.html">
+          <img class="fire-icon" src="../assets/fire-solid-full.svg" alt="" />
+          Heizung
+        </a>
+
+        <a class="sidebar-link" href="../settings/settings.html">
+          <img src="../assets/gear-solid-full.svg" alt="" />
+          Einstellungen
+        </a>
+
+        <a class="sidebar-link" href="../database/database.html">
+          <img src="../assets/database.svg" alt="" />
+          Datenbank
+        </a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <!-- Überschrift -->
+      <div class="content-header">
+        <h1>Übersicht</h1>
+        <p>Alle Verbräuche, Kosten und Kennzahlen auf einen Blick</p>
       </div>
-      <table id="databaseTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Wert</th>
-            <th>Neuer Name</th>
-            <th>Neuer Wert</th>
-            <th>Löschen</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <!-- Obergeschoss -->
+      <div class="floor-section">
+        <div class="floor-header">
+          <h2>Obergeschoss</h2>
+          <span>Aktuelle Verbrauchsübersicht</span>
+        </div>
 
-      <svg
-        class="addIcon"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 640 640"
-      >
-        <path
-          fill="currentColor"
-          d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z"
-        />
-      </svg>
-    </div>
+        <div class="box-summaries">
+          <div class="energy-box">
+            <div class="top">
+              <img
+                class="bolt-icon"
+                src="../assets/bolt-solid-full.svg"
+                alt=""
+              />
+              <span>Strom</span>
+            </div>
+
+            <div class="value"><strong id="og-strom-kwh">98</strong> kWh</div>
+
+            <div class="bottom">
+              <span class="better-result" id="og-strom-vorjahr-prozent"
+                ><strong id="og-strom-vorjahr-pfeil">↘</strong>-3%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="water-box">
+            <div class="top">
+              <img
+                class="droplet-icon"
+                src="../assets/droplet-solid-full.svg"
+                alt=""
+              />
+              <span>Wasser</span>
+            </div>
+
+            <div class="value"><strong id="og-wasser-l">412</strong> L</div>
+
+            <div class="bottom">
+              <span class="worse-result" id="og-wasser-vorjahr-prozent"
+                ><strong id="og-wasser-vorjahr-pfeil">↗</strong>+2%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="oil-box">
+            <div class="top">
+              <img
+                class="fire-icon"
+                src="../assets/fire-solid-full.svg"
+                alt=""
+              />
+              <span>Heizöl</span>
+            </div>
+
+            <div class="value"><strong id="og-öl-l">301</strong> L</div>
+
+            <div class="bottom">
+              <span class="better-result" id="og-öl-vorjahr-prozent"
+                ><strong id="og-öl-vorjahr-pfeil">↘</strong>-8%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="cost-box">
+            <div class="top">
+              <img class="euro-icon" src="../assets/euro.svg" alt="" />
+              <span>Kosten</span>
+            </div>
+
+            <div class="value"><strong id="og-kosten">214</strong> €</div>
+
+            <div class="bottom">
+              <span class="better-result" id="og-kosten-vorjahr-prozenz"
+                ><strong id="og-kosten-vorjahr-pfeil">↘</strong>-4%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Untergeschoss -->
+      <div class="floor-section">
+        <div class="floor-header">
+          <h2>Untergeschoss</h2>
+          <span>Aktuelle Verbrauchsübersicht</span>
+        </div>
+
+        <div class="box-summaries">
+          <div class="energy-box">
+            <div class="top">
+              <img
+                class="bolt-icon"
+                src="../assets/bolt-solid-full.svg"
+                alt=""
+              />
+              <span>Strom</span>
+            </div>
+
+            <div class="value"><strong id="ug-strom-kwh">98</strong> kWh</div>
+
+            <div class="bottom">
+              <span class="better-result" id="ug-strom-vorjahr-prozent"
+                ><strong id="ug-strom-vorjahr-pfeil">↘</strong>-3%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="water-box">
+            <div class="top">
+              <img
+                class="droplet-icon"
+                src="../assets/droplet-solid-full.svg"
+                alt=""
+              />
+              <span>Wasser</span>
+            </div>
+
+            <div class="value"><strong id="ug-wasser-l">412</strong> L</div>
+
+            <div class="bottom">
+              <span class="worse-result" id="ug-wasser-vorjahr-prozent"
+                ><strong id="ug-wasser-vorjahr-pfeil">↗</strong>+2%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="oil-box">
+            <div class="top">
+              <img
+                class="fire-icon"
+                src="../assets/fire-solid-full.svg"
+                alt=""
+              />
+              <span>Heizöl</span>
+            </div>
+
+            <div class="value"><strong id="ug-öl-l">301</strong> L</div>
+
+            <div class="bottom">
+              <span class="better-result" id="ug-öl-vorjahr-prozent"
+                ><strong id="ug-öl-vorjahr-pfeil">↘</strong>-8%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="cost-box">
+            <div class="top">
+              <img class="euro-icon" src="../assets/euro.svg" alt="" />
+              <span>Kosten</span>
+            </div>
+
+            <div class="value"><strong id="ug-kosten">214</strong> €</div>
+
+            <div class="bottom">
+              <span class="better-result" id="ug-kosten-vorjahr-prozenz"
+                ><strong id="ug-kosten-vorjahr-pfeil">↘</strong>-4%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Details -->
+      <div class="floor-section">
+        <div class="floor-header">
+          <h2>Details</h2>
+          <span>Details</span>
+        </div>
+
+        <div class="box-summaries">
+          <div class="energy-box">
+            <div class="top">
+              <img
+                class="bolt-icon"
+                src="../assets/bolt-solid-full.svg"
+                alt=""
+              />
+              <span>Strom</span>
+            </div>
+
+            <div class="value"><strong id="ug-strom-kwh">98</strong> kWh</div>
+
+            <div class="bottom">
+              <span class="better-result" id="ug-strom-vorjahr-prozent"
+                ><strong id="ug-strom-vorjahr-pfeil">↘</strong>-3%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="water-box">
+            <div class="top">
+              <img
+                class="droplet-icon"
+                src="../assets/droplet-solid-full.svg"
+                alt=""
+              />
+              <span>Wasser</span>
+            </div>
+
+            <div class="value"><strong id="ug-wasser-l">412</strong> L</div>
+
+            <div class="bottom">
+              <span class="worse-result" id="ug-wasser-vorjahr-prozent"
+                ><strong id="ug-wasser-vorjahr-pfeil">↗</strong>+2%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="oil-box">
+            <div class="top">
+              <img
+                class="fire-icon"
+                src="../assets/fire-solid-full.svg"
+                alt=""
+              />
+              <span>Heizöl</span>
+            </div>
+
+            <div class="value"><strong id="ug-öl-l">301</strong> L</div>
+
+            <div class="bottom">
+              <span class="better-result" id="ug-öl-vorjahr-prozent"
+                ><strong id="ug-öl-vorjahr-pfeil">↘</strong>-8%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+
+          <div class="cost-box">
+            <div class="top">
+              <img class="euro-icon" src="../assets/euro.svg" alt="" />
+              <span>Kosten</span>
+            </div>
+
+            <div class="value"><strong id="ug-kosten">214</strong> €</div>
+
+            <div class="bottom">
+              <span class="better-result" id="ug-kosten-vorjahr-prozenz"
+                ><strong id="ug-kosten-vorjahr-pfeil">↘</strong>-4%</span
+              >
+              zum Vorjahr
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   </body>
-  <footer></footer>
 </html>

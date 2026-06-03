@@ -1,444 +1,257 @@
-:root {
-  /* --- Farben --- */
-  /* Helles Mint Schema */
-  --primaryBackgroundColor: #ceffe8;
-  --primaryTextColor: #2f4f4f;
-  --disabledTextColor: #89a195;
-  --disabledInputBackgroundColor: #d0eede;
-
-  --inputTextColor: #2b7a4b;
-  --inputPlaceholderTextColor: var(--disabledTextColor);
-  --inputBackgroundColor: #f0fcf5;
-  --inputBorderColor: #b6d8c9;
-
-  --sectionBackground: #d9f0e0;
-  --apartmentBackground: #c2e5cc;
-
-  --deleteButtonBackgroundColor: #e74c3c;
-  --deleteButtonHoverBackgroundColor: #ff6b61;
-  --deleteButtonTextColor: #ffffff;
-
-  --addButtonBackgroundColor: #27ae60;
-  --addButtonHoverBackgroundColor: #58af7a;
-  --addButtonTextColor: #ffffff;
-
-  --sectionLinkBorderColor: #000000;
-  --sectionLinkHoverBackground: #27ae60;
-
-  --tableBorderColor: #b6d8c9;
-
-  --tableEvenBackgroundColor: #eaf8f0;
-  --tableUnevenBackgroundColor: #d4eddf;
-  --tableHeaderColor: var(--apartmentBackground);
-
-  --highlightColor: #c9f7c2;
-
-  /* --- Typografie --- */
-  --fontSize: 1.2rem;
-
-  /* --- Spacing / Layout --- */
-  --sectionPadding: 20px;
-  --containerWidth: 40vw;
-  --apartmentGapRow: 8px;
-  --apartmentGapColumn: 12px;
-  --apartmentPadding: 10px;
-  --apartmentPaddingLeft: 5%;
-  --apartmentMarginTop: 20px;
-  --apartmentMarginBottom: 10px;
-
-}
-:root[data-theme="dark"] {
-  --primaryBackgroundColor: #1a2420;
-  --primaryTextColor: #cce7da;
-  --disabledTextColor: #5d7368;
-  --disabledInputBackgroundColor: #2b3a34;
-
-  --inputTextColor: #7ed9a0;
-  --inputPlaceholderTextColor: var(--disabledTextColor);
-  --inputBackgroundColor: #23312c;
-  --inputBorderColor: #3b5248;
-
-  --sectionBackground: #1f2c27;
-  --apartmentBackground: #263833;
-
-  --deleteButtonBackgroundColor: #c0392b;
-  --deleteButtonHoverBackgroundColor: #e74c3c;
-  --deleteButtonTextColor: #ffffff;
-
-  --addButtonBackgroundColor: #1f8a48;
-  --addButtonHoverBackgroundColor: #27ae60;
-  --addButtonTextColor: #ffffff;
-
-  --sectionLinkBorderColor: #a3d9b1;
-  --sectionLinkHoverBackground: #27ae60;
-
-  --tableBorderColor: #3b5248;
-
-  --tableEvenBackgroundColor: #1f2d28;
-  --tableUnevenBackgroundColor: #24352f;
-  --tableHeaderColor: var(--apartmentBackground);
-
-  --highlightColor: #335e46;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-:root,
 body {
-  transition: background-color 1s ease, color 1s ease, border-color 1s ease;
+    font-family: Inter, Arial, sans-serif;
+    background: #f5f7fb;
 }
 
-/* --- Body --- */
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  font-family: Trebuchet MS, sans-serif;
-  margin: 0;
-  padding: var(--sectionPadding);
-  background-color: var(--primaryBackgroundColor);
-  color: var(--primaryTextColor);
-  font-size: var(--fontSize);
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    width: 260px;
+    height: 100vh;
+
+    background: white;
+    border-right: 1px solid #e5e7eb;
+
+    display: flex;
+    flex-direction: column;
 }
 
-/* --- Appearance Checkbox --- */
-.appearanceToggleCheckbox {
-  display: none;
+.sidebar-header {
+    display: flex;
+    align-items: center;
 }
 
-/* --- Inputs --- */
-input {
-  font-size: var(--fontSize);
-  background-color: var(--inputBackgroundColor);
-  color: var(--inputTextColor);
-  border: 1px solid var(--inputBorderColor);
-  grid-column: 2;
+.sidebar-logo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
 }
 
-input::placeholder {
-  font-size: var(--fontSize);
-  color: var(--inputPlaceholderTextColor);
+.sidebar-nav {
+    padding-top: 12px;
 }
 
-input[type="checkbox"] {
-  cursor: pointer;
+.sidebar a {
+    width: 100%;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 0 20px;
+
+    border: none;
+    background: transparent;
+
+    font-size: 15px;
+    color: #374151;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+    text-decoration: none;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type="number"] {
-  -moz-appearance: textfield;
+.sidebar a img {
+    width: 20px;
+    height: 20px;
 }
 
-input:disabled {
-  background-color: var(--disabledInputBackgroundColor);
+.sidebar a:hover {
+    background: #f3f6fb;
 }
 
-/* --- Labels --- */
+.sidebar a.active {
+    background: #eef4ff;
+    color: #2563eb;
+    font-weight: 600;
 
-label:hover {
-  cursor: pointer;
+    border-left: 4px solid #2563eb;
 }
 
-/* --- Headers --- */
-.sectionHeader {
-  display: block;
-  text-align: center;
+/* =========================
+   CONTENT
+========================= */
+
+.content {
+    margin-left: 260px;
+    padding: 30px;
 }
 
-.apartmentHeader {
-  grid-column: 1 / -1;
-  justify-self: center;
-  text-align: center;
-  margin: 0 auto;
+.content-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
 }
 
-.databaseHeader {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+.content-header p {
+    color: #6b6b6b;
 }
 
-.databaseHeader h2 {
-  margin-top: 0;
-  top: 20px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+/* =========================
+   SECTION TITLE
+========================= */
+
+
+.floor-section {
+    margin-top: 32px;
 }
 
-.databaseHeader input {
-  margin-top: 20px;
-  margin-right: 10px;
-  height: 25px;
+.floor-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+
+    margin-bottom: 16px;
+    padding-left: 4px;
 }
 
-/* --- Tables --- */
-table {
-  border-collapse: collapse;
-  margin: 20px auto;
+.floor-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #111827;
 }
 
-table,
-th,
-td {
-  border: 1px solid var(--tableBorderColor);
-  padding: 8px 12px;
-  text-align: center;
+.floor-header span {
+    font-size: 0.95rem;
+    color: #6b7280;
 }
 
-th {
-  background-color: var(--tableHeaderColor);
+/* =========================
+   GRID CARDS
+========================= */
+
+.box-summaries {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 2%;
 }
 
-table tr:nth-child(even) {
-  background-color: var(--tableEvenBackgroundColor);
+/* CARD BASE */
+.energy-box,
+.water-box,
+.oil-box,
+.cost-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    padding: 18px;
+    height: 180px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    transition: all .2s ease;
 }
 
-table tr:nth-child(odd) {
-  background-color: var(--tableUnevenBackgroundColor);
+.energy-box{
+background-color: #f6f3c288;
+}
+.water-box{
+background-color: #cfeaf780;
+}
+.oil-box{
+background-color: #f7d3c281;
+}
+.cost-box{
+background-color: #d7f2dc83;
 }
 
-.keyTd {
-  text-align: left;
+.energy-box:hover,
+.water-box:hover,
+.oil-box:hover,
+.cost-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-#addToDatabaseTable {
-  width: 90%;
-}
-#addToDatabaseTable input {
-  width: 100%;
-}
+/* =========================
+   CARD TOP
+========================= */
 
-/* --- Buttons --- */
-.deleteButton {
-  background-color: var(--deleteButtonBackgroundColor);
-  color: var(--deleteButtonTextColor);
-  border: none;
-  border-radius: 5px;
-  padding: 5px 12px;
-  cursor: pointer;
-  font-size: var(--fontSize);
+.top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.deleteButton:hover {
-  background-color: var(--deleteButtonHoverBackgroundColor);
+.top img {
+    width: 48px;
+    height: auto;
 }
 
-.addButton {
-  display: block;
-  margin: 0 auto 10px;
-  background-color: var(--addButtonBackgroundColor);
-  color: var(--addButtonTextColor);
-  border: none;
-  border-radius: 5px;
-  padding: 5px 12px;
-  cursor: pointer;
-  font-size: var(--fontSize);
+.top span {
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
 }
 
-.addButton:hover {
-  background-color: var(--addButtonHoverBackgroundColor);
+/* =========================
+   VALUE
+========================= */
+
+.value {
+    font-size: 2rem;
+    color: #111827;
 }
 
-/* --- Section / Container --- */
-#general,
-#energy,
-#water,
-#heating {
-  display: block;
-  width: var(--containerWidth);
-  margin: 5px auto;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: var(--sectionBackground);
+.value strong {
+    font-size: 4rem;
 }
 
-#database {
-  display: block;
-  width: auto;
-  min-width: var(--containerWidth);
-  max-width: 100vw;
-  margin: 5px auto;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: var(--sectionBackground);
+/* =========================
+   BOTTOM (FIXED LAYOUT)
+========================= */
+
+.bottom {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+
+    font-size: 1rem;
+    color: #6b7280;
 }
 
-/* --- Apartment Container --- */
-#general.apartmentContainer,
-#energy.apartmentContainer,
-#water.apartmentContainer,
-#heating.apartmentContainer,
-#database.apartmentContainer {
-  display: grid;
+/* TREND COLORS */
+.worse-result {
+    color: red;
+    font-weight: 600;
 }
 
-.apartmentContainer {
-  display: grid;
-  grid-template-columns: 65% 25% auto;
-  gap: var(--apartmentGapRow) var(--apartmentGapColumn);
-  padding: var(--apartmentPadding);
-  padding-left: var(--apartmentPaddingLeft);
-  border-top: 1px solid var(--tableBorderColor);
-  border-bottom: 1px solid var(--tableBorderColor);
-  background-color: var(--apartmentBackground);
-  margin-top: var(--apartmentMarginTop);
-  margin-bottom: var(--apartmentMarginBottom);
-}
-
-/* --- Apartment Grid Items --- */
-.preInputLabel {
-  grid-column: 1;
-}
-
-.postInputLabel {
-  grid-column: 3;
-}
-
-/* --- Updated table element highlighting --- */
-@keyframes fadeHighlight {
-  from {
-    background-color: var(--highlightColor);
-  } /* Startfarbe */
-  to {
-    background-color: transparent;
-  } /* oder deine normale Tabellenfarbe */
-}
-
-.highlightFade {
-  animation: fadeHighlight 1.2s ease-out;
-}
-
-/* --- Server Error --- */
-.serverConnectionErrorImg {
-  display: block;
-  width: 25%;
-  height: auto;
-  margin: 0 auto;
-}
-
-/* --- Icons --- */
-
-/* Add Icon */
-.addIcon {
-  display: block;
-  width: 5%;
-  height: auto;
-  margin: 0 auto 10px;
-  border: 1px solid #2f4f4f;
-  border-radius: 50%;
-  padding: 5px;
-  fill: white;
-  transition: fill 0.2s;
-  transition: transform 0.2s;
-}
-
-.addIcon:hover {
-  cursor: pointer;
-  fill: #00ffcc;
-  transform: scale(1.1);
-}
-
-/* Theme Toggle Icon */
-.dark-white-toggle-icon {
-  width: 20%;
-  height: auto;
-  transition: transform 0.5s;
-}
-
-.dark-white-toggle-icon:hover {
-  transform: rotate(180deg);
-  height: auto;
-  cursor: pointer;
+.better-result {
+    color: green;
+    font-weight: 600;
 }
 
 
-/* Section Selection Icons */
-.sectionSelectionIcon {
-  width: 75px;
-  height: 75px;
-  scale: 1.2;
-  margin-bottom: 8px;
-  transition: background-color 0.3s ease;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-}
 
-#sectionSelection a {
-  border-radius: 8px;
-  border: 1px solid var(--sectionLinkBorderColor);
-  padding: 20px;
-  margin: 5px;
-  text-decoration: none;
+.bolt-icon {
+    filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1500%) hue-rotate(2deg);
 }
-
-
-.energySelection,
-.waterSelection,
-.heatingSelection {
-  display: inline-block;
-  padding: 15px 25px;
-  text-align: center;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  background-color: var(--primaryBackgroundColor);
+.droplet-icon {
+    filter: brightness(0) saturate(100%) invert(38%) sepia(98%) saturate(748%) hue-rotate(175deg);
 }
-
-.energySelection .sectionSelectionIcon {
-  background-color: #f5c542;
+.fire-icon {
+    filter: brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(1200%) hue-rotate(330deg);
 }
-.waterSelection .sectionSelectionIcon {
-  background-color: #3a8dde;
+.euro-icon {
+    filter: brightness(0) saturate(100%) invert(48%) sepia(93%) saturate(420%) hue-rotate(85deg);
 }
-.heatingSelection .sectionSelectionIcon {
-  background-color: #e55c3c;
-}
-
-.energySelection:hover {
-  background-color: #f5c542;
-}
-.energySelection:hover .sectionSelectionIcon {
-  background-color: var(--primaryBackgroundColor);
-}
-
-.waterSelection:hover {
-  background-color: #3a8dde;
-}
-.waterSelection:hover .sectionSelectionIcon {
-  background-color: var(--primaryBackgroundColor);
-}
-
-.heatingSelection:hover {
-  background-color: #e55c3c;
-}
-.heatingSelection:hover .sectionSelectionIcon {
-  background-color: var(--primaryBackgroundColor);
-}
-
-.sectionSelectionIcon {
-  scale: 1.2;
-  width: 75px;
-}
-
-#energyTab {
-  mask-image: url("../assets/bolt-solid-full.svg");
-  -webkit-mask-image: url("../assets/bolt-solid-full.svg");
-}
-
-#waterTab {
-  mask-image: url("../assets/droplet-solid-full.svg");
-  -webkit-mask-image: url("../assets/droplet-solid-full.svg");
-}
-
-#heatingTab {
-  mask-image: url("../assets/fire-solid-full.svg");
-  -webkit-mask-image: url("../assets/fire-solid-full.svg");
+.home-icon{
+    filter: brightness(0) saturate(100%) invert(39%) sepia(93%) saturate(2200%) hue-rotate(214deg);
 }

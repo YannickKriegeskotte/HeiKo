@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="database.css" />
+    <link rel="icon" type="image/x-icon" href="../assets/HeiKoFavicon.png" />
+    <!-- <link rel="stylesheet" href="../utils/commons.css" /> -->
+
+    <script src="../lib/jquery-3.7.1.min.js"></script>
+    <script type="module" src="databaseMain.js"></script>
+
+    <title>HeiKo</title>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img class="sidebar-logo" src="../assets/HeiKo Logo.png" alt="HeiKo" />
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" href="../index/index.html">
+          <img class="home-icon" src="../assets/home.svg" alt="" />
+          Übersicht
+        </a>
+
+        <a class="sidebar-link" href="../newMonth/newMonth.html">
+          <img class="euro-icon" src="../assets/plus-solid-full.svg" alt="" />
+          Neuer Monat
+        </a>
+
+        <a class="sidebar-link" href="../energy/energy.html">
+          <img class="bolt-icon" src="../assets/bolt-solid-full.svg" alt="" />
+          Strom
+        </a>
+
+        <a class="sidebar-link" href="../water/water.html">
+          <img
+            class="droplet-icon"
+            src="../assets/droplet-solid-full.svg"
+            alt=""
+          />
+          Wasser
+        </a>
+
+        <a class="sidebar-link" href="../heating/heating.html">
+          <img class="fire-icon" src="../assets/fire-solid-full.svg" alt="" />
+          Heizung
+        </a>
+
+        <a class="sidebar-link" href="../settings/settings.html">
+          <img src="../assets/gear-solid-full.svg" alt="" />
+          Einstellungen
+        </a>
+
+        <a class="sidebar-link active" href="../database/database.html">
+          <img src="../assets/database.svg" alt="" />
+          Datenbank
+        </a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="content-header">
+        <div class="header-left">
+          <h1>Datenbank Einblicke</h1>
+          <p>Alle Datenbank Werte im Überblick</p>
+        </div>
+
+        <div class="header-actions">
+          
+          <input class="search-input" type="text" id="search-input" placeholder="Suchen..."/>
+          <button class="primary-btn" id="save-button">
+            <img
+              class="save-icon"
+              src="../assets/save-icon.svg"
+              alt=""
+            />Speichern
+          </button>
+        </div>
+      </div>
+
+      <!-- Entry Cards -->
+
+      <section class="card">
+        <div class="card-header">
+          <img class="database-icon" src="../assets/database.svg" alt="" />
+
+          <div>
+            <h2>Einträge <img class="question-icon" src="../assets/question.svg"  title="Links stehen die Key-Namen, rechts die zugehörigen Werte. Änderungen kannst du jeweils darunter eintragen und mit „Speichern“ übernehmen."/></h2>
+            <p>Alle Einträge</p>
+          </div>
+        </div>
+        <!-- Card Grids via js-->
+      </section>
+    </main>
+  </body>
+</html>

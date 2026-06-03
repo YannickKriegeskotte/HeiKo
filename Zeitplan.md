@@ -40,12 +40,17 @@ Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 15 Stunden
 05.04.26:   17:15-20:00 Uhr
 11.04.26:   20:30-00:30 Uhr
 12.04.26:   11:30- 15:00 Uhr
-18.04.26:   14-15
-21.04.26:   20:30-
+18.04.26:   14-15 Uhr
+21.04.26:   20:30-00 Uhr
+30.05.26:   12-15 Uhr
+01.06.26:   16-23 Uhr
+02.06.26:   16-18 Uhr
+03.06.26:   15-23 Uhr
 
 
 
-Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 17 Stunden
+
+Ungefährer Zeitaufwand durch Planung auserhalb von VSC: 18 Stunden
 
 
 

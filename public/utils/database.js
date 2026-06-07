@@ -1,6 +1,6 @@
 import * as Helper from "./helpers.js";
 
-const debug = true;
+const debug = false;
 
 // =========================
 // API BASE
@@ -16,6 +16,7 @@ const API = {
 // =====================================================
 
 export async function saveTimeEntry({
+  id,
   type,
   apartment_id = null,
   metric,
@@ -23,12 +24,12 @@ export async function saveTimeEntry({
   state = null,
   date
 }) {
-  if (debug) console.log("saveTimeEntry", { type, apartment_id, metric, value, state, date });
-
+  if (debug) console.log("saveTimeEntry", { id, type, apartment_id, metric, value, state, date });
   const response = await fetch(`${API.time}/save`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      id,
       type,
       apartment_id,
       metric,
@@ -56,6 +57,13 @@ export async function getTimeRange(type, apartment_id, metric, from, to) {
   );
 
   if (!response.ok) return [];
+  return await response.json();
+}
+//............
+export async function getAllTimeEntries(){
+  const response = await fetch(
+    `${API.time}/all`
+  );
   return await response.json();
 }
 

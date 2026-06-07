@@ -71,6 +71,7 @@ async function main() {
   // Save entry (ALL IN ONE)
   app.post("/time/save", async (req, res) => {
     const {
+      id,
       type,
       apartment_id = null,
       metric,
@@ -80,11 +81,22 @@ async function main() {
     } = req.body;
 
     try {
-      await db.run(
-        `INSERT INTO time_series (type, apartment_id, metric, value, state, date)
+      if (id) {
+        // UPDATE
+        await db.run(
+          `UPDATE time_series
+         SET type = ?, apartment_id = ?, metric = ?, value = ?, state = ?, date = ?
+         WHERE id = ?`,
+          [type, apartment_id, metric, value, state, date, id]
+        );
+      } else {
+        // INSERT
+        await db.run(
+          `INSERT INTO time_series (type, apartment_id, metric, value, state, date)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [type, apartment_id, metric, value, state, date]
-      );
+          [type, apartment_id, metric, value, state, date]
+        );
+      }
 
       res.json({ success: true });
     } catch (err) {
@@ -116,7 +128,7 @@ async function main() {
     }
   });
 
-  // Get range
+  // Get time range
   app.get("/time/range", async (req, res) => {
     const { type, apartment_id, metric, from, to } = req.query;
 
@@ -138,6 +150,24 @@ async function main() {
       res.status(500).json({ error: "DB-Fehler" });
     }
   });
+
+  // Get time all
+  app.get("/time/all", async (req, res) => {
+
+    try {
+      const rows = await db.all(
+        `SELECT *
+         FROM time_series
+         ORDER BY date ASC`,
+      );
+
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "DB-Fehler" });
+    }
+  });
+
 
   app.delete("/time/delete", async (req, res) => {
     const { id } = req.body;
@@ -195,11 +225,11 @@ async function main() {
   });
 
   app.get("/time/latestByType", async (req, res) => {
-  const { type } = req.query;
+    const { type } = req.query;
 
-  try {
-    const rows = await db.all(
-      `
+    try {
+      const rows = await db.all(
+        `
       SELECT t.*
       FROM time_series t
       INNER JOIN (
@@ -220,22 +250,22 @@ async function main() {
       )
       AND t.date = latest.max_date
       `,
-      [type]
-    );
+        [type]
+      );
 
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "DB-Fehler" });
-  }
-});
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "DB-Fehler" });
+    }
+  });
 
 
-app.get("/time/latestByYear", async (req, res) => {
+  app.get("/time/latestByYear", async (req, res) => {
     const { type, apartment_id, metric, year } = req.query;
 
     const row = await db.get(
-        `SELECT *
+      `SELECT *
          FROM time_series
          WHERE type = ?
            AND metric = ?
@@ -243,11 +273,11 @@ app.get("/time/latestByYear", async (req, res) => {
            AND substr(date,1,4) = ?
          ORDER BY date DESC, id DESC
          LIMIT 1`,
-        [type, metric, apartment_id, year]
+      [type, metric, apartment_id, year]
     );
 
     res.json(row || null);
-});
+  });
 
   // =====================================================
   // SETTINGS (prices etc.)

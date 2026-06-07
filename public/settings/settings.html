@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="database.css" />
+    <link rel="stylesheet" href="settings.css" />
     <link rel="icon" type="image/x-icon" href="../assets/HeiKoFavicon.png" />
     <!-- <link rel="stylesheet" href="../utils/commons.css" /> -->
 
     <script src="../lib/jquery-3.7.1.min.js"></script>
-    <script type="module" src="databaseMain.js"></script>
+    <script type="module" src="settings.js"></script>
 
     <title>HeiKo</title>
   </head>
@@ -49,12 +49,12 @@
           Heizung
         </a>
 
-        <a class="sidebar-link" href="../settings/settings.html">
+        <a class="sidebar-link active" href="../settings/settings.html">
           <img src="../assets/gear-solid-full.svg" alt="" />
           Einstellungen
         </a>
 
-        <a class="sidebar-link active" href="../database/database.html">
+        <a class="sidebar-link" href="../database/database.html">
           <img src="../assets/database.svg" alt="" />
           Datenbank
         </a>
@@ -64,36 +64,14 @@
     <main class="content">
       <div class="content-header">
         <div class="header-left">
-          <h1>Datenbank Einblicke</h1>
-          <p>Alle Datenbank Werte im Überblick</p>
+          <h1>Einstellungen</h1>
+          <p>Joa. Genau.</p>
         </div>
 
         <div class="header-actions">
-          
-          <input class="search-input" type="text" id="search-input" placeholder="Suchen..."/>
-          <button class="primary-btn" id="save-button">
-            <img
-              class="save-icon"
-              src="../assets/save-icon.svg"
-              alt=""
-            />Speichern
-          </button>
         </div>
       </div>
 
-      <!-- Entry Cards -->
-
-      <section class="card">
-        <div class="card-header">
-          <img class="database-icon" src="../assets/database.svg" alt="" />
-
-          <div>
-            <h2>Einträge <img class="question-icon" src="../assets/question.svg"  title="Bearbeite oder Suche Einträge"/></h2>
-            <p id="entry-amount"></p>
-          </div>
-        </div>
-        <!-- Card Grids via js-->
-      </section>
     </main>
   </body>
 </html>

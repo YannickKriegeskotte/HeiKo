@@ -3,99 +3,96 @@ import * as Helper from "../utils/helpers.js";
 import { renderEntries } from "./databaseMain.js";
 
 export async function registerListeners() {
-    let allEntries = await DB.getAllValuesFromDB();
+    let allEntries = await DB.getAllTimeEntries();
 
 
+    // Search
     $(document).on('input', '#search-input', function () {
 
         const search = $(this).val().toLowerCase();
+        // console.log("search", search);
 
-        const filtered = allEntries.filter(entry =>
-            entry.key.toLowerCase().includes(search) ||
-            String(entry.value).toLowerCase().includes(search)
-        );
+        const filtered = allEntries.filter(entry => {
 
+            return (
+                String(entry.id ?? '').toLowerCase().includes(search) ||
+                String(entry.type ?? '').toLowerCase().includes(search) ||
+                String(entry.apartment_id ?? '').toLowerCase().includes(search) ||
+                String(entry.metric ?? '').toLowerCase().includes(search) ||
+                String(entry.value ?? '').toLowerCase().includes(search) ||
+                String(entry.state ?? '').toLowerCase().includes(search) ||
+                String(entry.date ?? '').toLowerCase().includes(search)
+            );
+        });
+        $('#entry-amount').text(filtered.length + " Einträge");
         renderEntries(filtered);
     });
 
 
+    // Save
     $(document).on('click', '#save-button', async function () {
 
-        $('.card-grid').each(async function () {
+        const updates = [];
 
-            let $card = $(this);
+        $('.entry-card.card-changed').each(function () {
+            const $card = $(this);
 
-            // =====================
-            // OLD KEY finden
-            // =====================
-            let oldKeyId = $card.find('label[id^="old-"][id$="-key"]').attr('id');
-
-            let oldKey = oldKeyId
-                ? oldKeyId.replace(/^old-/, '').replace(/-key$/, '')
-                : null;
-
-            // =====================
-            // OLD VALUE finden
-            // =====================
-            let oldValue = $card
-                .find('label[id^="old-"][id$="-value"]')
-                .text()
-                .trim();
-
-            // =====================
-            // NEW KEY + VALUE finden
-            // =====================
-            let newKey = $card
-                .find('input[id^="new-"][id$="-key-input"]')
-                .val();
-
-            let newValue = $card
-                .find('input[id^="new-"][id$="-value-input"]')
-                .val();
-
-            newKey = newKey ? newKey.trim() : "";
-            newValue = newValue ? newValue.trim() : "";
-
-            // =====================
-            // Skip wenn nichts geändert
-            // =====================
-            if (!newKey && !newValue) return;
-
-            // =====================
-            // Situation analysieren und entsprechend Speichern
-            // =====================
-            if (newKey && newValue) {
-                console.log("NEW KEY + NEW VALUE", newKey, newValue);
-                await DB.deleteKeyInDB(oldKey);
-                await DB.saveValueToDB(newKey,newValue);
-                
-
-            } else if (newKey && !newValue) {
-                console.log("NEW KEY + OLD VALUE", newKey, oldValue);
-                await DB.deleteKeyInDB(oldKey);
-                await DB.saveValueToDB(newKey,oldValue);
-
-            } else if (!newKey && newValue) {
-                console.log("OLD KEY + NEW VALUE", oldKey, newValue);
-                await DB.saveValueToDB(oldKey,newValue);
-
-            }
+            const data ={
+                id: $card.data('id')
+            };
+            $card.find('input[data-field]').each(function () {
+                data[$(this).data('field')] = $(this).val();
+            });
+            
+            updates.push(data);
         });
+        console.log("updates",updates);
+
+        // Updates durchgehen und in DB speichern:
+        for(const update of updates){
+            await DB.saveTimeEntry(update);
+        }
+
+
+
+
 
         // Daten neu aus DB holen
-        allEntries = await DB.getAllValuesFromDB();
+        allEntries = await DB.getAllTimeEntries();
 
         let filter = $('#search-input').val() || "";
 
         // Entries mit aktuellem Filter versehen,
-        let filterdEntries = allEntries.filter(function (entry) {
-            return entry.key.includes(filter) ||
-                String(entry.value).includes(filter);
+        let filteredEntries = allEntries.filter(entry => {
+
+            return (
+                String(entry.id ?? '').toLowerCase().includes(filter) ||
+                String(entry.type ?? '').toLowerCase().includes(filter) ||
+                String(entry.apartment_id ?? '').toLowerCase().includes(filter) ||
+                String(entry.metric ?? '').toLowerCase().includes(filter) ||
+                String(entry.value ?? '').toLowerCase().includes(filter) ||
+                String(entry.state ?? '').toLowerCase().includes(filter) ||
+                String(entry.date ?? '').toLowerCase().includes(filter)
+            );
         });
 
         // Alte cards aus html löschen
-        $(".card").find(".card-grid").remove();
+        $(".card").find(".entry-card").remove();
         // Und neu rendern
-        renderEntries(filterdEntries);
+        renderEntries(filteredEntries);
+
+        
+    });
+
+    // Input change listener für card class Marker
+    $(document).on('input', '.db-data-input, .entry-id-input', async function (event) {
+        if(!event.originalEvent) return;
+        let $this = $(this);
+        // Entry-card wird markiert
+        $this.closest('.entry-card').addClass('card-changed');
+
+        // Input bekommt visuelle markierung (gelber glow)
+        $this.addClass('input-changed');
+
     });
 }

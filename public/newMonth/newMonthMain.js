@@ -3,6 +3,7 @@ import * as Helper from "../utils/helpers.js";
 import { registerListeners } from "../newMonth/newMonthListeners.js";
 
 $(document).ready(function () {
+    Helper.hideLoader();
 
 
     // Date input mit heutigem datum füllen
@@ -11,7 +12,7 @@ $(document).ready(function () {
 
     // Checkbox states aus DB laden
     $(async function () {
-        const entries = await DB.getLatestTimeByType("kosten");
+        const entries = await DB.getLatestTimeByType("gebuehren");
         for(const entry of entries){
             const boxID = entry.metric + "-" + entry.apartment_id + "-lock";
             $(`#${boxID}`).prop("checked", entry.state === 1);

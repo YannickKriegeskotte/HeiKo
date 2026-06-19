@@ -37,19 +37,19 @@ export async function registerListeners() {
         $('.entry-card.card-changed').each(function () {
             const $card = $(this);
 
-            const data ={
+            const data = {
                 id: $card.data('id')
             };
             $card.find('input[data-field]').each(function () {
                 data[$(this).data('field')] = $(this).val();
             });
-            
+
             updates.push(data);
         });
-        console.log("updates",updates);
+        console.log("updates", updates);
 
         // Updates durchgehen und in DB speichern:
-        for(const update of updates){
+        for (const update of updates) {
             await DB.saveTimeEntry(update);
         }
 
@@ -81,12 +81,12 @@ export async function registerListeners() {
         // Und neu rendern
         renderEntries(filteredEntries);
 
-        
+
     });
 
     // Input change listener für card class Marker
     $(document).on('input', '.db-data-input, .entry-id-input', async function (event) {
-        if(!event.originalEvent) return;
+        if (!event.originalEvent) return;
         let $this = $(this);
         // Entry-card wird markiert
         $this.closest('.entry-card').addClass('card-changed');
@@ -94,5 +94,12 @@ export async function registerListeners() {
         // Input bekommt visuelle markierung (gelber glow)
         $this.addClass('input-changed');
 
+    });
+
+
+    // === Input value scroll manipulation deaktivieren  === 
+    $('input[type="number"]').on('wheel', function (event) {
+        event.preventDefault();
+        $(this).blur();
     });
 }

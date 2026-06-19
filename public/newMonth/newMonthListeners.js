@@ -6,50 +6,38 @@ export function registerListeners() {
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
 
+    const debug = true;
 
 
 
 
     // === Buttons === 
+    // Save
     $(document).on('click', '#save-button', async function () {
 
-        console.log("Save Button");
-
-        // Datum holen (ISO Format: YYYY-MM-DD)
         const dateStr = $('#date-input').val();
 
-        // VALIDIERUNG
+        // VALIDIERUNG (kann bleiben wie sie ist)
         let missing = false;
 
         $('body')
             .find("input:not([type='date']):not(:disabled)")
             .each(function () {
-
                 if ($(this).val() === "") {
                     missing = true;
-
-                    const $target = $(this).closest('.input-wrapper').length
-                        ? $(this).closest('.input-wrapper')
-                        : $(this);
-
-                    $('html, body').animate({
-                        scrollTop: $target.offset().top - 100
-                    }, 500);
-
-                    $target.addClass('input-error-animation');
-
-                    setTimeout(() => {
-                        $target.removeClass('input-error-animation');
-                    }, 1200);
-
                     return false;
                 }
             });
 
-        // Abbruch, wenn leerer Input
         if (missing) return;
 
-        // VALUE holen
+        Helper.showLoader();
+
+        // =========================
+        // 1. ALLE ROHDATEN SAMMELN
+        // =========================
+        const entries = [];
+
         const fields = [
             // Wasser
             { id: "warmwasser", apartment: "og", type: "wasser", metric: "warmwasser" },
@@ -59,7 +47,7 @@ export function registerListeners() {
 
             // Heizung
             { id: "heizung-betriebsstunden", apartment: "", type: "heizung", metric: "betriebsstunden" },
-            { id: "heizung-verbrauch", apartment: "", type: "heizung", metric: "verbrauch" },
+            { id: "heizung-verbrauch", apartment: "", type: "heizung", metric: "zaehlerstand-verbrauch" },
             { id: "heizung-druck", apartment: "", type: "heizung", metric: "druck" },
 
             // Öl
@@ -67,8 +55,8 @@ export function registerListeners() {
             { id: "oel-meter", apartment: "", type: "oel", metric: "meter" },
 
             // Strom
-            { id: "stromzaehler-ug", apartment: "ug", type: "strom", metric: "zaehler-ug" },
-            { id: "stromzaehler-og", apartment: "og", type: "strom", metric: "zaehler-og" },
+            { id: "stromzaehler-ug", apartment: "ug", type: "strom", metric: "zaehler" },
+            { id: "stromzaehler-og", apartment: "og", type: "strom", metric: "zaehler" },
             { id: "solarstrom", apartment: "", type: "strom", metric: "solarstrom" },
 
             // Solar
@@ -79,81 +67,93 @@ export function registerListeners() {
             // UI
 
             // Zählergebühren Strom
-            { id: "zaehlergebuehren-strom-og-lock", apartment: "og", type: "kosten", metric: "zaehlergebuehren-strom" },
-            { id: "zaehlergebuehren-strom-ug-lock", apartment: "ug", type: "kosten", metric: "zaehlergebuehren-strom" },
+            { id: "zaehlergebuehren-strom-og-lock", apartment: "og", type: "gebuehren", metric: "zaehlergebuehren-strom" },
+            { id: "zaehlergebuehren-strom-ug-lock", apartment: "ug", type: "gebuehren", metric: "zaehlergebuehren-strom" },
 
             // Zählergebühren Wasser
-            { id: "zaehlergebuehren-wasser-og-lock", apartment: "og", type: "kosten", metric: "zaehlergebuehren-wasser" },
-            { id: "zaehlergebuehren-wasser-ug-lock", apartment: "ug", type: "kosten", metric: "zaehlergebuehren-wasser" },
+            { id: "zaehlergebuehren-wasser-og-lock", apartment: "og", type: "gebuehren", metric: "zaehlergebuehren-wasser" },
+            { id: "zaehlergebuehren-wasser-ug-lock", apartment: "ug", type: "gebuehren", metric: "zaehlergebuehren-wasser" },
 
             // Kilowatt Preis
-            { id: "kilowatt-preis-og-lock", apartment: "og", type: "kosten", metric: "kilowatt-preis" },
-            { id: "kilowatt-preis-ug-lock", apartment: "ug", type: "kosten", metric: "kilowatt-preis" },
+            { id: "kilowatt-preis-og-lock", apartment: "og", type: "gebuehren", metric: "kilowatt-preis" },
+            { id: "kilowatt-preis-ug-lock", apartment: "ug", type: "gebuehren", metric: "kilowatt-preis" },
 
             // Wasser Preis
-            { id: "wasser-preis-og-lock", apartment: "og", type: "kosten", metric: "wasser-preis" },
-            { id: "wasser-preis-ug-lock", apartment: "ug", type: "kosten", metric: "wasser-preis" },
+            { id: "wasser-preis-og-lock", apartment: "og", type: "gebuehren", metric: "wasser-preis" },
+            { id: "wasser-preis-ug-lock", apartment: "ug", type: "gebuehren", metric: "wasser-preis" },
 
             // Abwasser Preis
-            { id: "abwasser-preis-og-lock", apartment: "og", type: "kosten", metric: "abwasser-preis" },
-            { id: "abwasser-preis-ug-lock", apartment: "ug", type: "kosten", metric: "abwasser-preis" },
+            { id: "abwasser-preis-og-lock", apartment: "og", type: "gebuehren", metric: "abwasser-preis" },
+            { id: "abwasser-preis-ug-lock", apartment: "ug", type: "gebuehren", metric: "abwasser-preis" },
 
             // Öl Preis
-            { id: "oel-preis-og-lock", apartment: "og", type: "kosten", metric: "oel-preis" },
-            { id: "oel-preis-ug-lock", apartment: "ug", type: "kosten", metric: "oel-preis" },
+            { id: "oel-preis-og-lock", apartment: "og", type: "gebuehren", metric: "oel-preis" },
+            { id: "oel-preis-ug-lock", apartment: "ug", type: "gebuehren", metric: "oel-preis" },
 
             // Miete (nur UG)
-            { id: "miete-ug-lock", apartment: "ug", type: "kosten", metric: "miete" }
+            { id: "miete-ug-lock", apartment: "ug", type: "gebuehren", metric: "miete" }
         ];
 
-
-        // ===============================
-        // AUTO SAVE LOOP
-        // ===============================
         for (const field of fields) {
 
             const $el = $("#" + field.id);
 
-            let value;
+            let value = null;
+            let state = null;
 
-            // Checkbox → state speichern
             if ($el.attr("type") === "checkbox") {
-                let state = $el.is(":checked") ? 1 : 0;
-                let val = null;
-                if(!state){
-                    val = $("#" + field.id.replace(/-lock$/, "")).val();
+                state = $el.is(":checked") ? 1 : 0;
+
+                if (state === 0) {
+                    value = $("#" + field.id.replace(/-lock$/, "")).val();
+                } else {
+                    const previous = await DB.getPreviousEntry(
+                        field.type,
+                        field.metric,
+                        field.apartment,
+                        dateStr
+                    );
+                    value = previous?.value ?? null;
                 }
-                
-                await DB.saveTimeEntry({
-                    type: field.type,
-                    apartment_id: field.apartment, // jetzt aus field
-                    metric: field.metric,
-                    state: state,
-                    value: val,
-                    date: dateStr
-                });
-
+            } else {
+                value = $el.val();
             }
-            // normale Inputs → value speichern
-            else {
-                let val = $el.val();
-                await DB.saveTimeEntry({
-                    type: field.type,
-                    apartment_id: field.apartment, // jetzt aus field
-                    metric: field.metric,
-                    value: val,
-                    date: dateStr
-                });
 
-            }
+            entries.push({
+                type: field.type,
+                apartment_id: field.apartment,
+                metric: field.metric,
+                value,
+                state,
+                date: dateStr
+            });
         }
 
-        console.log("Alle Werte gespeichert");
+        // =========================
+        // 2. EINMAL AN BACKEND SENDEN
+        // =========================
+        await fetch("/time/save-batch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ entries })
+        });
 
 
+        // =========================
+        // 3. HTML NEU HERRICHTEN
+        // =========================
+        Helper.hideLoader();
 
+        $('input[type=number]').val('');
+        $('#date-input').val(new Date().toISOString().split('T')[0]);
     });
 
+
+
+
+
+
+    // Reset
     $(document).on('click', '#reset-button', function () {
         $('input[type=number]').val('');
 
@@ -170,6 +170,12 @@ export function registerListeners() {
         $input.prop('disabled', isLocked);
 
         $input.css('background-color', isLocked ? '#6d6d6d' : '');
+    });
+
+    // === Input value scroll manipulation deaktivieren  === 
+    $('input[type="number"]').on('wheel', function (event) {
+        event.preventDefault();
+        $(this).blur();
     });
 
 

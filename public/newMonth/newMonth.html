@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <link rel="stylesheet" href="../utils/commons.css" />
     <link rel="stylesheet" href="newMonth.css" />
     <link rel="icon" type="image/x-icon" href="../assets/HeiKoFavicon.png" />
     <!-- <link rel="stylesheet" href="../utils/commons.css" /> -->
@@ -15,6 +16,10 @@
   </head>
 
   <body>
+    <div id="loadingOverlay">
+      <img src="../assets/loading.gif" alt="Loading..." />
+      <p id="loading-text"></p>
+    </div>
     <aside class="sidebar">
       <div class="sidebar-header">
         <img class="sidebar-logo" src="../assets/HeiKo Logo.png" alt="HeiKo" />
@@ -37,7 +42,11 @@
         </a>
 
         <a class="sidebar-link" href="../water/water.html">
-          <img class="droplet-icon" src="../assets/droplet-solid-full.svg" alt="" />
+          <img
+            class="droplet-icon"
+            src="../assets/droplet-solid-full.svg"
+            alt=""
+          />
           Wasser
         </a>
 
@@ -46,10 +55,7 @@
           Heizung
         </a>
 
-        <a class="sidebar-link" href="../settings/settings.html">
-          <img src="../assets/gear-solid-full.svg" alt="" />
-          Einstellungen
-        </a>
+
 
         <a class="sidebar-link" href="../database/database.html">
           <img src="../assets/database.svg" alt="" />
@@ -91,31 +97,59 @@
 
         <div class="measurement-grid">
           <div class="input-group">
-            <label>Warmwasser</label>
+            <label>
+              Warmwasser OG
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Zählerstand des Warmwasserzählers im Obergeschoss"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="warmwasser" />
-              <span class="unit">L</span>
+              <span class="unit"></span>
             </div>
           </div>
 
           <div class="input-group">
-            <label>Kaltwasser</label>
+            <label>
+              Kaltwasser OG
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Zählerstand des Kaltwasserzählers im Obergeschoss"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="kaltwasser" />
-              <span class="unit">L</span>
+              <span class="unit"></span>
             </div>
           </div>
 
           <div class="input-group">
-            <label>Gesamtwasser</label>
+            <label>
+              Gesamtwasser
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Zählerstand des Hauptwasserzählers"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="gesamtwasser" />
-              <span class="unit">L</span>
+              <span class="unit"></span>
             </div>
           </div>
 
           <div class="input-group">
-            <label>Druck Enthärtungsanlage</label>
+            <label>
+              Druck Enthärtungsanlage
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Betriebsdruck der Enthärtungsanlage"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="enthaertungsanlage-druck" />
               <span class="unit">Bar</span>
@@ -136,7 +170,14 @@
 
         <div class="measurement-grid">
           <div class="input-group">
-            <label>Betriebsstunden</label>
+            <label>
+              Betriebsstunden
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Gesamte bisherige Betriebszeit laut Heizungssteuerung"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="heizung-betriebsstunden" />
               <span class="unit">Std</span>
@@ -144,7 +185,14 @@
           </div>
 
           <div class="input-group">
-            <label>Verbrauch</label>
+            <label>
+              Verbrauch
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Bisher insgesamt verbrauchte Ölmenge laut Heizungssteuerung"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="heizung-verbrauch" />
               <span class="unit">L</span>
@@ -152,7 +200,14 @@
           </div>
 
           <div class="input-group">
-            <label>Druck</label>
+            <label>
+              Druck
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="DIESEN TEXT ÜBERARBEITEN"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="heizung-druck" />
               <span class="unit">Bar</span>
@@ -173,7 +228,14 @@
 
         <div class="measurement-grid">
           <div class="input-group">
-            <label>Öl Zeiger</label>
+            <label>
+              Öl Zeiger
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Tankfüllstand laut Anzeige der Heizungsanlage"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="oel-zeiger" />
               <span class="unit">L</span>
@@ -181,7 +243,14 @@
           </div>
 
           <div class="input-group">
-            <label>Öl Meter</label>
+            <label>
+              Öl Meter
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Gemessener Tankfüllstand anhand des Öl-Messstabs"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="oel-meter" />
               <span class="unit">cm</span>
@@ -202,7 +271,14 @@
 
         <div class="measurement-grid">
           <div class="input-group">
-            <label>Zählerstand UG</label>
+            <label>
+              Zählerstand UG
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Stromzählerstand der Wohnung im Untergeschoss"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="stromzaehler-ug" />
               <span class="unit"></span>
@@ -210,7 +286,14 @@
           </div>
 
           <div class="input-group">
-            <label>Zählerstand OG</label>
+            <label>
+              Zählerstand OG
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Stromzählerstand der Wohnung im Obergeschoss"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="stromzaehler-og" />
               <span class="unit"></span>
@@ -218,7 +301,14 @@
           </div>
 
           <div class="input-group">
-            <label>Solarstrom</label>
+            <label>
+              Solarstrom
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="DIESEN TEXT ÜBERARBEITEN"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="solarstrom" />
               <span class="unit"></span>
@@ -239,7 +329,14 @@
 
         <div class="measurement-grid">
           <div class="input-group">
-            <label>Laufzeit Solarpumpe</label>
+            <label>
+              Laufzeit Solarpumpe
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Gesamte bisherige Laufzeit der Solarpumpe laut Betriebszähler"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="solarpumpe-laufzeit" />
               <span class="unit">Std</span>
@@ -247,7 +344,14 @@
           </div>
 
           <div class="input-group">
-            <label>Solarenergie</label>
+            <label>
+              Solarenergie
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Bisher insgesamt durch die Solarthermieanlage erzeugte Energie"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="solarenergie" />
               <span class="unit">kWh</span>
@@ -255,7 +359,14 @@
           </div>
 
           <div class="input-group">
-            <label>Solardruck</label>
+            <label>
+              Solardruck
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Aktueller Anlagendruck des Solarthermie-Kreislaufs"
+              />
+            </label>
             <div class="input-wrapper">
               <input type="number" id="solarpumpe-druck" />
               <span class="unit">Bar</span>
@@ -266,7 +377,6 @@
 
       <!-- Sonstiges -->
       <section class="pricing-table">
-
         <div class="pricing-header">
           <h2>Sonstige Werte</h2>
 
@@ -361,7 +471,6 @@
             <input type="number" id="miete-ug" />
           </div>
         </div>
-
       </section>
     </main>
   </body>

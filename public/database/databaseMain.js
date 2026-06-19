@@ -55,7 +55,7 @@ export function renderEntries(entries) {
           </div>
 `;
 
-        if (entry.type == "kosten") {
+        if (entry.type == "gebuehren") {
             htmlText += `
             <div class="field">
             <label>State</label>

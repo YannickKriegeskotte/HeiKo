@@ -3,6 +3,13 @@ import { registerListeners } from "./indexListeners.js";
 
 $(document).ready(async function () {
 
+
+
+
+
+
+
+
     await createFloorSection("og", "Obergeschoss");
     await createFloorSection("ug", "Untergeschoss");
 
@@ -94,25 +101,25 @@ async function createFloorSection(apartment, title) {
 
     await updateStatBox(
         `#${apartment}-energy-box`,
-        "strom",
+        "verbrauch",
         apartment,
-        "gesamt-verbrauch",
+        "stromverbrauch-jahr",
         "kWh"
     );
 
     await updateStatBox(
         `#${apartment}-water-box`,
-        "wasser",
+        "verbrauch",
         apartment,
-        "gesamt-verbrauch",
+        "wasserverbrauch-jahr",
         "L"
     );
 
     await updateStatBox(
         `#${apartment}-oil-box`,
-        "heizung",
+        "verbrauch",
         apartment,
-        "gesamt-verbrauch",
+        "oelverbrauch-jahr",
         "L"
     );
 
@@ -207,3 +214,124 @@ async function updateStatBox(
         .find(".tooltip")
         .text(`Vorjahr: ${stats.previousData}`);
 }
+
+
+/*
+
+    let currentYear = null;
+    let yearlyConsumption = 0;
+
+    for (let i = 1; i < ogStromEntries.length; i++) {
+
+        const currentEntry = ogStromEntries[i];
+        const previousEntry = ogStromEntries[i - 1];
+
+        const difference =
+            Number(currentEntry.value) -
+            Number(previousEntry.value);
+
+        const year = new Date(currentEntry.date).getFullYear();
+
+        if (currentYear === null) {
+            currentYear = year;
+        }
+
+        // Jahr gewechselt → Vorjahr speichern
+        if (year !== currentYear) {
+
+            await DB.saveTimeEntry({
+                type: "verbrauch",
+                apartment_id: "og",
+                metric: "stromverbrauch-jahr",
+                value: yearlyConsumption,
+                date: `${currentYear}-12-31`
+            });
+
+            currentYear = year;
+            yearlyConsumption = 0;
+        }
+
+        yearlyConsumption += difference;
+
+        await DB.saveTimeEntry({
+            type: "verbrauch",
+            apartment_id: "og",
+            metric: "stromverbrauch-monat",
+            value: difference,
+            date: currentEntry.date
+        });
+        console.log("saved og month",currentEntry.date);
+    }
+
+    // letztes Jahr speichern
+    if (currentYear !== null) {
+        await DB.saveTimeEntry({
+            type: "verbrauch",
+            apartment_id: "og",
+            metric: "stromverbrauch-jahr",
+            value: yearlyConsumption,
+            date: `${currentYear}-12-31`
+        });
+        console.log("saved og year",`${currentYear}-12-31`);
+    }
+
+
+    // UG
+    currentYear = null;
+    yearlyConsumption = 0;
+
+    for (let i = 1; i < ugStromEntries.length; i++) {
+
+        const currentEntry = ugStromEntries[i];
+        const previousEntry = ugStromEntries[i - 1];
+
+        const difference =
+            Number(currentEntry.value) -
+            Number(previousEntry.value);
+
+        const year = new Date(currentEntry.date).getFullYear();
+
+        if (currentYear === null) {
+            currentYear = year;
+        }
+
+        // Jahr gewechselt → Vorjahr speichern
+        if (year !== currentYear) {
+
+            await DB.saveTimeEntry({
+                type: "verbrauch",
+                apartment_id: "ug",
+                metric: "stromverbrauch-jahr",
+                value: yearlyConsumption,
+                date: `${currentYear}-12-31`
+            });
+
+            currentYear = year;
+            yearlyConsumption = 0;
+        }
+
+        yearlyConsumption += difference;
+
+        await DB.saveTimeEntry({
+            type: "verbrauch",
+            apartment_id: "ug",
+            metric: "stromverbrauch-monat",
+            value: difference,
+            date: currentEntry.date
+        });
+        console.log("saved ug month",currentEntry.date);
+    }
+
+    // letztes Jahr speichern
+    if (currentYear !== null) {
+        await DB.saveTimeEntry({
+            type: "verbrauch",
+            apartment_id: "ug",
+            metric: "stromverbrauch-jahr",
+            value: yearlyConsumption,
+            date: `${currentYear}-12-31`
+        });
+        console.log("saved ug year",`${currentYear}-12-31`);
+    }
+
+    */

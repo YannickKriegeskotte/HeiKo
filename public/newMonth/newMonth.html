@@ -20,49 +20,6 @@
       <img src="../assets/loading.gif" alt="Loading..." />
       <p id="loading-text"></p>
     </div>
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <img class="sidebar-logo" src="../assets/HeiKo Logo.png" alt="HeiKo" />
-      </div>
-
-      <nav class="sidebar-nav">
-        <a class="sidebar-link" href="../index/index.html">
-          <img class="home-icon" src="../assets/home.svg" alt="" />
-          Übersicht
-        </a>
-
-        <a class="sidebar-link active" href="../newMonth/newMonth.html">
-          <img class="euro-icon" src="../assets/plus-solid-full.svg" alt="" />
-          Neuer Monat
-        </a>
-
-        <a class="sidebar-link" href="../energy/energy.html">
-          <img class="bolt-icon" src="../assets/bolt-solid-full.svg" alt="" />
-          Strom
-        </a>
-
-        <a class="sidebar-link" href="../water/water.html">
-          <img
-            class="droplet-icon"
-            src="../assets/droplet-solid-full.svg"
-            alt=""
-          />
-          Wasser
-        </a>
-
-        <a class="sidebar-link" href="../heating/heating.html">
-          <img class="fire-icon" src="../assets/fire-solid-full.svg" alt="" />
-          Heizung
-        </a>
-
-
-
-        <a class="sidebar-link" href="../database/database.html">
-          <img src="../assets/database.svg" alt="" />
-          Datenbank
-        </a>
-      </nav>
-    </aside>
 
     <main class="content">
       <div class="content-header">
@@ -254,6 +211,21 @@
             <div class="input-wrapper">
               <input type="number" id="oel-meter" />
               <span class="unit">cm</span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>
+              Öl Kaufmenge
+              <img
+                class="question-icon"
+                src="../assets/question.svg"
+                title="Eingekaufte Ölmenge in Litern"
+              />
+            </label>
+            <div class="input-wrapper">
+              <input type="number" id="oel-kaufmenge" value="0" min="0" />
+              <span class="unit">L</span>
             </div>
           </div>
         </div>
@@ -452,14 +424,10 @@
         </div>
 
         <div class="pricing-row">
-          <label>Öl Preis</label>
+          <label>Öl Preis (gesamt Haus)</label>
           <div class="cell">
-            <input type="checkbox" id="oel-preis-og-lock" />
-            <input type="number" id="oel-preis-og" />
-          </div>
-          <div class="cell">
-            <input type="checkbox" id="oel-preis-ug-lock" />
-            <input type="number" id="oel-preis-ug" />
+            <input type="checkbox" id="oel-preis-lock" />
+            <input type="number" id="oel-preis" />
           </div>
         </div>
 

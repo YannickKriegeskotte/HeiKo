@@ -1,0 +1,678 @@
+{
+    "year": "",
+    "lastAddedMonth": "",
+    "months": {
+        "1": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "2": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "3": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "4": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "5": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "6": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "7": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "8": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "9": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "10": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "11": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        },
+        "12": {
+            "ug": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0
+                }
+            },
+            "og": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    },
+                    "abwasser": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": {
+                        "warm": 0,
+                        "kalt": 0,
+                        "gesamt": 0
+                    }
+                }
+            },
+            "total": {
+                "kosten": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "abwasser": 0,
+                    "oel": 0,
+                    "gesamt": 0
+                },
+                "verbrauch": {
+                    "strom": 0,
+                    "wasser": 0,
+                    "oel": 0
+                }
+            },
+            "laufzeit": {
+                "heizung": 0,
+                "solarpumpe": 0
+            },
+            "produziert": {
+                "solarstrom": 0,
+                "solarwasserenergie": 0
+            }
+        }
+    }
+}

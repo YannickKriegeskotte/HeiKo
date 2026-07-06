@@ -1,0 +1,99 @@
+{
+  "yearMonth": "",
+  "readingDate": "",
+
+  "wasser": {
+    "og": {
+      "warmwasserZaehler": 0,   
+      "kaltwasserZaehler": 0    
+    },
+    "gesamtwasserZaehler": 0,   
+    "enthaertungsanlageDruck": 0
+  },
+
+  "heizung": {
+    "betriebsstundenZaehler": 0, 
+    "oelverbrauchZaehler": 0,    
+    "druck": 0
+  },
+
+  "strom": {
+    "og": {
+      "zaehler": 0   
+    },
+    "ug": {
+      "zaehler": 0   
+    },
+    "solarstromZaehler": 0 
+  },
+
+  "oel": {
+    "meter": 0,     
+    "zeiger": 0,
+    "kaufmenge": 0
+  },
+
+  "solarpumpe": {
+    "druck": 0,
+    "energie": 0, 
+    "laufzeit": 0  
+  },
+
+  "gebuehren": {
+    "og": {
+      "zaehlergebuehrenStrom": { "value": 0, "locked": false },
+      "kilowattPreis": { "value": 0, "locked": false },
+      "wasserPreis": { "value": 0, "locked": false },
+      "abwasserPreis": { "value": 0, "locked": false }
+    },
+    "ug": {
+      "zaehlergebuehrenStrom": { "value": 0, "locked": false },
+      "kilowattPreis": { "value": 0, "locked": false },
+      "wasserPreis": { "value": 0, "locked": false },
+      "abwasserPreis": { "value": 0, "locked": false },
+      "miete": { "value": 0, "locked": false }
+    },
+    "oelPreis": { "value": 0, "locked": false },
+    "zaehlergebuehrenWasser": { "value": 0, "locked": false }
+  },
+
+  "verbrauch": {
+    "og": {
+      "strom": 0,
+      "warmwasser": 0,
+      "kaltwasser": 0,
+      "gesamtwasser": 0
+    },
+    "ug": {
+      "strom": 0,
+      "gesamtwasser": 0
+    },
+    "oel": 0
+  },
+
+  "produziert": {
+    "solarstrom": 0,
+    "solarwasserenergie": 0
+  },
+
+  "kosten": {
+    "og": {
+      "strom": 0,
+      "warmwasser": 0,
+      "kaltasser": 0,
+      "gesamtwasser": 0,
+      "abwasser": 0
+    },
+    "ug": {
+      "strom": 0,
+      "wasser": 0,
+      "abwasser": 0
+    },
+    "oel": 0
+  },
+
+  "laufzeit": {
+    "heizung": 0,
+    "solarpumpe": 0
+  }
+}

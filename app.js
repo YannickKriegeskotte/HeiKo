@@ -2,7 +2,6 @@ const express = require("express");
 const path = require("path");
 
 // Routes
-const timeRoutes = require("./routes/time.routes");
 const snapshotRoutes = require("./routes/snapshot.routes");
 const pingRoutes = require("./routes/ping.routes");
 
@@ -25,7 +24,6 @@ function createApp(db) {
     // ROUTES
     // =========================
     app.use("/ping", pingRoutes);
-    app.use("/time", timeRoutes);
     app.use("/snapshot", snapshotRoutes);
     app.get("/", (req, res) => {
         res.sendFile(path.join(__dirname, "public", "index", "index.html"));

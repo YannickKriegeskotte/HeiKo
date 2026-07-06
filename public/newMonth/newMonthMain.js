@@ -1,29 +1,69 @@
-import * as DB from "../utils/database.js";
+import { loadSidebar } from "../utils/sidebar.js";
 import * as Helper from "../utils/helpers.js";
+
 import { registerListeners } from "../newMonth/newMonthListeners.js";
 
-$(document).ready(function () {
-    Helper.hideLoader();
+$(async function () {
+  await loadSidebar("newMonth");
+  Helper.hideLoader();
 
+  $("#date-input").val(new Date().toISOString().split("T")[0]);
 
-    // Date input mit heutigem datum füllen
-    $('#date-input').val(new Date().toISOString().split('T')[0]);
+  const res = await fetch("/snapshot/month/latest");
+  const data = await res.json();
+  console.log("LATEST", data);
 
+  if (!res.ok) return;
+  if (data.success) {
+    const gebuehren = data.data.payload.gebuehren;
 
-    // Checkbox states aus DB laden
-    $(async function () {
-        const entries = await DB.getLatestTimeByType("gebuehren");
-        for(const entry of entries){
-            const boxID = entry.metric + "-" + entry.apartment_id + "-lock";
-            $(`#${boxID}`).prop("checked", entry.state === 1);
-            if(entry.state){
-                const inputID = entry.metric + "-" + entry.apartment_id;
-                $(`#${inputID}`).prop('disabled', entry.state === 1);
-                $(`#${inputID}`).css('background-color', entry.state === 1 ? '#6d6d6d' : '');
-            }
-        }
-    });
+    // OG
+    applyLock(
+      gebuehren?.og?.zaehlergebuehrenStrom,
+      "zaehlergebuehren-strom-og",
+    );
 
+    applyLock(gebuehren?.og?.kilowattPreis, "kilowatt-preis-og");
+    applyLock(
+      gebuehren?.og?.zaehlergebuehrenWasser,
+      "zaehlergebuehren-wasser-og",
+    );
+    applyLock(gebuehren?.og?.wasserPreis, "wasser-preis-og");
+    applyLock(gebuehren?.og?.abwasserPreis, "abwasser-preis-og");
 
-    registerListeners();
+    // UG
+    applyLock(
+      gebuehren?.ug?.zaehlergebuehrenStrom,
+      "zaehlergebuehren-strom-ug",
+    );
+    applyLock(gebuehren?.ug?.kilowattPreis, "kilowatt-preis-ug");
+    applyLock(
+      gebuehren?.ug?.zaehlergebuehrenWasser,
+      "zaehlergebuehren-wasser-ug",
+    );
+    applyLock(gebuehren?.ug?.wasserPreis, "wasser-preis-ug");
+    applyLock(gebuehren?.ug?.abwasserPreis, "abwasser-preis-ug");
+    applyLock(gebuehren?.ug?.miete, "miete-ug");
+
+    // Öl
+    applyLock(gebuehren?.oelPreis, "oel-preis");
+    console.log("Vormonat geladen");
+  } else {
+    console.log("Vormonat nicht geladen");
+  }
+
+  registerListeners();
 });
+
+function applyLock(valueObj, baseId) {
+  if (!valueObj) return;
+
+  const locked = valueObj.locked === true;
+
+  const $box = $(`#${baseId}-lock`);
+  const $input = $(`#${baseId}`);
+
+  $box.prop("checked", locked);
+  $input.prop("disabled", locked);
+  $input.css("background-color", locked ? "#6d6d6d" : "");
+}

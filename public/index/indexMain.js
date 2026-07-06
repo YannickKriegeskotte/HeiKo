@@ -1,337 +1,226 @@
-import * as DB from "../utils/database.js";
+import { loadSidebar } from "../utils/sidebar.js";
 import { registerListeners } from "./indexListeners.js";
 
+// Global Vars
+let currentYearState, previousYearState;
+const metricMap = {
+  og: {
+    strom_verbrauch: ["og", "verbrauch", "strom"],
+    strom_solar: ["produziert", "solarstrom"],
+
+    wasser_kalt: ["og", "verbrauch", "wasser", "kalt"],
+    wasser_warm: ["og", "verbrauch", "wasser", "warm"],
+    wasser_gesamt: ["og", "verbrauch", "wasser", "gesamt"],
+
+    kosten_strom: ["og", "kosten", "strom"],
+    kosten_wasser: ["og", "kosten", "wasser", "gesamt"],
+    kosten_gesamt: ["og", "kosten", "gesamt"],
+  },
+
+  ug: {
+    strom_verbrauch: ["ug", "verbrauch", "strom"],
+    wasser_verbrauch: ["ug", "verbrauch", "wasser"],
+
+    kosten_strom: ["ug", "kosten", "strom"],
+    kosten_wasser: ["ug", "kosten", "wasser"],
+    kosten_gesamt: ["ug", "kosten", "gesamt"],
+  },
+
+  shared: {
+    heizoel_gesamt: ["total", "verbrauch", "oel"],
+    heizung_laufzeit: ["laufzeit", "heizung"],
+    solar_laufzeit: ["laufzeit", "solarpumpe"],
+    wasser_solar: ["produziert", "solarwasserenergie"],
+  },
+};
+const yearly_template = await fetch(
+  "../utils/yearly_snapshot_template.json",
+).then((r) => r.json());
+
 $(document).ready(async function () {
+  await loadSidebar("index");
+  let currentYearData, previousYearData;
 
+  // get latest year
+  let res = await fetch("/snapshot/year/latest");
+  const latestRes = await res.json();
 
+  // if latest year not found load template
+  if (!res.ok || !latestRes.success) {
+    
+    currentYearData = structuredClone(yearly_template);
+    previousYearData = structuredClone(yearly_template);
+  } else {
+    currentYearData = latestRes.data.payload;
+    console.log("currentYearData", currentYearData);
+    const currentYear = Number(currentYearData.year);
+    console.log(currentYear);
 
+    // load previous year
+    const prevRes = await fetch(`/snapshot/year/get/${currentYear - 1}`);
+    const prevData = await prevRes.json();
 
+    // if previous year not found load template
+    if (!prevRes.ok || !prevData.success) {
+      previousYearData = yearly_template;
+      console.log("load template");
+    } else {
+      previousYearData = prevData.data.payload;
+    }
+  }
+  console.log("previousYearData", previousYearData);
+  // extract last added month from snapshot. when template: lastAddedMonth = "" => make 1
+  const lastAddedMonth = Number(currentYearData.lastAddedMonth) || 1;
 
+  // load current sate of last year
+  currentYearState = currentYearData.months[lastAddedMonth];
 
+  // load previous year state for current month
+  previousYearState = previousYearData.months[lastAddedMonth];
 
+  console.log("currentYearState", currentYearState);
+  console.log("previousYearState", previousYearState);
+  console.log(currentYearState === previousYearState);
 
-    await createFloorSection("og", "Obergeschoss");
-    await createFloorSection("ug", "Untergeschoss");
+  // fill floors with data
 
-    registerListeners();
+  await createFloor("og", "Obergeschoss");
+  await createFloor("ug", "Untergeschoss");
+  await createFloor("shared", "Gemeinsam");
+
+  registerListeners();
 });
 
-async function createFloorSection(apartment, title) {
-
-    $("#floor-sections").append(`
-        <div class="floor-section" id="${apartment}-section">
+async function createFloor(id, title) {
+  $("#floor-sections").append(`
+        <div class="floor-section" id="${id}-section">
             <div class="floor-header">
                 <h2>${title}</h2>
                 <span>Aktuelle Verbrauchsübersicht</span>
             </div>
 
-            <div class="box-summaries">
-
-                <div class="energy-box" id="${apartment}-energy-box">
-                    <div class="top">
-                        <img
-                            class="bolt-icon"
-                            src="../assets/bolt-solid-full.svg"
-                            alt=""
-                        />
-                        <span>Strom</span>
-                    </div>
-
-                    <div class="value">
-                        <strong>0</strong> kWh
-                    </div>
-
-                    <div class="bottom"></div>
-                </div>
-
-                <div class="water-box" id="${apartment}-water-box">
-                    <div class="top">
-                        <img
-                            class="droplet-icon"
-                            src="../assets/droplet-solid-full.svg"
-                            alt=""
-                        />
-                        <span>Wasser</span>
-                    </div>
-
-                    <div class="value">
-                        <strong>0</strong> L
-                    </div>
-
-                    <div class="bottom"></div>
-                </div>
-
-                <div class="oil-box" id="${apartment}-oil-box">
-                    <div class="top">
-                        <img
-                            class="fire-icon"
-                            src="../assets/fire-solid-full.svg"
-                            alt=""
-                        />
-                        <span>Heizung</span>
-                    </div>
-
-                    <div class="value">
-                        <strong>0</strong> L
-                    </div>
-
-                    <div class="bottom"></div>
-                </div>
-
-                <div class="cost-box" id="${apartment}-cost-box">
-                    <div class="top">
-                        <img
-                            class="euro-icon"
-                            src="../assets/euro.svg"
-                            alt=""
-                        />
-                        <span>Kosten</span>
-                    </div>
-
-                    <div class="value">
-                        <strong>0</strong> €
-                    </div>
-
-                    <div class="bottom"></div>
-                </div>
-
-            </div>
+            <div class="box-summaries" id="${id}-boxes"></div>
         </div>
     `);
 
-    await updateStatBox(
-        `#${apartment}-energy-box`,
-        "verbrauch",
-        apartment,
-        "stromverbrauch-jahr",
-        "kWh"
-    );
-
-    await updateStatBox(
-        `#${apartment}-water-box`,
-        "verbrauch",
-        apartment,
-        "wasserverbrauch-jahr",
-        "L"
-    );
-
-    await updateStatBox(
-        `#${apartment}-oil-box`,
-        "verbrauch",
-        apartment,
-        "oelverbrauch-jahr",
-        "L"
-    );
-
-    await updateStatBox(
-        `#${apartment}-cost-box`,
-        "kosten",
-        apartment,
-        "gesamt-kosten",
-        "€"
-    );
+  if (id === "og") await createOG(id);
+  if (id === "ug") await createUG(id);
+  if (id === "shared") await createShared(id);
 }
 
-async function getYearComparison(type, apartment, metric) {
+async function getYearComparison(apartment, key) {
+  const path = metricMap[apartment][key];
 
-    const currentYearEntry =
-        await DB.getLatestTimeEntry(type, apartment, metric);
+  const current = getValue(currentYearState, path);
+  const previous = getValue(previousYearState, path);
 
-    const currentYear =
-        new Date(currentYearEntry.date).getFullYear();
+  const change =
+    previous === 0 ? current : ((current - previous) / previous) * 100;
+  console.log(currentYearState);
+  console.log(current, previous, change, path);
 
-    const lastYearEntry =
-        await DB.getLatestTimeEntryByYear(
-            type,
-            apartment,
-            metric,
-            currentYear - 1
-        );
-
-    const currentYearData = currentYearEntry.value;
-    const lastYearData = lastYearEntry.value;
-
-    const changePercent =
-        ((currentYearData - lastYearData) / lastYearData) * 100;
-
-    return {
-        currentData: currentYearData,
-        previousData: lastYearData,
-        change: changePercent
-    };
+  return {
+    currentData: current,
+    previousData: previous,
+    change: change,
+  };
 }
 
-async function updateStatBox(
-    selector,
-    type,
-    apartment,
-    metric,
-    unit
-) {
+async function createOG(floor) {
+  renderBox(floor, "strom", "Strom", [
+    await metric("og", "strom_verbrauch", "Verbrauch", "kWh"),
+    await metric("og", "strom_solar", "Erzeugt", "kWh"),
+  ]);
 
-    const stats =
-        await getYearComparison(
-            type,
-            apartment,
-            metric
-        );
+  renderBox(floor, "wasser", "Wasser", [
+    await metric("og", "wasser_kalt", "Kaltwasser", "L"),
+    await metric("og", "wasser_warm", "Warmwasser", "L"),
+    await metric("og", "wasser_gesamt", "Gesamt", "L"),
+  ]);
 
-    $(selector)
-        .find(".value")
-        .html(`<strong>${stats.currentData}</strong> ${unit}`);
+  renderBox(floor, "kosten", "Kosten", [
+    await metric("og", "kosten_strom", "Strom", "€"),
+    await metric("og", "kosten_wasser", "Wasser", "€"),
+    await metric("og", "kosten_gesamt", "Gesamt", "€"),
+  ]);
+}
 
-    const cssClass =
-        stats.change < 0
-            ? "better-result"
-            : "worse-result";
+async function createUG(floor) {
+  renderBox(floor, "strom", "Strom", [
+    await metric("ug", "strom_verbrauch", "Verbrauch", "kWh"),
+  ]);
 
-    const arrow =
-        stats.change < 0
-            ? "↘"
-            : "↗";
+  renderBox(floor, "wasser", "Wasser", [
+    await metric("ug", "wasser_verbrauch", "Verbrauch", "L"),
+  ]);
 
-    $(selector)
-        .find(".bottom")
-        .html(`
-            <span class="comparison ${cssClass}">
-                <strong>${arrow}</strong>
-                ${stats.change.toFixed(1)}%
-            </span>
-            zum Vorjahr
-            <div class="tooltip"></div>
-        `);
+  renderBox(floor, "kosten", "Kosten", [
+    await metric("ug", "kosten_strom", "Strom", "€"),
+    await metric("ug", "kosten_wasser", "Wasser", "€"),
+    await metric("ug", "kosten_gesamt", "Gesamt", "€"),
+  ]);
+}
 
-    $(selector)
-        .find(".comparison")
-        .html(`
-        <span class="${cssClass}">
-            <strong>${arrow}</strong>
-            ${stats.change.toFixed(1)}%
-        </span>
+async function createShared(floor) {
+  renderBox(floor, "heizung", "Heizung", [
+    await metric("shared", "heizoel_gesamt", "Ölverbrauch", "L"),
+    await metric("shared", "heizung_laufzeit", "Laufzeit", "Std"),
+  ]);
+
+  renderBox(floor, "solar", "Solarpumpe", [
+    await metric("shared", "solar_laufzeit", "Laufzeit", "h"),
+    await metric("shared", "wasser_solar", "Energie", "kW"),
+  ]);
+}
+
+async function metric(apartment, key, label, unit) {
+  const stats = await getYearComparison(apartment, key);
+
+  return {
+    label,
+    value: stats.currentData,
+    unit,
+    change: stats.change,
+    previous: stats.previousData,
+    invert: key === "strom_solar" || key === "wasser_solar",
+  };
+}
+
+function renderBox(floor, id, title, metrics) {
+  $(`#${floor}-boxes`).append(`
+        <div class="box ${id}-box" id="${floor}-${id}-box">
+            <div class="top">
+                <span>${title}</span>
+            </div>
+
+            <div class="metrics"></div>
+            <div class="bottom"></div>
+        </div>
     `);
 
-    $(selector)
-        .find(".tooltip")
-        .text(`Vorjahr: ${stats.previousData}`);
+  const box = $(`#${floor}-${id}-box`);
+
+  metrics.forEach((m) => {
+    const better = m.invert ? m.change > 0 : m.change < 0;
+
+    box.find(".metrics").append(`
+      <div class="metric-row">
+          <span class="label">${m.label}</span>
+          <span class="value"><strong>${m.value}</strong> ${m.unit}</span>
+          <span class="change ${better ? "better" : "worse"}">
+              ${m.change < 0 ? "↘" : "↗"} ${m.change.toFixed(1)}%
+          </span>
+      </div>
+  `);
+  });
+
+  const last = metrics[metrics.length - 1];
+
+  box.find(".bottom").html(`
+        <div class="tooltip">Vorjahr: ${last.previous}</div>
+    `);
 }
 
-
-/*
-
-    let currentYear = null;
-    let yearlyConsumption = 0;
-
-    for (let i = 1; i < ogStromEntries.length; i++) {
-
-        const currentEntry = ogStromEntries[i];
-        const previousEntry = ogStromEntries[i - 1];
-
-        const difference =
-            Number(currentEntry.value) -
-            Number(previousEntry.value);
-
-        const year = new Date(currentEntry.date).getFullYear();
-
-        if (currentYear === null) {
-            currentYear = year;
-        }
-
-        // Jahr gewechselt → Vorjahr speichern
-        if (year !== currentYear) {
-
-            await DB.saveTimeEntry({
-                type: "verbrauch",
-                apartment_id: "og",
-                metric: "stromverbrauch-jahr",
-                value: yearlyConsumption,
-                date: `${currentYear}-12-31`
-            });
-
-            currentYear = year;
-            yearlyConsumption = 0;
-        }
-
-        yearlyConsumption += difference;
-
-        await DB.saveTimeEntry({
-            type: "verbrauch",
-            apartment_id: "og",
-            metric: "stromverbrauch-monat",
-            value: difference,
-            date: currentEntry.date
-        });
-        console.log("saved og month",currentEntry.date);
-    }
-
-    // letztes Jahr speichern
-    if (currentYear !== null) {
-        await DB.saveTimeEntry({
-            type: "verbrauch",
-            apartment_id: "og",
-            metric: "stromverbrauch-jahr",
-            value: yearlyConsumption,
-            date: `${currentYear}-12-31`
-        });
-        console.log("saved og year",`${currentYear}-12-31`);
-    }
-
-
-    // UG
-    currentYear = null;
-    yearlyConsumption = 0;
-
-    for (let i = 1; i < ugStromEntries.length; i++) {
-
-        const currentEntry = ugStromEntries[i];
-        const previousEntry = ugStromEntries[i - 1];
-
-        const difference =
-            Number(currentEntry.value) -
-            Number(previousEntry.value);
-
-        const year = new Date(currentEntry.date).getFullYear();
-
-        if (currentYear === null) {
-            currentYear = year;
-        }
-
-        // Jahr gewechselt → Vorjahr speichern
-        if (year !== currentYear) {
-
-            await DB.saveTimeEntry({
-                type: "verbrauch",
-                apartment_id: "ug",
-                metric: "stromverbrauch-jahr",
-                value: yearlyConsumption,
-                date: `${currentYear}-12-31`
-            });
-
-            currentYear = year;
-            yearlyConsumption = 0;
-        }
-
-        yearlyConsumption += difference;
-
-        await DB.saveTimeEntry({
-            type: "verbrauch",
-            apartment_id: "ug",
-            metric: "stromverbrauch-monat",
-            value: difference,
-            date: currentEntry.date
-        });
-        console.log("saved ug month",currentEntry.date);
-    }
-
-    // letztes Jahr speichern
-    if (currentYear !== null) {
-        await DB.saveTimeEntry({
-            type: "verbrauch",
-            apartment_id: "ug",
-            metric: "stromverbrauch-jahr",
-            value: yearlyConsumption,
-            date: `${currentYear}-12-31`
-        });
-        console.log("saved ug year",`${currentYear}-12-31`);
-    }
-
-    */
+function getValue(obj, path) {
+  return path.reduce((o, key) => o[key], obj);
+}

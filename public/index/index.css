@@ -32,21 +32,21 @@
 
 .box-summaries {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-top: 2%;
 }
 
-/* CARD BASE */
-.energy-box,
-.water-box,
-.oil-box,
-.cost-box {
+/* =========================
+   CARD BASE (NEU GENERALISIERT)
+========================= */
+
+.box {
   border: 1px solid #e5e7eb;
   border-radius: 16px;
 
   padding: 18px;
-  height: 180px;
+  min-height: 180px;
 
   display: flex;
   flex-direction: column;
@@ -55,73 +55,109 @@
   transition: all 0.2s ease;
 }
 
-.energy-box {
-  background-color: #f6f3c288;
-}
-.water-box {
-  background-color: #cfeaf780;
-}
-.oil-box {
-  background-color: #f7d3c281;
-}
-.cost-box {
-  background-color: #d7f2dc83;
-}
-
-.energy-box:hover,
-.water-box:hover,
-.oil-box:hover,
-.cost-box:hover {
+.box:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* individuelle Hintergründe */
+.strom-box {
+  background-color: #f6f3c288;
+}
+
+.wasser-box {
+  background-color: #cfeaf780;
+}
+
+.heizoel-box {
+  background-color: #f7d3c281;
+}
+
+.kosten-box {
+  background-color: #d7f2dc83;
+}
+
+.heizung-box {
+  background-color: #e6e6ff80;
+}
+
+.solar-box {
+  background-color: #ffe7c280;
+}
+
 /* =========================
-   CARD TOP
+   TOP
 ========================= */
 
 .top {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.top img {
-  width: 48px;
-  height: auto;
-}
-
-.top span {
-  font-size: 2rem;
-  font-weight: 500;
-  line-height: 1;
-}
-
-/* =========================
-   VALUE
-========================= */
-
-.value {
-  font-size: 2rem;
+  justify-content: space-between;
+  font-size: 1.4rem;
+  font-weight: 600;
   color: #111827;
 }
 
-.value strong {
-  font-size: 4rem;
+/* =========================
+   METRICS (NEU)
+========================= */
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-top: 10px;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 0.95rem;
+  color: #374151;
+  gap: 8px;
+}
+
+.metric-row .label {
+  flex: 1;
+  color: #6b7280;
+}
+
+.metric-row .value {
+  flex: 1;
+  text-align: center;
+  color: #111827;
+}
+
+.metric-row .value strong {
+  font-size: 1.2rem;
+}
+
+.metric-row .change {
+  flex: 1;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Trend Farben */
+.change.worse {
+  color: #dc2626;
+}
+
+.change.better {
+  color: #16a34a;
 }
 
 /* =========================
-   BOTTOM (FIXED LAYOUT)
+   BOTTOM TOOLTIP
 ========================= */
 
 .bottom {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 6px;
-
-  font-size: 1rem;
+  margin-top: 10px;
+  font-size: 0.85rem;
   color: #6b7280;
 }
 
@@ -147,13 +183,29 @@
   opacity: 1;
 }
 
-/* TREND COLORS */
-.worse-result {
-  color: red;
-  font-weight: 600;
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+  .box-summaries {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.better-result {
-  color: green;
-  font-weight: 600;
+@media (max-width: 700px) {
+  .box-summaries {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .metric-row .value,
+  .metric-row .change {
+    text-align: left;
+  }
 }

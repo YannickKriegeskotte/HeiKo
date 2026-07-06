@@ -10,8 +10,4 @@ export function registerListeners() {
 
 
 
-    // === Buttons === 
-    $(document).on('click', 'button.save-button', async function () {
-       console.log("Klick");
-    });
 }

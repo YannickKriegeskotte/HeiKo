@@ -1,9 +1,28 @@
 const router = require("express").Router();
 const snapshotController = require("../controllers/snapshot.controller");
 
-router.post("/:type/save", snapshotController.save);
-router.get("/:type/get", snapshotController.get);
-router.get("/:type/all", snapshotController.all);
-router.delete("/:type/delete", snapshotController.remove);
+
+// ===========================
+// MONTH
+// ===========================
+router.post("/month/save", snapshotController.saveMonth);
+
+router.get("/month/latest", snapshotController.getLatestMonth);
+
+router.get("/month/get", snapshotController.getMonth);
+
+router.get("/month/previous", snapshotController.getPreviousMonth);
+
+router.post("/processNewMonth", snapshotController.processNewMonth);
+
+// ===========================
+// YEAR
+// ===========================
+
+router.post("/year/save", snapshotController.saveYear);
+
+router.get("/year/latest", snapshotController.getLatestYear);
+
+router.get("/year/get/:year", snapshotController.getYear);
 
 module.exports = router;

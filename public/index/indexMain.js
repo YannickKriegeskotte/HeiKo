@@ -47,9 +47,13 @@ $(document).ready(async function () {
 
   // if latest year not found load template
   if (!res.ok || !latestRes.success) {
-    
+    const currentYear = new Date().getFullYear();
+
     currentYearData = structuredClone(yearly_template);
+    currentYearData.year = currentYear;
+
     previousYearData = structuredClone(yearly_template);
+    previousYearData.year = currentYear - 1;
   } else {
     currentYearData = latestRes.data.payload;
     console.log("currentYearData", currentYearData);
@@ -62,7 +66,8 @@ $(document).ready(async function () {
 
     // if previous year not found load template
     if (!prevRes.ok || !prevData.success) {
-      previousYearData = yearly_template;
+      previousYearData = structuredClone(yearly_template);
+      previousYearData.year = currentYearData.year - 1;
       console.log("load template");
     } else {
       previousYearData = prevData.data.payload;
@@ -222,5 +227,5 @@ function renderBox(floor, id, title, metrics) {
 }
 
 function getValue(obj, path) {
-  return path.reduce((o, key) => o[key], obj);
+  return path.reduce((o, key) => o?.[key], obj) ?? 0;
 }

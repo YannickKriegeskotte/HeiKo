@@ -5,34 +5,44 @@ const monthly_template = await fetch(
 ).then((r) => r.json());
 
 export function registerListeners() {
-  const date = Helper.getDate();
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-
-  const debug = true;
 
   // === Buttons ===
   // Save
   $(document).on("click", "#save-button", async function () {
-    console.log("Klick");
-    const dateStr = $("#date-input").val();
+    console.log("Save Button");
+    const dateStr = $("#readingDate").val();
 
     // =========================
     // Validierung
     // =========================
     let missing = false;
+    let missingObj;
 
     $("body")
       .find("input:not([type='date']):not(:disabled)")
       .each(function () {
         if ($(this).val() === "") {
           missing = true;
+          missingObj = this;
           return false;
         }
       });
-    missing = false; // <------------------------------------------------------------------- ENTFERNEN
-    if (missing) return;
+    // missing = false; // <------------------------------------------------------------------- ENTFERNEN
+    if (missing) {
+      console.log("missing input");
+      
+      missingObj.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+      $(missingObj).parent().addClass("input-error-animation");
+
+      setTimeout(() => {
+        $(missingObj).parent().removeClass("input-error-animation");
+      }, 1200);
+      return
+    }
 
     // Helper.showLoader();
 
@@ -42,157 +52,71 @@ export function registerListeners() {
     let snapshot = structuredClone(monthly_template);
 
     // =========================
+    // Vormonat aus DB laden
+    // =========================
+    console.log("load prev");
+    const yearMonth = dateStr.slice(0, 7);
+    const response = await ((await fetch(`/snapshot/month/previous/${yearMonth}`)).json());
+    console.log("prev", response);
+
+    // prev not found
+    if (!response.success) {
+
+      // Aktive Checkboxen mit 0 füllen
+      $("input[type=checkbox]").each(function () {
+        if (!this.checked) return;
+        const valueID = this.id.replace("locked", "value");
+        $(`#${valueID}`).val(0);
+      });
+    } else {
+
+      const prev = response.data.payload;
+
+      // =========================
+      // Aktive Checkboxen mit prev füllen
+      // =========================
+      $("input[type=checkbox]").each(function () {
+        if (!this.checked) return;
+
+        const valueID = this.id.replace("locked", "value");
+        const path = valueID.split("-");
+        const value = getNestedValue(prev, path);
+
+        $(`#${valueId}`).val(value);
+      });
+    }
+
+    // =========================
     // JSON template füllen
     // =========================
+
+    // date input
+    $("input[type=date]").each(function () {
+      const path = this.id.split("-");
+      const value = this.value;
+
+      setNestedValue(snapshot, path, value);
+    });
+
+
+    // alle number inputfelder (auch von Gebühren, da vorher potentielle Vormonatswerte eingetragen wurden)
+    $("input[type=number]").each(function () {
+      const path = this.id.split("-");
+      const value = Number(this.value);
+
+      setNestedValue(snapshot, path, value);
+    });
+
+    // alle checkboxen
+    $("input[type=checkbox]").each(function () {
+      const path = this.id.split("-");
+
+      setNestedValue(snapshot, path, this.checked);
+    });
+
+
+    // monat aus reading date extrahieren und limiter drüber laufen lassen
     snapshot.yearMonth = determineMonth(dateStr);
-    snapshot.readingDate = dateStr;
-
-    // -------------------------
-    // Wasser
-    // -------------------------
-    snapshot.wasser.og.warmwasserZaehler = $("#warmwasser").val();
-    snapshot.wasser.og.kaltwasserZaehler = $("#kaltwasser").val();
-
-    snapshot.wasser.gesamtwasserZaehler = $("#gesamtwasser").val();
-    snapshot.wasser.enthaertungsanlageDruck = $(
-      "#enthaertungsanlage-druck",
-    ).val();
-
-    // -------------------------
-    // Heizung
-    // -------------------------
-    snapshot.heizung.betriebsstundenZaehler = $(
-      "#heizung-betriebsstunden",
-    ).val();
-    snapshot.heizung.oelverbrauchZaehler = $("#heizung-verbrauch").val();
-    snapshot.heizung.druck = $("#heizung-druck").val();
-
-    // -------------------------
-    // Strom
-    // -------------------------
-    snapshot.strom.og.zaehler = $("#stromzaehler-og").val();
-    snapshot.strom.ug.zaehler = $("#stromzaehler-ug").val();
-    snapshot.strom.solarstromZaehler = $("#solarstrom").val();
-
-    // -------------------------
-    // Öl
-    // -------------------------
-    snapshot.oel.meter = $("#oel-meter").val();
-    snapshot.oel.zeiger = $("#oel-zeiger").val();
-    snapshot.oel.kaufmenge = $("#oel-kaufmenge").val();
-
-    // -------------------------
-    // Solarpumpe
-    // -------------------------
-    snapshot.solarpumpe.druck = $("#solarpumpe-druck").val();
-    snapshot.solarpumpe.energie = $("#solarenergie").val();
-    snapshot.solarpumpe.laufzeit = $("#solarpumpe-laufzeit").val();
-
-    // -------------------------
-    // Gebühren OG
-    // -------------------------
-    snapshot.gebuehren.og.zaehlergebuehrenStrom.value = $(
-      "#zaehlergebuehren-strom-og",
-    ).val();
-    snapshot.gebuehren.og.zaehlergebuehrenStrom.locked = $(
-      "#zaehlergebuehren-strom-og-lock",
-    ).is(":checked");
-
-    snapshot.gebuehren.og.kilowattPreis.value = $("#kilowatt-preis-og").val();
-    snapshot.gebuehren.og.kilowattPreis.locked = $(
-      "#kilowatt-preis-og-lock",
-    ).is(":checked");
-
-    snapshot.gebuehren.og.wasserPreis.value = $("#wasser-preis-og").val();
-    snapshot.gebuehren.og.wasserPreis.locked = $("#wasser-preis-og-lock").is(
-      ":checked",
-    );
-
-    snapshot.gebuehren.og.abwasserPreis.value = $("#abwasser-preis-og").val();
-    snapshot.gebuehren.og.abwasserPreis.locked = $(
-      "#abwasser-preis-og-lock",
-    ).is(":checked");
-
-    // -------------------------
-    // Gebühren UG
-    // -------------------------
-    snapshot.gebuehren.ug.zaehlergebuehrenStrom.value = $(
-      "#zaehlergebuehren-strom-ug",
-    ).val();
-    snapshot.gebuehren.ug.zaehlergebuehrenStrom.locked = $(
-      "#zaehlergebuehren-strom-ug-lock",
-    ).is(":checked");
-
-    snapshot.gebuehren.ug.kilowattPreis.value = $("#kilowatt-preis-ug").val();
-    snapshot.gebuehren.ug.kilowattPreis.locked = $(
-      "#kilowatt-preis-ug-lock",
-    ).is(":checked");
-
-    snapshot.gebuehren.ug.wasserPreis.value = $("#wasser-preis-ug").val();
-    snapshot.gebuehren.ug.wasserPreis.locked = $("#wasser-preis-ug-lock").is(
-      ":checked",
-    );
-
-    snapshot.gebuehren.ug.abwasserPreis.value = $("#abwasser-preis-ug").val();
-    snapshot.gebuehren.ug.abwasserPreis.locked = $(
-      "#abwasser-preis-ug-lock",
-    ).is(":checked");
-
-    snapshot.gebuehren.ug.miete.value = $("#miete-ug").val();
-    snapshot.gebuehren.ug.miete.locked = $("#miete-ug-lock").is(":checked");
-
-    // -------------------------
-    // Gebühren global
-    // -------------------------
-    snapshot.gebuehren.oelPreis.value = $("#oel-preis").val();
-    snapshot.gebuehren.oelPreis.locked = $("#oel-preis-lock").is(":checked");
-
-    snapshot.gebuehren.zaehlergebuehrenWasser.value = $(
-      "#zaehlergebuehren-wasser",
-    ).val();
-    snapshot.gebuehren.zaehlergebuehrenWasser.locked = $(
-      "#zaehlergebuehren-wasse-lock",
-    ).is(":checked");
-
-    // -------------------------
-    // Verbrauch (initial)
-    // -------------------------
-    snapshot.verbrauch.og.strom = 0;
-    snapshot.verbrauch.og.warmwasser = 0;
-    snapshot.verbrauch.og.kaltwasser = 0;
-    snapshot.verbrauch.og.gesamtwasser = 0;
-
-    snapshot.verbrauch.ug.strom = 0;
-    snapshot.verbrauch.ug.gesamtwasser = 0;
-
-    snapshot.verbrauch.oel = 0;
-
-    // -------------------------
-    // Produktion (initial)
-    // -------------------------
-    snapshot.produziert.solarstrom = 0;
-    snapshot.produziert.solarwasserenergie = 0;
-
-    // -------------------------
-    // Kosten (initial)
-    // -------------------------
-    snapshot.kosten.og.strom = 0;
-    snapshot.kosten.og.warmwasser = 0;
-    snapshot.kosten.og.kaltasser = 0;
-    snapshot.kosten.og.gesamtwasser = 0;
-    snapshot.kosten.og.abwasser = 0;
-
-    snapshot.kosten.ug.strom = 0;
-    snapshot.kosten.ug.wasser = 0;
-    snapshot.kosten.ug.abwasser = 0;
-
-    snapshot.kosten.oel = 0;
-
-    // -------------------------
-    // Laufzeit (initial)
-    // -------------------------
-    snapshot.laufzeit.heizung = 0;
-    snapshot.laufzeit.solarpumpe = 0;
 
     console.log("NEW", snapshot);
     // =========================
@@ -213,26 +137,27 @@ export function registerListeners() {
     Helper.hideLoader();
 
     $("input[type=number]").val("");
-    $("#date-input").val(new Date().toISOString().split("T")[0]);
+    $("#readingDate").val(new Date().toISOString().split("T")[0]);
   });
 
   // Reset
   $(document).on("click", "#reset-button", function () {
     $("input[type=number]").val("");
 
-    $("#date-input").val(new Date().toISOString().split("T")[0]);
+    $("#readingDate").val(new Date().toISOString().split("T")[0]);
   });
 
   // === Checkboxen ===
-  $(document).on("change", ".cell input[type=checkbox]", function () {
-    let $this = $(this);
-    let $input = $this.next("input[type=number]");
+  $(document).on("change", ".lock-switch input[type=checkbox]", function () {
 
-    let isLocked = this.checked;
+    const $numberInput = $(this)
+      .closest(".pricing-input")
+      .find("input[type=number]");
 
-    $input.prop("disabled", isLocked);
+    const locked = this.checked;
 
-    $input.css("background-color", isLocked ? "#6d6d6d" : "");
+    $numberInput.prop("disabled", locked);
+    $numberInput.css("background-color", locked ? "#6d6d6d" : "");
   });
 
   // === Input value scroll manipulation deaktivieren  ===
@@ -253,4 +178,24 @@ function determineMonth(isoDate) {
   const month = String(d.getMonth() + 1).padStart(2, "0");
 
   return `${year}-${month}`;
+}
+
+function setNestedValue(obj, path, value) {
+  let current = obj;
+
+  for (let i = 0; i < path.length - 1; i++) {
+    current = current[path[i]];
+  }
+
+  current[path[path.length - 1]] = value;
+}
+
+function getNestedValue(obj, path) {
+  let current = obj;
+
+  for (const key of path) {
+    current = current[key];
+  }
+
+  return current;
 }

@@ -11,7 +11,7 @@ router.get("/month/latest", snapshotController.getLatestMonth);
 
 router.get("/month/get", snapshotController.getMonth);
 
-router.get("/month/previous", snapshotController.getPreviousMonth);
+router.get("/month/previous/:yearMonth", snapshotController.getPreviousMonth);
 
 router.post("/processNewMonth", snapshotController.processNewMonth);
 

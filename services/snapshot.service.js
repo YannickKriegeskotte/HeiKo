@@ -7,33 +7,38 @@ const { calculateMonthlySnapshot, calculateYearlySnapshot } = require("../domain
  * @json snapshot 
  */
 async function processNewMonth(snapshot) {
-  console.log("service processNewMonth");
-  
+  console.log("\t service processNewMonth");
+
 
   // ===========================
-  // GET PREVIOUS MONTH FROM DB
+  // Vormonat aus DB laden
   // ===========================
 
-  const month = snapshot.yearMonth;
+  const yearMonth = snapshot.yearMonth;
+  const prevRaw = await snapshotRepo.getPreviousMonth(yearMonth);
+  let prev = null;
 
-  const prevRaw = await snapshotRepo.getPreviousMonth(month);
+  // Vormonat gefunden
+  if (prevRaw !== null) {
+    prev = prevRaw.payload;
+  }
 
-  const prev = prevRaw.payload;
+
 
   // ===========================
-  // CALCULATE MONTH STUFF
+  // Businesslogik berechnen
   // ===========================
 
   const processedMonth = await calculateMonthlySnapshot(snapshot, prev);
-  
+
   // ===========================
-  // SAVE NEW MONTH TO DB
+  // Aktuallisierten Monat in DB speichern
   // ===========================
 
   await snapshotRepo.saveMonth(processedMonth);
 
   // ===========================
-  // UPDATE YEARLY SNAPSHOT
+  // Monat zu Yearly_snapshot hinzufügen
   // ===========================
 
   await addMonthToYear(processedMonth);
@@ -44,8 +49,8 @@ async function processNewMonth(snapshot) {
  * @json processedMonth
  * @string year 
  */
-async function addMonthToYear(processedMonth){
-  console.log("service addMonthToYear");
+async function addMonthToYear(processedMonth) {
+  console.log("\t service addMonthToYear");
 
   // ===========================
   // EXTRACT YEAR FROM SNAPSHOT
@@ -60,13 +65,16 @@ async function addMonthToYear(processedMonth){
   // ===========================
 
   const snapshotRaw = await getYear(year);
-  const snapshot = snapshotRaw.data
+  let snapshot = null;
 
+  if (snapshot !== null) {
+    snapshot = snapshotRaw.data
+  }
   // ===========================
   // CALCULATE YEAR STUFF
   // ===========================
 
-  let processedYear = await calculateYearlySnapshot(snapshot,processedMonth, year);
+  let processedYear = await calculateYearlySnapshot(snapshot, processedMonth, year);
 
   // ===========================
   // SAVE UPDATED YEAR IN DB
@@ -83,7 +91,7 @@ async function addMonthToYear(processedMonth){
 // ===========================
 
 async function saveMonth(snapshot) {
-  console.log("service saveMonth");
+  console.log("\t service saveMonth");
   await snapshotRepo.saveMonth(snapshot);
 
   return {
@@ -91,9 +99,10 @@ async function saveMonth(snapshot) {
   };
 }
 
-async function getMonth(month) {
-  console.log("service getMonth");
-  const data = await snapshotRepo.getMonth(month);
+async function getMonth(YearMonth) {
+  console.log("\t service getMonth", YearMonth);
+  const data = await snapshotRepo.getMonth(YearMonth);
+  console.log("\t\t success:", data !== null);
 
   return {
     success: data !== null,
@@ -102,8 +111,9 @@ async function getMonth(month) {
 }
 
 async function getLatestMonth() {
-  console.log("service getLatestMonth");
+  console.log("\t service getLatestMonth");
   const data = await snapshotRepo.getLatestMonth();
+  console.log("\t\t success:", data !== null);
 
   return {
     success: data !== null,
@@ -111,9 +121,10 @@ async function getLatestMonth() {
   };
 }
 
-async function getPreviousMonth(month) {
-  console.log("service getPreviousMonth");
-  const data = await snapshotRepo.getPreviousMonth(month);
+async function getPreviousMonth(yearMonth) {
+  console.log("\t service getPreviousMonth", yearMonth);
+  const data = await snapshotRepo.getPreviousMonth(yearMonth);
+  console.log("\t\t success:", data !== null);
 
   return {
     success: data !== null,
@@ -126,7 +137,7 @@ async function getPreviousMonth(month) {
 // ===========================
 
 async function saveYear(snapshot) {
-  console.log("service saveYear");
+  console.log("\t service saveYear");
   await snapshotRepo.saveYear(snapshot);
 
   return {
@@ -135,8 +146,9 @@ async function saveYear(snapshot) {
 }
 
 async function getYear(year) {
-  console.log("service getYear");
+  console.log("\t service getYear", year);
   const data = await snapshotRepo.getYear(year);
+  console.log("\t\t success:", data !== null);
 
   return {
     success: data !== null,
@@ -145,8 +157,9 @@ async function getYear(year) {
 }
 
 async function getLatestYear() {
-  console.log("service getLatestYear");
+  console.log("\t service getLatestYear");
   const data = await snapshotRepo.getLatestYear();
+  console.log("\t\t success:", data !== null);
 
   return {
     success: data !== null,

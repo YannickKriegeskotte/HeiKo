@@ -16,12 +16,18 @@
   </head>
 
   <body>
+    <!-- ===================================================== -->
+    <!-- Loading GIF -->
+    <!-- ===================================================== -->
     <div id="loadingOverlay">
       <img src="../assets/loading.gif" alt="Loading..." />
       <p id="loading-text"></p>
     </div>
 
     <main class="content">
+      <!-- ===================================================== -->
+      <!-- Menüleiste Oben -->
+      <!-- ===================================================== -->
       <div class="content-header">
         <div class="header-left">
           <h1>Messwerte erfassen</h1>
@@ -33,7 +39,7 @@
             <img src="../assets/reset-icon.svg" alt="" />Zurücksetzen
           </button>
 
-          <input class="date-input" type="date" id="date-input" />
+          <input class="date-input" type="date" id="readingDate" />
 
           <button class="primary-btn" id="save-button">
             <img class="save-icon" src="../assets/save-icon.svg" alt="" />
@@ -42,7 +48,9 @@
         </div>
       </div>
 
+      <!-- ===================================================== -->
       <!-- Wasser -->
+      <!-- ===================================================== -->
       <section class="measurement-card water-card">
         <div class="measurement-header">
           <img class="droplet-icon" src="../assets/droplet-solid-full.svg" />
@@ -63,7 +71,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="warmwasser" />
+              <input type="number" id="wasser-og-warmwasserZaehler" />
               <span class="unit"></span>
             </div>
           </div>
@@ -78,7 +86,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="kaltwasser" />
+              <input type="number" id="wasser-og-kaltwasserZaehler" />
               <span class="unit"></span>
             </div>
           </div>
@@ -93,7 +101,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="gesamtwasser" />
+              <input type="number" id="wasser-gesamtwasserZaehler" />
               <span class="unit"></span>
             </div>
           </div>
@@ -108,14 +116,16 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="enthaertungsanlage-druck" />
+              <input type="number" id="wasser-enthaertungsanlageDruck" />
               <span class="unit">Bar</span>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- ===================================================== -->
       <!-- Heizung -->
+      <!-- ===================================================== -->
       <section class="measurement-card heating-card">
         <div class="measurement-header">
           <img class="fire-icon" src="../assets/fire-solid-full.svg" />
@@ -136,7 +146,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="heizung-betriebsstunden" />
+              <input type="number" id="heizung-betriebsstundenZaehler" />
               <span class="unit">Std</span>
             </div>
           </div>
@@ -151,7 +161,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="heizung-verbrauch" />
+              <input type="number" id="heizung-oelverbrauchZaehler" />
               <span class="unit">L</span>
             </div>
           </div>
@@ -173,7 +183,9 @@
         </div>
       </section>
 
+      <!-- ===================================================== -->
       <!-- Öl -->
+      <!-- ===================================================== -->
       <section class="measurement-card oil-card">
         <div class="measurement-header">
           <img class="oil-icon" src="../assets/droplet-solid-full.svg" />
@@ -231,7 +243,9 @@
         </div>
       </section>
 
+      <!-- ===================================================== -->
       <!-- Strom -->
+      <!-- ===================================================== -->
       <section class="measurement-card energy-card">
         <div class="measurement-header">
           <img class="bolt-icon" src="../assets/bolt-solid-full.svg" />
@@ -252,7 +266,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="stromzaehler-ug" />
+              <input type="number" id="strom-ug-zaehler" />
               <span class="unit"></span>
             </div>
           </div>
@@ -267,7 +281,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="stromzaehler-og" />
+              <input type="number" id="strom-og-zaehler" />
               <span class="unit"></span>
             </div>
           </div>
@@ -282,14 +296,16 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="solarstrom" />
+              <input type="number" id="strom-solarstromZaehler" />
               <span class="unit"></span>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- ===================================================== -->
       <!-- Solarthermie -->
+      <!-- ===================================================== -->
       <section class="measurement-card solar-card">
         <div class="measurement-header">
           <img class="sun-icon" src="../assets/sun-solid-full.svg" />
@@ -325,7 +341,7 @@
               />
             </label>
             <div class="input-wrapper">
-              <input type="number" id="solarenergie" />
+              <input type="number" id="solarpumpe-ergie" />
               <span class="unit">kWh</span>
             </div>
           </div>
@@ -347,96 +363,175 @@
         </div>
       </section>
 
-      <!-- Sonstiges -->
-      <section class="pricing-table">
-        <div class="pricing-header">
-          <h2>Sonstige Werte</h2>
-
-          <div class="col-title">
-            <span>gleich wie vorher?</span>
-            <strong>OG</strong>
-          </div>
-
-          <div class="col-title">
-            <span>gleich wie vorher?</span>
-            <strong>UG</strong>
+      <!-- ===================================================== -->
+      <!-- Gebühren -->
+      <!-- ===================================================== -->
+      <section class="measurement-card pricing-card">
+        <div class="measurement-header">
+          <img src="../assets/euro.svg" class="euro-icon" />
+          <div>
+            <h2>Gebühren</h2>
+            <p>Selten veränderte Werte</p>
           </div>
         </div>
 
-        <div class="pricing-row">
-          <label>Zählergebühren Strom</label>
-          <div class="cell">
-            <input type="checkbox" id="zaehlergebuehren-strom-og-lock" />
-            <input type="number" id="zaehlergebuehren-strom-og" />
+        <!-- OG -->
+        <h3 class="pricing-group-title">Obergeschoss</h3>
+
+        <div class="pricing-grid">
+          <div class="pricing-item">
+            <label>Zählergebühren Strom</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-og-zaehlergebuehrenStrom-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-og-zaehlergebuehrenStrom-value" />
+            </div>
           </div>
-          <div class="cell">
-            <input type="checkbox" id="zaehlergebuehren-strom-ug-lock" />
-            <input type="number" id="zaehlergebuehren-strom-ug" />
+
+          <div class="pricing-item">
+            <label>kWh Preis</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-og-kilowattPreis-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-og-kilowattPreis-value" />
+            </div>
+          </div>
+
+          <div class="pricing-item">
+            <label>Wasserpreis</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-og-wasserPreis-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-og-wasserPreis-value" />
+            </div>
+          </div>
+
+          <div class="pricing-item">
+            <label>Abwasserpreis</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-og-abwasserPreis-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-og-abwasserPreis-value" />
+            </div>
           </div>
         </div>
 
-        <div class="pricing-row">
-          <label>Zählergebühren Wasser</label>
-          <div class="cell">
-            <input type="checkbox" id="zaehlergebuehren-wasser-og-lock" />
-            <input type="number" id="zaehlergebuehren-wasser-og" />
+        <!-- UG -->
+
+        <h3 class="pricing-group-title">Untergeschoss</h3>
+
+        <div class="pricing-grid">
+          <div class="pricing-item">
+            <label>Zählergebühren Strom</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-ug-zaehlergebuehrenStrom-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-ug-zaehlergebuehrenStrom-value" />
+            </div>
           </div>
-          <div class="cell">
-            <input type="checkbox" id="zaehlergebuehren-wasser-ug-lock" />
-            <input type="number" id="zaehlergebuehren-wasser-ug" />
+
+          <div class="pricing-item">
+            <label>kWh Preis</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-ug-kilowattPreis-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-ug-kilowattPreis-value" />
+            </div>
+          </div>
+
+          <div class="pricing-item">
+            <label>Wasserpreis</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-ug-wasserPreis-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-ug-wasserPreis-value" />
+            </div>
+          </div>
+
+          <div class="pricing-item">
+            <label>Abwasserpreis</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-ug-abwasserPreis-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-ug-abwasserPreis-value" />
+            </div>
+          </div>
+
+          <div class="pricing-item">
+            <label>Miete</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-ug-miete-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-ug-miete-value" />
+            </div>
           </div>
         </div>
 
-        <div class="pricing-row">
-          <label>Kilowatt Preis</label>
-          <div class="cell">
-            <input type="checkbox" id="kilowatt-preis-og-lock" />
-            <input type="number" id="kilowatt-preis-og" />
-          </div>
-          <div class="cell">
-            <input type="checkbox" id="kilowatt-preis-ug-lock" />
-            <input type="number" id="kilowatt-preis-ug" />
-          </div>
-        </div>
+        <!-- Global -->
 
-        <div class="pricing-row">
-          <label>Wasser Preis</label>
-          <div class="cell">
-            <input type="checkbox" id="wasser-preis-og-lock" />
-            <input type="number" id="wasser-preis-og" />
-          </div>
-          <div class="cell">
-            <input type="checkbox" id="wasser-preis-ug-lock" />
-            <input type="number" id="wasser-preis-ug" />
-          </div>
-        </div>
+        <h3 class="pricing-group-title">Global</h3>
 
-        <div class="pricing-row">
-          <label>Abwasser Preis</label>
-          <div class="cell">
-            <input type="checkbox" id="abwasser-preis-og-lock" />
-            <input type="number" id="abwasser-preis-og" />
-          </div>
-          <div class="cell">
-            <input type="checkbox" id="abwasser-preis-ug-lock" />
-            <input type="number" id="abwasser-preis-ug" />
-          </div>
-        </div>
+        <div class="pricing-grid">
+          <div class="pricing-item">
+            <label>Ölpreis</label>
 
-        <div class="pricing-row">
-          <label>Öl Preis (gesamt Haus)</label>
-          <div class="cell">
-            <input type="checkbox" id="oel-preis-lock" />
-            <input type="number" id="oel-preis" />
-          </div>
-        </div>
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-oelPreis-locked" />
+                <span>wie vorher</span>
+              </label>
 
-        <div class="pricing-row">
-          <label>Miete</label>
-          <div class="cell empty"></div>
-          <div class="cell">
-            <input type="checkbox" id="miete-ug-lock" />
-            <input type="number" id="miete-ug" />
+              <input type="number" id="gebuehren-oelPreis-value" />
+            </div>
+          </div>
+
+          <div class="pricing-item">
+            <label>Zählergebühren Wasser</label>
+
+            <div class="pricing-input">
+              <label class="lock-switch">
+                <input type="checkbox" id="gebuehren-zaehlergebuehrenWasser-locked" />
+                <span>wie vorher</span>
+              </label>
+
+              <input type="number" id="gebuehren-zaehlergebuehrenWasser-value" />
+            </div>
           </div>
         </div>
       </section>

@@ -7,7 +7,7 @@ $(async function () {
   await loadSidebar("newMonth");
   Helper.hideLoader();
 
-  $("#date-input").val(new Date().toISOString().split("T")[0]);
+  $("#readingDate").val(new Date().toISOString().split("T")[0]);
 
   const res = await fetch("/snapshot/month/latest");
   const data = await res.json();
@@ -17,53 +17,39 @@ $(async function () {
   if (data.success) {
     const gebuehren = data.data.payload.gebuehren;
 
-    // OG
-    applyLock(
-      gebuehren?.og?.zaehlergebuehrenStrom,
-      "zaehlergebuehren-strom-og",
-    );
+    applyLocks(gebuehren);
 
-    applyLock(gebuehren?.og?.kilowattPreis, "kilowatt-preis-og");
-    applyLock(
-      gebuehren?.og?.zaehlergebuehrenWasser,
-      "zaehlergebuehren-wasser-og",
-    );
-    applyLock(gebuehren?.og?.wasserPreis, "wasser-preis-og");
-    applyLock(gebuehren?.og?.abwasserPreis, "abwasser-preis-og");
-
-    // UG
-    applyLock(
-      gebuehren?.ug?.zaehlergebuehrenStrom,
-      "zaehlergebuehren-strom-ug",
-    );
-    applyLock(gebuehren?.ug?.kilowattPreis, "kilowatt-preis-ug");
-    applyLock(
-      gebuehren?.ug?.zaehlergebuehrenWasser,
-      "zaehlergebuehren-wasser-ug",
-    );
-    applyLock(gebuehren?.ug?.wasserPreis, "wasser-preis-ug");
-    applyLock(gebuehren?.ug?.abwasserPreis, "abwasser-preis-ug");
-    applyLock(gebuehren?.ug?.miete, "miete-ug");
-
-    // Öl
-    applyLock(gebuehren?.oelPreis, "oel-preis");
     console.log("Vormonat geladen");
   } else {
     console.log("Vormonat nicht geladen");
   }
 
+    $("input[type=number]").each(function () {
+      $(this).val(9);
+    
+    });
+
   registerListeners();
 });
 
-function applyLock(valueObj, baseId) {
-  if (!valueObj) return;
+function applyLocks(obj, path = []) {
+  for (const [key, value] of Object.entries(obj)) {
+    if (value && typeof value === "object") {
+      if ("value" in value && "locked" in value) {
+        const id = [...path, key].join("-");
 
-  const locked = valueObj.locked === true;
+        const $input = $(`#${id}-value`);
+        const $box = $(`#${id}-locked`);
 
-  const $box = $(`#${baseId}-lock`);
-  const $input = $(`#${baseId}`);
+        $input.val("");
 
-  $box.prop("checked", locked);
-  $input.prop("disabled", locked);
-  $input.css("background-color", locked ? "#6d6d6d" : "");
+        $box.prop("checked", value.locked);
+        $input.prop("disabled", value.locked);
+        $input.css("background-color", value.locked ? "#6d6d6d" : "");
+      }
+    }
+    else {
+      applyLocks(value, [...path, key]);
+    }
+  }
 }

@@ -80,7 +80,7 @@
     "og": {
       "strom": 0,
       "warmwasser": 0,
-      "kaltasser": 0,
+      "kaltwasser": 0,
       "gesamtwasser": 0,
       "abwasser": 0
     },

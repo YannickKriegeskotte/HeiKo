@@ -6,10 +6,10 @@ const { getDB } = require("../db/dbStore");
 
 /**
  *
- * @param {*} snapshot
+ * @json snapshot
  */
 async function saveMonth(snapshot) {
-  console.log("repo saveMonth");
+  console.log("\t\t repo saveMonth");
   const db = getDB();
 
   await db.run(
@@ -24,11 +24,11 @@ async function saveMonth(snapshot) {
 
 /**
  *
- * @param {*} month
+ * @string yearMonth
  * @returns Month JSON / NULL
  */
-async function getMonth(month) {
-  console.log("repo getMonth");
+async function getMonth(yearMonth) {
+  console.log("\t\t repo getMonth",yearMonth);
   const db = getDB();
 
   const row = await db.get(
@@ -37,10 +37,13 @@ async function getMonth(month) {
     FROM monthly_snapshot
     WHERE date = ?
     `,
-    [month],
+    [yearMonth],
   );
 
-  if (!row) return null;
+  if (!row){
+    console.log("\t\t\t",row,"->",null);
+    return null;
+  } 
 
   return {
     ...row,
@@ -53,7 +56,7 @@ async function getMonth(month) {
  * @returns Month JSON / NULL
  */
 async function getLatestMonth() {
-  console.log("repo getLatestMonth");
+  console.log("\t\t repo getLatestMonth");
   const db = getDB();
 
   const row = await db.get(`
@@ -72,18 +75,18 @@ async function getLatestMonth() {
 
 /**
  *
- * @string month
+ * @string yearMonth
  * @returns Month JSON / NULL
  */
-async function getPreviousMonth(month) {
-  console.log("repo getPreviousMonth");
-  const date = new Date(`${month}-01`);
+async function getPreviousMonth(yearMonth) {
+  console.log("\t\t repo getPreviousMonth", yearMonth);
+  const date = new Date(`${yearMonth}-01`);
 
   date.setMonth(date.getMonth() - 1);
 
-  const previousMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  const previousYearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
-  return await getMonth(previousMonth);
+  return await getMonth(previousYearMonth);
 }
 
 // ===========================
@@ -92,10 +95,10 @@ async function getPreviousMonth(month) {
 
 /**
  *
- * @param {*} snapshot
+ * @json snapshot
  */
 async function saveYear(snapshot) {
-  console.log("repo saveYear");
+  console.log("\t\t repo saveYear");
   const db = getDB();
 
   await db.run(
@@ -110,11 +113,11 @@ async function saveYear(snapshot) {
 
 /**
  *
- * @param {*} year
+ * @string year
  * @returns Year JSON / NULL
  */
 async function getYear(year) {
-  console.log("repo getYear");
+  console.log("\t\t repo getYear");
   const db = getDB();
 
   const row = await db.get(
@@ -139,7 +142,7 @@ async function getYear(year) {
  * @returns Year JSON / NULL
  */
 async function getLatestYear() {
-  console.log("repo getLatestYear");
+  console.log("\t\t repo getLatestYear");
   const db = getDB();
 
   const row = await db.get(`

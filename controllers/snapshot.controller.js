@@ -11,7 +11,7 @@ async function saveMonth(req, res) {
 }
 
 async function getMonth(req, res) {
-  console.log("controller getMonth");
+  console.log("controller getMonth", req.body);
   const result = await snapshotService.getMonth(req.body);
   res.json(result);
 }
@@ -23,7 +23,7 @@ async function getLatestMonth(req, res) {
 }
 
 async function getPreviousMonth(req, res) {
-  console.log("controller getPreviousMonth");
+  console.log("controller getPreviousMonth", req.body);
   const result = await snapshotService.getPreviousMonth(req.body);
   res.json(result);
 }
@@ -50,7 +50,7 @@ async function saveYear(req, res) {
 }
 
 async function getYear(req, res) {
-  console.log("controller getYear");
+  console.log("controller getYear", req.body);
 
   const year = req.params.year;
 

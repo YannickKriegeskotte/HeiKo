@@ -37,15 +37,19 @@ const yearly_template = await fetch(
   "../utils/yearly_snapshot_template.json",
 ).then((r) => r.json());
 
+
+// ===========================
+// MAIN
+// ===========================
 $(document).ready(async function () {
   await loadSidebar("index");
   let currentYearData, previousYearData;
 
-  // get latest year
+  // Aktuellstes Jahr aus DB laden
   let res = await fetch("/snapshot/year/latest");
   const latestRes = await res.json();
 
-  // if latest year not found load template
+  // Wenn nichts gefunden, Template laden
   if (!res.ok || !latestRes.success) {
     const currentYear = new Date().getFullYear();
 
@@ -60,11 +64,11 @@ $(document).ready(async function () {
     const currentYear = Number(currentYearData.year);
     console.log(currentYear);
 
-    // load previous year
+    // Vorjahr zum aktuellsten Jahr aus DB laden
     const prevRes = await fetch(`/snapshot/year/get/${currentYear - 1}`);
     const prevData = await prevRes.json();
 
-    // if previous year not found load template
+    // Wenn Vorjahr nicht gefunden, Template laden
     if (!prevRes.ok || !prevData.success) {
       previousYearData = structuredClone(yearly_template);
       previousYearData.year = currentYearData.year - 1;
@@ -74,20 +78,20 @@ $(document).ready(async function () {
     }
   }
   console.log("previousYearData", previousYearData);
-  // extract last added month from snapshot. when template: lastAddedMonth = "" => make 1
+  // Letzten aktuallisierten monat aus Snapshot extrahieren. Bei Template: lastAddedMonth = "" => mache zu 1
   const lastAddedMonth = Number(currentYearData.lastAddedMonth) || 1;
 
-  // load current sate of last year
+  // Aktuellen Jahresfortschirtt aus Jahressnapshot holen
   currentYearState = currentYearData.months[lastAddedMonth];
 
-  // load previous year state for current month
+  // Vorjahresstand für aktuellen Jahresfortschritt aus Vorjahressnapshot holen
   previousYearState = previousYearData.months[lastAddedMonth];
 
   console.log("currentYearState", currentYearState);
   console.log("previousYearState", previousYearState);
   console.log(currentYearState === previousYearState);
 
-  // fill floors with data
+  // Stockwerke mit Daten füllen
 
   await createFloor("og", "Obergeschoss");
   await createFloor("ug", "Untergeschoss");
@@ -121,8 +125,8 @@ async function getYearComparison(apartment, key) {
 
   const change =
     previous === 0 ? current : ((current - previous) / previous) * 100;
-  console.log(currentYearState);
-  console.log(current, previous, change, path);
+  // console.log(currentYearState);
+  // console.log(current, previous, change, path);
 
   return {
     currentData: current,

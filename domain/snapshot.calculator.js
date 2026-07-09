@@ -14,11 +14,11 @@ function calculateMonthlySnapshot(snapshot, prev) {
 
 function calculateMonthlyConsumption(snapshot, prev) {
   console.log("domain calculateMonthlyConsumption");
-  let i=0;
+  let i = 0;
   // -------------------------
   // VERBRAUCH
   // -------------------------
-  
+
   i++;
   console.log(i);
   snapshot.verbrauch.og.strom =
@@ -26,35 +26,35 @@ function calculateMonthlyConsumption(snapshot, prev) {
 
   i++;
   console.log(i);
-    snapshot.verbrauch.og.warmwasser =
+  snapshot.verbrauch.og.warmwasser =
     num(snapshot.wasser.og.warmwasserZaehler) -
     num(prev.wasser.og.warmwasserZaehler);
 
   i++;
   console.log(i);
-    snapshot.verbrauch.og.kaltwasser =
+  snapshot.verbrauch.og.kaltwasser =
     num(snapshot.wasser.og.kaltwasserZaehler) -
     num(prev.wasser.og.kaltwasserZaehler);
 
   i++;
   console.log(i);
-    snapshot.verbrauch.og.gesamtwasser =
+  snapshot.verbrauch.og.gesamtwasser =
     snapshot.verbrauch.og.warmwasser + snapshot.verbrauch.og.kaltwasser;
 
   i++;
   console.log(i);
-    snapshot.verbrauch.ug.strom =
+  snapshot.verbrauch.ug.strom =
     num(snapshot.strom.ug.zaehler) - num(prev.strom.ug.zaehler);
 
   i++;
   console.log(i);
-    snapshot.verbrauch.ug.gesamtwasser =
+  snapshot.verbrauch.ug.gesamtwasser =
     num(snapshot.wasser.gesamtwasserZaehler) -
     snapshot.verbrauch.og.gesamtwasser;
 
   i++;
   console.log(i);
-    snapshot.verbrauch.oel =
+  snapshot.verbrauch.oel =
     num(prev.oel.meter) + num(snapshot.oel.kaufmenge) - num(snapshot.oel.meter);
 
   // -------------------------
@@ -68,7 +68,7 @@ function calculateMonthlyConsumption(snapshot, prev) {
 
   i++;
   console.log(i);
-    snapshot.produziert.solarwasserenergie =
+  snapshot.produziert.solarwasserenergie =
     num(snapshot.solarpumpe.energie) - num(prev.solarpumpe.energie);
 
   // -------------------------
@@ -83,10 +83,10 @@ function calculateMonthlyConsumption(snapshot, prev) {
 
   i++;
   console.log(i);
-    snapshot.laufzeit.solarpumpe =
+  snapshot.laufzeit.solarpumpe =
     num(snapshot.solarpumpe.laufzeit) - num(prev.solarpumpe.laufzeit);
 
-  
+
 }
 function calculateMonthlyCost(snapshot) {
   console.log("domain calculateMonthlyCost");
@@ -149,24 +149,34 @@ function calculateMonthlyCost(snapshot) {
 async function calculateYearlySnapshot(snapshotDB, processedMonth, year) {
   console.log("domain calculateYearlySnapshot");
 
+
+  console.log("\t load yearly template");
+  const path = require("path");
   const fs = require("fs").promises;
 
-const yearlyTemplate = JSON.parse(
-  await fs.readFile("../public/utils/yearly_snapshot_template.json", "utf8")
-);
+  const yearlyTemplate = JSON.parse(
+    await fs.readFile(
+      path.join(__dirname, "../public/utils/yearly_snapshot_template.json"),
+      "utf8"
+    )
+  );
+  console.log("\t template loaded");
 
   // Neues Jahresobjekt wurde bereits anhand des Templates erzeugt
   // Falls keines vorhanden ist, muss lediglich year gesetzt werden.
   if (snapshotDB == null) {
+    console.log("\t snapshotDB = null");
     snapshotDB = yearlyTemplate;
   }
 
+  console.log("\t get month from processedMonth");
   // Monat aus YYYY-MM bestimmen
   const month = String(Number(processedMonth.yearMonth.split("-")[1]));
-
+  console.log("\t month", month);
   // Metadaten aktualisieren
   snapshotDB.year = year;
   snapshotDB.lastAddedMonth = month;
+  console.log("\t updated metadata", snapshotDB.year, snapshotDB.lastAddedMonth);
 
   // Berechneten Monat übernehmen
   snapshotDB.months[month] = {
@@ -176,6 +186,7 @@ const yearlyTemplate = JSON.parse(
     laufzeit: processedMonth.laufzeit,
     produziert: processedMonth.produziert,
   };
+  console.log("\t imported calculated month");
 
   console.log("done");
   return snapshotDB;

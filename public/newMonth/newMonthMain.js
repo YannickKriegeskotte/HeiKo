@@ -3,16 +3,21 @@ import * as Helper from "../utils/helpers.js";
 
 import { registerListeners } from "../newMonth/newMonthListeners.js";
 
+// ===========================
+// MAIN
+// ===========================
 $(async function () {
   await loadSidebar("newMonth");
   Helper.hideLoader();
 
   $("#readingDate").val(new Date().toISOString().split("T")[0]);
 
+  // Aktuellsten Monat laden
   const res = await fetch("/snapshot/month/latest");
   const data = await res.json();
   console.log("LATEST", data);
 
+  // Wenn nicht gefunden, locks überspringen
   if (!res.ok) return;
   if (data.success) {
     const gebuehren = data.data.payload.gebuehren;
@@ -24,11 +29,13 @@ $(async function () {
     console.log("Vormonat nicht geladen");
   }
 
-    $("input[type=number]").each(function () {
-      $(this).val(9);
-    
-    });
+  // DEBUG TEST
+  /*
+  $("input[type=number]").each(function () {
+    $(this).val(9);
 
+  });
+*/
   registerListeners();
 });
 

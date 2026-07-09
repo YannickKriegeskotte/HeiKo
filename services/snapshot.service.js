@@ -9,6 +9,11 @@ const { calculateMonthlySnapshot, calculateYearlySnapshot } = require("../domain
 async function processNewMonth(snapshot) {
   console.log("\t service processNewMonth");
 
+  if(snapshot === null){
+    console.log("\t\t",snapshot,"->",null);
+    return null;
+  }
+
 
   // ===========================
   // Vormonat aus DB laden
@@ -24,7 +29,7 @@ async function processNewMonth(snapshot) {
   }
 
 
-
+ 
   // ===========================
   // Businesslogik berechnen
   // ===========================
@@ -53,7 +58,7 @@ async function addMonthToYear(processedMonth) {
   console.log("\t service addMonthToYear");
 
   // ===========================
-  // EXTRACT YEAR FROM SNAPSHOT
+  // Jahr aus Snapshot extrahieren
   // ===========================
 
   let year = new Date(`${processedMonth.yearMonth}-01`);
@@ -61,23 +66,23 @@ async function addMonthToYear(processedMonth) {
 
 
   // ===========================
-  // GET YEAR FROM DB
+  // Besagtes Jahr aus DB laden
   // ===========================
 
-  const snapshotRaw = await getYear(year);
-  let snapshot = null;
+  const snapshotDBRaw = await getYear(year);
+  let snapshotDB = null;
 
-  if (snapshot !== null) {
-    snapshot = snapshotRaw.data
+  if (snapshotDBRaw !== null) {
+    snapshotDB = snapshotDBRaw.data
   }
   // ===========================
-  // CALCULATE YEAR STUFF
+  // Jahresbusinesslogik berechnen
   // ===========================
 
-  let processedYear = await calculateYearlySnapshot(snapshot, processedMonth, year);
+  let processedYear = await calculateYearlySnapshot(snapshotDB, processedMonth, year);
 
   // ===========================
-  // SAVE UPDATED YEAR IN DB
+  // Aktuallisiertes Jahr in DB speichern
   // ===========================
 
   await snapshotRepo.saveYear(processedYear);

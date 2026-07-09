@@ -27,7 +27,7 @@ export function registerListeners() {
           return false;
         }
       });
-    // missing = false; // <------------------------------------------------------------------- ENTFERNEN
+    missing = false; // <------------------------------------------------------------------- ENTFERNEN
     if (missing) {
       console.log("missing input");
       
@@ -119,6 +119,8 @@ export function registerListeners() {
     snapshot.yearMonth = determineMonth(dateStr);
 
     console.log("NEW", snapshot);
+
+    snapshot = {"yearMonth":"2019-01","readingDate":"2019-01-31","wasser":{"og":{"warmwasserZaehler":431,"kaltwasserZaehler":1800},"gesamtwasserZaehler":475,"enthaertungsanlageDruck":5.2},"heizung":{"betriebsstundenZaehler":4509,"oelverbrauchZaehler":5553,"druck":1.8},"strom":{"og":{"zaehler":81512},"ug":{"zaehler":124869},"solarstromZaehler":0},"oel":{"meter":4.9,"zeiger":96,"kaufmenge":0},"solarpumpe":{"druck":2.6,"energie":0,"laufzeit":2867,"ergie":13391},"gebuehren":{"og":{"zaehlergebuehrenStrom":{"value":14.8,"locked":false},"kilowattPreis":{"value":0.3,"locked":false},"wasserPreis":{"value":0.22,"locked":false},"abwasserPreis":{"value":0.25,"locked":false}},"ug":{"zaehlergebuehrenStrom":{"value":14.8,"locked":false},"kilowattPreis":{"value":0.3,"locked":false},"wasserPreis":{"value":0.22,"locked":false},"abwasserPreis":{"value":0.25,"locked":false},"miete":{"value":720,"locked":false}},"oelPreis":{"value":0,"locked":false},"zaehlergebuehrenWasser":{"value":15.6,"locked":false}},"verbrauch":{"og":{"strom":0,"warmwasser":0,"kaltwasser":0,"gesamtwasser":0},"ug":{"strom":0,"gesamtwasser":0},"oel":0},"produziert":{"solarstrom":0,"solarwasserenergie":0},"kosten":{"og":{"strom":0,"warmwasser":0,"kaltwasser":0,"gesamtwasser":0,"abwasser":0},"ug":{"strom":0,"wasser":0,"abwasser":0},"oel":0},"laufzeit":{"heizung":0,"solarpumpe":0}};
     // =========================
     // An Backend senden
     // =========================

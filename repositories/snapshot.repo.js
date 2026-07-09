@@ -66,7 +66,10 @@ async function getLatestMonth() {
     LIMIT 1
   `);
 
-  if (!row) return null;
+    if (!row){
+    console.log("\t\t\t",row,"->",null);
+    return null;
+  } 
   return {
     ...row,
     payload: JSON.parse(row.payload),
@@ -129,7 +132,10 @@ async function getYear(year) {
     [year],
   );
 
-  if (!row) return null;
+    if (!row){
+    console.log("\t\t\t",row,"->",null);
+    return null;
+  } 
 
   return {
     ...row,
@@ -152,7 +158,10 @@ async function getLatestYear() {
     LIMIT 1
   `);
 
-  if (!row) return null;
+    if (!row){
+    console.log("\t\t\t",row,"->",null);
+    return null;
+  } 
   return {
     ...row,
     payload: JSON.parse(row.payload),

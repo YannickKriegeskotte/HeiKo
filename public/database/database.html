@@ -15,7 +15,6 @@
     <title>HeiKo</title>
   </head>
   <body>
-
     <main class="content">
       <div class="content-header">
         <div class="header-left">
@@ -24,8 +23,12 @@
         </div>
 
         <div class="header-actions">
-          
-          <input class="search-input" type="text" id="search-input" placeholder="Suchen..."/>
+          <input
+            class="search-input"
+            type="text"
+            id="search-input"
+            placeholder="Suchen..."
+          />
           <button class="primary-btn" id="save-button">
             <img
               class="save-icon"
@@ -36,18 +39,113 @@
         </div>
       </div>
 
-      <!-- Entry Cards -->
+      <!-- DATABASE CONTAINER -->
+      <section class="database-container">
+        <!-- YEAR HEADER -->
 
-      <section class="card">
-        <div class="card-header">
-          <img class="database-icon" src="../assets/database.svg" alt="" />
+        <div class="year-header">
+          <h2>2025</h2>
 
-          <div>
-            <h2>Einträge <img class="question-icon" src="../assets/question.svg"  title="Bearbeite oder Suche Einträge"/></h2>
-            <p id="entry-amount"></p>
+          <div class="latest-month">
+            <span> Letzter hinzugefügter Monat: </span>
+
+            <input type="text" value="06" readonly />
           </div>
         </div>
-        <!-- Card Grids via js-->
+
+        <!-- MAIN AREA -->
+
+        <div class="database-body">
+          <!-- MONTH LIST -->
+
+          <aside class="month-list">
+            <h3>Monate</h3>
+
+            <div class="months">
+              <button class="month active">
+                <span>[1]</span>
+                Januar
+              </button>
+
+              <button class="month">
+                <span>[2]</span>
+                Februar
+              </button>
+
+              <button class="month">
+                <span>[3]</span>
+                März
+              </button>
+
+              <button class="month">
+                <span>[4]</span>
+                April
+              </button>
+
+              <button class="month">...</button>
+            </div>
+          </aside>
+
+          <!-- SNAPSHOT -->
+
+          <section class="snapshot-view">
+            <h3>Daten des Monats</h3>
+
+            <!-- WATER -->
+
+            <div class="data-card water">
+              <h4>💧 Wasser</h4>
+
+              <div class="data-row">
+                <label> Warmwasser OG </label>
+
+                <input value="1234" />
+              </div>
+
+              <div class="data-row">
+                <label> Kaltwasser OG </label>
+
+                <input value="567" />
+              </div>
+
+              <div class="data-row">
+                <label> Gesamtwasser </label>
+
+                <input value="2000" />
+              </div>
+
+              <div class="data-row">
+                <label> Druck Enthärtungsanlage </label>
+
+                <input value="5" />
+              </div>
+            </div>
+
+            <!-- HEATING -->
+
+            <div class="data-card heating">
+              <h4>🔥 Heizung</h4>
+
+              <div class="data-row">
+                <label> Betriebsstunden </label>
+
+                <input value="400" />
+              </div>
+
+              <div class="data-row">
+                <label> Verbrauch </label>
+
+                <input value="300" />
+              </div>
+
+              <div class="data-row">
+                <label> Druck </label>
+
+                <input value="2" />
+              </div>
+            </div>
+          </section>
+        </div>
       </section>
     </main>
   </body>

@@ -1,7 +1,7 @@
 {
   "name": "heiko",
   "type": "commonjs",
-  "version": "2.15.0.a11",
+  "version": "3.6.0",
   "main": "app.js",
   "bin": "app.js",
   "pkg": {
@@ -11,7 +11,7 @@
     ]
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "Yannick Krk",
